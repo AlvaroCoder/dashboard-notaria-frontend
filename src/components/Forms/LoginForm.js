@@ -5,8 +5,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
+  const router = useRouter();
   const [dataSend, setDataSend] = useState({
     username : "",
     password : ""
@@ -31,7 +33,8 @@ const LoginForm = () => {
   };
 
   return (
-    <form className="mmax-w-md w-full rounded-xl p-8 shadow-sm text-black">
+    <div 
+      className="mmax-w-md w-full rounded-xl p-8 shadow-sm text-black">
         <h1 className="text-xl font-semibold text-center mb-6">Inicio de Sesión</h1>
         <div className="bg-white ">
           <label htmlFor="username" className="block mb-1 font-medium text-sm">Nombre de usuario <span className="text-red-400">*</span></label>
@@ -65,11 +68,12 @@ const LoginForm = () => {
           </div>
         </div>
        <button
-        className="w-full cursor-pointer bg-guinda-oscuro text-white font-semibold py-2 rounded-lg hover:bg-guinda-claro transition-colors"
+          onClick={()=>router.push("/dashboard/")}
+          className="w-full cursor-pointer bg-guinda-oscuro text-white font-semibold py-2 rounded-lg hover:bg-guinda-claro transition-colors"
        >
           Inicia Sesión
        </button>
-      </form>
+      </div>
   );
 };
 
