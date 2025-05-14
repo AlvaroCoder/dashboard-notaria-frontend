@@ -6,6 +6,12 @@
 }
 
 @theme inline {
+  --color-guinda-claro : #91232E;
+  --color-guinda-oscuro : #5F1926;
+  --color-verde-claro : #669243;
+  --color-verde-oscuro : #20420F;
+  --color-azul-oscuro : #1B2943;
+  --color-azul-claro : #515A7B;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

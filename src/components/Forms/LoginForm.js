@@ -1,11 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [dataSend, setDataSend] = useState({
+    username : "",
+    password : ""
+  });
+  const [showPassword, setShowPassword] = useState(false);
 
+  const handleChangeShowPassword=()=>{
+    setShowPassword(!showPassword);
+  }
+
+  const handleChangeInput=(evt)=>{
+    const target = evt.target;
+    setDataSend({
+      ...dataSend,
+      [target.name] : target.value
+    });
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí puedes manejar el envío de datos (ej. API)
@@ -13,54 +31,45 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#000000] px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[#1A1A1A] text-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-[#6E0D24]"
-      >
-        <h2 className="text-3xl font-bold text-center text-[#DCAB6B] mb-6">
-          Iniciar Sesión
-        </h2>
-
-        <div className="mb-4">
-          <label className="block text-sm text-[#DCAB6B] mb-1">Correo electrónico</label>
-          <input
-            type="email"
-            className="w-full px-4 py-2 rounded-md bg-[#000000] text-white border border-[#DCAB6B] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCAB6B]"
-            placeholder="ejemplo@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <form className="mmax-w-md w-full rounded-xl p-8 shadow-sm text-black">
+        <h1 className="text-xl font-semibold text-center mb-6">Inicio de Sesión</h1>
+        <div className="bg-white ">
+          <label htmlFor="username" className="block mb-1 font-medium text-sm">Nombre de usuario <span className="text-red-400">*</span></label>
+          <div className="flex flex-row items-center border border-black rounded-lg px-3 py-2 mb-4">
+            <PersonIcon className="mr-2 text-lg"/>
+            <input
+              className="w-full outline-none bg-transparent"
+              type="text"
+              name="username"
+              value={dataSend.username}
+              onChange={handleChangeInput}
+              required
+            />
+          </div>
         </div>
-
-        <div className="mb-6">
-          <label className="block text-sm text-[#DCAB6B] mb-1">Contraseña</label>
-          <input
-            type="password"
-            className="w-full px-4 py-2 rounded-md bg-[#000000] text-white border border-[#DCAB6B] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DCAB6B]"
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <div className="bg-white ">
+          <label htmlFor="password" className="block mb-1 font-medium text-sm">Contraseña <span className="text-red-400">*</span></label>
+          <div className="flex flex-row items-center border border-black rounded-lg px-3 py-2 mb-6">
+            <LockIcon className="mr-2 text-lg"/>
+            <input
+              className="w-full outline-none bg-transparent"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={dataSend.password}
+              onChange={handleChangeInput}
+              required
+            />
+            {
+              showPassword ? <p onClick={handleChangeShowPassword}><VisibilityOffIcon/></p> : <p onClick={handleChangeShowPassword}><RemoveRedEyeIcon/></p>
+            }
+          </div>
         </div>
-
-        <button
-          type="submit"
-          className="w-full bg-[#6E0D24] hover:bg-[#8b142f] text-white font-semibold py-2 rounded-md transition duration-200"
-        >
-          Acceder
-        </button>
-
-        <p className="mt-4 text-center text-sm text-gray-400">
-          ¿Olvidaste tu contraseña?
-          <a href="#" className="text-[#DCAB6B] hover:underline ml-1">
-            Recuperar acceso
-          </a>
-        </p>
+       <button
+        className="w-full cursor-pointer bg-guinda-oscuro text-white font-semibold py-2 rounded-lg hover:bg-guinda-claro transition-colors"
+       >
+          Inicia Sesión
+       </button>
       </form>
-    </div>
   );
 };
 
