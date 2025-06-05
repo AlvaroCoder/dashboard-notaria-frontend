@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHead, TableRow, TableHeader, TableCell, TableBody } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { List, LayoutGrid } from "lucide-react";
+import Link from "next/link";
 
 const estadosContrato = [
   "PROCESO INICIADO",
@@ -42,7 +43,9 @@ const contratosMock = [
   // Agrega más contratos si necesitas
 ];
 
-export default function TableroContratos() {
+export default function TableroContratos({
+  dataContracts=[]
+}) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
 
   return (
@@ -80,24 +83,33 @@ export default function TableroContratos() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contratosMock.map((contrato, idx) => (
+              {dataContracts.map((contrato, idx) => (
                 <TableRow key={idx}>
-                  <TableCell>{contrato.numero}</TableCell>
-                  <TableCell>{contrato.tipoContrato}</TableCell>
-                  <TableCell>{contrato.tipoBien}</TableCell>
-                  <TableCell>{contrato.compradores.join(", ")}</TableCell>
-                  <TableCell>{contrato.vendedores.join(", ")}</TableCell>
+                  <TableCell>{idx}</TableCell>
                   <TableCell>
-                    <a
-                      href={contrato.minutaUrl}
+                    <Link href={"/dashboard/contracts/idasdasd"}>
+                    {contrato?.case}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{"Inmueble"}</TableCell>
+                  <TableCell>{
+                      contrato?.buyers?.people?.map((person, idx)=><p key={idx}>{person?.firstName} {person?.lastName}</p>)
+                    }</TableCell>
+                  <TableCell>{
+                    contrato?.sellers?.people?.map((person, idx)=><p key={idx}>{person?.firstName} {person?.lastName}</p>)
+                    }</TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/download/?idContract=${contrato?.id}`}
                       target="_blank"
                       className="text-blue-600 underline"
                       rel="noopener noreferrer"
                     >
                       Descargar
-                    </a>
+                    </Link>
                   </TableCell>
-                  <TableCell>{contrato.tipoPago}</TableCell>
+                  <TableCell><p className="text-sm break-words whitespace-normal w-20">
+                  {contrato.paymentMethod?.caption}</p></TableCell>
                   <TableCell>{contrato.estado}</TableCell>
                 </TableRow>
               ))}

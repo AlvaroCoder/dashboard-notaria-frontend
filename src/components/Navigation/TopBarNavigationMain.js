@@ -1,15 +1,28 @@
 'use client'
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../ui/button';
+import { getSession } from '@/authentication/lib';
+import { UserIcon } from 'lucide-react';
 
 export default function TopBarNavigationMain() {
     const router = useRouter();
     const [isFixed, setIsFixed] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+    const [username, setUsername] = useState(null);
     const existeRutaAdmin = pathname.split("/").includes("login") || pathname.split("/").includes("dashboard") ;
+    useEffect(()=>{
+        async function getDataUsername() {
+            const session = await getSession();
+            
+            const user = session?.user?.username;
+            setUsername(user);
+        }
+        getDataUsername();
+
+    },[]);
   return (
     <nav
         className={`
@@ -31,7 +44,9 @@ export default function TopBarNavigationMain() {
                 className='px-4 py-3  rounded-lg bg-amarillo hover:bg-yellow-500 text-black cursor-pointer'
                 onClick={()=>router.push("/login")}
             >   
-                <p>Iniciar Sesión</p>
+                {
+                    username ? <p className='flex flex-row items-center gap-4'><UserIcon/> {username}</p> : <p>Iniciar Sesión</p>
+                }
             </button>
         </section>
     </nav>
