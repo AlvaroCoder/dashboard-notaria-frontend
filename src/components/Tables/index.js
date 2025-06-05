@@ -1,0 +1,1 @@
+export {default as TableroContratos} from "@/components/Tables/TableroContratos";

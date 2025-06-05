@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import ErrorViewComp from "../Errors/ErrorViewComp";
 import { Loader2 } from "lucide-react";
 import { login } from "@/authentication/lib";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -52,7 +53,9 @@ const LoginForm = () => {
         return;
       }      
       router.push("/dashboard");
-
+      toast("Inicio de sesion exitoso", {
+        type : 'success'
+      })
     } catch (error) {
       alert('Ocurrió un error en el servidor. Inténtalo nuevamente.');
     } finally{

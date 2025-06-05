@@ -3,6 +3,11 @@ import React, { useState } from 'react'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { usePathname } from 'next/navigation';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { HomeIcon } from 'lucide-react';
+
+import PersonIcon from '@mui/icons-material/Person';
+import Link from 'next/link';
 
 export default function SideBarNavigation() {
   const [loading, setLoading] = useState(true);
@@ -10,42 +15,40 @@ export default function SideBarNavigation() {
 
   const routes=[
     {
-        routeName : "Libros",
-        routePath : "/dashboard/libros",
-        routeIcon : BookIcon,
+        routeName : "Inicio",
+        routePath : "/dashboard",
+        routeIcon : HomeIcon,
         selected : true
     },
     {
-        routeName : "Equipos",
-        routePath : "/dashboard/equipos",
-        routeIcon : LaptopChromebookIcon,
+        routeName : "Contratos",
+        routePath : "/dashboard/contracts",
+        routeIcon : InsertDriveFileIcon,
         selected : false
     },
     {
         routeName : "Usuarios",
-        routePath : "/dashboard/miembros",
-        routeIcon : GroupIcon,
-        selected : false
-    },
-    {
-        routeName : "Proyectos",
-        routePath : "/dashboard/proyectos",
-        routeIcon : LightbulbIcon,
-        selected : false
-    },
-    {
-        routeName : "Trabajos",
-        routePath : "/dashboard/trabajos",
-        routeIcon :  MenuBookIcon,
-        selected : false
-    },
-    {
-        routeName : "Papers",
-        routePath : "/dashboard/papers",
-        routeIcon : InsertDriveFileIcon,
+        routePath : "/dashboard/usuarios",
+        routeIcon : PersonIcon,
         selected : false
     }
-]
+];
+  const [dataRoutes, setDataRoutes] = useState(routes);
+const handleClick = (index)=>{
+  const newDataRoutes = dataRoutes.map((item, idx)=>{
+      if (index === idx) {
+          return {
+              ...item,
+              selected : true
+          }
+      }
+      return {
+          ...item,
+          selected : false
+      }
+  })
+  setDataRoutes(newDataRoutes)
+}
   const [openSidebar, setOpenSidebar] = useState(false);
   const handleChangeOpenSidebar =()=>setOpenSidebar(!openSidebar);
   return (
@@ -61,7 +64,27 @@ export default function SideBarNavigation() {
         /> 
       } 
       <div className='mt-12`'>
-
+        <ul className='block mt-6'>
+            {
+              dataRoutes.map((item, idx)=>{
+                const Icon = item.routeIcon;
+                return (
+                  <Link 
+                    key={idx} 
+                    href={item.routePath}>
+                    <li 
+                    onClick={()=>handleClick(idx)}
+                    className={`${item.selected && "bg-guinda-claro"} list-none text-white cursor-pointer p-4 hover:bg-guinda-claro w-full flex flex-row items-center ${!openSidebar && 'justify-center'}`} >
+                        <Icon/>
+                      {
+                        openSidebar &&  <p className='ml-2'>{item.routeName}</p> 
+                      }
+                    </li>
+                  </Link>
+                )
+              })
+            }
+        </ul>
       </div>
     </div>
   )
