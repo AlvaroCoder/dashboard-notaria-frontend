@@ -2,8 +2,50 @@
 import React, { useState } from 'react'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import { usePathname } from 'next/navigation';
 
 export default function SideBarNavigation() {
+  const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+
+  const routes=[
+    {
+        routeName : "Libros",
+        routePath : "/dashboard/libros",
+        routeIcon : BookIcon,
+        selected : true
+    },
+    {
+        routeName : "Equipos",
+        routePath : "/dashboard/equipos",
+        routeIcon : LaptopChromebookIcon,
+        selected : false
+    },
+    {
+        routeName : "Usuarios",
+        routePath : "/dashboard/miembros",
+        routeIcon : GroupIcon,
+        selected : false
+    },
+    {
+        routeName : "Proyectos",
+        routePath : "/dashboard/proyectos",
+        routeIcon : LightbulbIcon,
+        selected : false
+    },
+    {
+        routeName : "Trabajos",
+        routePath : "/dashboard/trabajos",
+        routeIcon :  MenuBookIcon,
+        selected : false
+    },
+    {
+        routeName : "Papers",
+        routePath : "/dashboard/papers",
+        routeIcon : InsertDriveFileIcon,
+        selected : false
+    }
+]
   const [openSidebar, setOpenSidebar] = useState(false);
   const handleChangeOpenSidebar =()=>setOpenSidebar(!openSidebar);
   return (
@@ -18,6 +60,9 @@ export default function SideBarNavigation() {
           onClick={handleChangeOpenSidebar}
         /> 
       } 
+      <div className='mt-12`'>
+
+      </div>
     </div>
   )
 }
