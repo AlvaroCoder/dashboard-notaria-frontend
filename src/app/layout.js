@@ -27,7 +27,9 @@ export default function RootLayout({ children }) {
         <TopBarNavigationMain/>
         {children}
         
-        <ToastContainer/>
+        <ToastContainer
+          position="bottom"
+        />
       </body>
     </html>
   );

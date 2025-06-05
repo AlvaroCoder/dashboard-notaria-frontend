@@ -12,7 +12,6 @@ export default function Page() {
         <h1 className="text-3xl font-bold text-gray-800">Contratos</h1>
         <p className="text-gray-600">Gestión de los contratos subidos por los clientes.</p>
       </div>
-
       {/* Buscador y botón */}
       <div className="w-full flex flex-row sm:flex-row sm:items-center sm:justify-between gap-4">
         {/* Buscador */}
@@ -24,14 +23,12 @@ export default function Page() {
             className="pl-10 w-full"
           />
         </div>
-
         {/* Botón agregar contrato */}
         <Button className="flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Agregar contrato
         </Button>
       </div>
-
       {/* Tablero (solo maqueta por ahora) */}
       <div className=" space-y-6">
         <TableroContratos/>
