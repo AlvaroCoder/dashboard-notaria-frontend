@@ -1,0 +1,1 @@
+export {default as TextEditor} from "@/components/Views/TextEditorv1";

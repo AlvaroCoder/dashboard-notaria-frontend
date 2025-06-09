@@ -22,7 +22,7 @@ export default function SideBarNavigation() {
     },
     {
         routeName : "Contratos",
-        routePath : "/dashboard/contracts",
+        routePath : "/dashboard/contracts/inmueble",
         routeIcon : InsertDriveFileIcon,
         selected : false
     },

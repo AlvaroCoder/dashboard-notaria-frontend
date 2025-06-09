@@ -87,7 +87,7 @@ export default function TableroContratos({
                 <TableRow key={idx}>
                   <TableCell>{idx}</TableCell>
                   <TableCell>
-                    <Link href={"/dashboard/contracts/idasdasd"}>
+                    <Link href={"/dashboard/contracts/inmueble/" + contrato?.id} className="text-blue-600 underline">
                     {contrato?.case}
                     </Link>
                   </TableCell>

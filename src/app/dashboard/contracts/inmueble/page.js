@@ -11,7 +11,7 @@ import TableroContratosCarga from '@/components/Tables/TableroContratoCarga';
 export default function Page() {
     const typeContract = "propertyCompraVenta"
     const URL_CONTRACTS_INMUEBLES = `http://localhost:8000/home/contracts/${typeContract}`
-    const URL_CONTRACT_STATUS = "http://localhost:8000/home/contractSatus/";
+    const URL_CONTRACT_STATUS = "http://localhost:8000/home/contractStatus/";
     
     const {data : dataResponseProperty, loading : loadingDataProperties, error : errorDataProperties} = useFetch(URL_CONTRACTS_INMUEBLES);
     console.log(dataResponseProperty);
