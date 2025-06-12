@@ -14,12 +14,11 @@ export function useFetch(URL="") {
                 const response = session ? await fetch(URL, {
                     headers : {
                         'Content-Type' : 'application/json',
-                        'Authorization' : `Bearer ${session?.user?.access_token}`,
                     },
                     method : 'GET',
                     mode : 'cors'
                 }) :  await fetch(URL);
-
+                
                 if (!response.ok) {
                     const jsonResponse = await response.json();
                     setError(jsonResponse?.detail);
@@ -32,6 +31,8 @@ export function useFetch(URL="") {
 
             } catch (err) {
                 setError(err);
+                console.log(err);
+                
             } finally {
                 setLoading(false);
             }

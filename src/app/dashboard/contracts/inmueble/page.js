@@ -1,6 +1,6 @@
 'use client'
 import { useFetch } from '@/hooks/useFetch'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,42 @@ export default function Page() {
     const typeContract = "propertyCompraVenta"
     const URL_CONTRACTS_INMUEBLES = `http://localhost:8000/home/contracts/${typeContract}`
     const URL_CONTRACT_STATUS = "http://localhost:8000/home/contractStatus/";
+    const [loadingDataProperties, setLoadingDataProperties] = useState(false);
+    const [error, setError] = useState(null);
+    const [dataResponseProperty, setDataResponseProperty] = useState(null);
+    useEffect(() => {
+      async function fetchData() {
+        try {
+            setLoadingDataProperties(true);
+            const response = await fetch(URL_CONTRACTS_INMUEBLES, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'GET',
+                mode: 'cors',
+                redirect  : 'follow'
+            });
+            if (!response.ok) {
+                const jsonResponse = await response.json();
+                setError(jsonResponse?.detail);
+                return;
+            }
+            const jsonResponse = await response.json();
+            console.log(jsonResponse);
+            
+            setDataResponseProperty(jsonResponse?.data);
+            setLoading(false);
+        } catch (err) {
+            console.log(err);
+            
+        } finally{
+            setLoadingDataProperties(false);
+        }
+      }
+      fetchData();
+    }, [])
     
-    const {data : dataResponseProperty, loading : loadingDataProperties, error : errorDataProperties} = useFetch(URL_CONTRACTS_INMUEBLES);
-    console.log(dataResponseProperty);
+
     const {data : dataResponseStatus, loading : loadingDataStatus, error : erroDataStatus} = useFetch(URL_CONTRACT_STATUS);
     console.log(dataResponseStatus);
     
@@ -41,7 +74,7 @@ export default function Page() {
         </div>
         <div>
             {
-                loadingDataProperties ?
+                (loadingDataProperties || loadingDataStatus) ?
                 <TableroContratosCarga/> :
                 <TableroContratos
                     dataContracts={dataResponseProperty?.data}
