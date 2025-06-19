@@ -3,15 +3,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Oxford';
+  src: url('../../public/fonts/Oxford.ttf') format('ttf');
+  font-weight: bold;
+  font-style: normal;
+}
+@theme{
+  --font-oxford : 'Oxford'
+}
+
 @theme inline {
   --color-guinda-claro : #91232E;
   --color-guinda-oscuro : #5F1926;
+  --color-gris : "#CFCFD1";
   --color-verde-claro : #669243;
   --color-verde-oscuro : #20420F;
   --color-azul-oscuro : #1B2943;
   --color-azul-claro : #515A7B;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring : var(--sidebar-ring);

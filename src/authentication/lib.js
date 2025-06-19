@@ -57,7 +57,7 @@ export async function login(dataUser, userType="client") {
     const user = {username : formData.userName, access_token : responseJson?.access_token, refresh_token : responseJson?.refresh_token, token_type : responseJson?.token_type};    
     const session = await encrypt({user, expires});
     
-    (await cookies()).set("session",session, {expires, httpOnly : true});
+    (await cookies()).set("dashboard-session",session, {expires, httpOnly : true});
     
     return {
         error : false,
@@ -66,12 +66,12 @@ export async function login(dataUser, userType="client") {
 }
 
 export async function logout() {
-    cookies().set("session", "", {expires:new Date(0)})
+    cookies().set("dashboard-session", "", {expires:new Date(0)})
     redirect('/login');
 }
 
 export async function getSession() {
-    const session = (await cookies()).get("session")?.value;
+    const session = (await cookies()).get("dashboard-session")?.value;
     if(!session) return null;
     return await decrypt(session);
 }

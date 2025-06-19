@@ -14,11 +14,14 @@ export default function Page() {
     const URL_CONTRACT_STATUS = "http://localhost:8000/home/contractStatus/";
     const [loadingDataProperties, setLoadingDataProperties] = useState(false);
     const [error, setError] = useState(null);
+    
     const [dataResponseProperty, setDataResponseProperty] = useState(null);
     useEffect(() => {
       async function fetchData() {
         try {
             setLoadingDataProperties(true);
+            console.log(URL_CONTRACTS_INMUEBLES);
+            
             const response = await fetch(URL_CONTRACTS_INMUEBLES, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,8 +38,8 @@ export default function Page() {
             const jsonResponse = await response.json();
             console.log(jsonResponse);
             
-            setDataResponseProperty(jsonResponse?.data);
-            setLoading(false);
+            setDataResponseProperty(jsonResponse);
+            
         } catch (err) {
             console.log(err);
             

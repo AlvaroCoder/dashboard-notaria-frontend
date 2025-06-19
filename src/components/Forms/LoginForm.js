@@ -65,7 +65,7 @@ const LoginForm = () => {
 
   return (
     <div 
-      className="mmax-w-md w-full rounded-xl p-8 shadow-sm text-black">
+      className="max-w-md w-full rounded-xl p-8 shadow-sm text-black">
         <h1 className="text-xl font-semibold text-center mb-6">Inicio de Sesión</h1>
         <div>
           {
