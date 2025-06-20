@@ -1,23 +1,38 @@
-import { Car, HomeIcon } from 'lucide-react'
+'use client';
+import { cn } from '@/lib/utils';
+import { Building2, Car, Home, HomeIcon } from 'lucide-react'
 import Link from 'next/link';
-import React from 'react'
+import React, { useState } from 'react'
 
 export default function SideBarNavigationContracts() {
     const routes = [
-        {routename : "Inmuebles", routePath : "/dashboard/contracts/inmueble", icon : HomeIcon},
-        {routename : "Vehiculos", routePath : "/dashboard/contracts/vehiculo", icon : Car}
-    ]
+        {routename: "Inicio", routePath : "/dashboard/contracts", icon : Home, selected : true},
+        {routename : "Inmuebles", routePath : "/dashboard/contracts/inmueble", icon : Building2, selected : false},
+        {routename : "Vehiculos", routePath : "/dashboard/contracts/vehiculo", icon : Car, selected : false}
+    ];
+
+    const [dataRoutes, setDataRoutes] = useState(routes);
+    const handleChange=(idx)=>{
+        const newDataRoutes = dataRoutes?.map((item, key)=> key === idx ? {...item, selected : true} : {...item, selected: false} )
+        setDataRoutes(newDataRoutes);
+    }
+
   return (
-    <aside className='min-w-[200px] h-full shadow'>
+    <aside className='min-w-[180px] h-full shadow'>
         <ul className='flex flex-col px-2 gap-2 mt-4'>
             {
-                routes.map((item, idx)=>{
+                dataRoutes.map((item, idx)=>{
                     const Icon = item.icon;
                     return(
-                        <li key={idx} className='rounded-lg p-4 w-full '>
-                            <Link className='flex flex-row gap-2' href={item.routePath}>
+                        <li 
+                        key={idx} 
+                        onClick={()=>handleChange(idx)}
+                        className={cn('rounded-sm p-4 w-full ',item.selected && 'bg-[#F6DF9B] text-[#0C1019]')}>
+                            <Link 
+                            className='flex flex-row gap-2' 
+                            href={item.routePath}>
                                 <Icon/>
-                                {item.routename}
+                                <p>{item.routename}</p>
                             </Link>
                         </li>
                     )

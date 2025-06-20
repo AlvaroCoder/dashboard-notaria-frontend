@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Title1 from "../elements/Title1";
+import Separator2 from "../elements/Separator2";
 
 // Datos de prueba
 const compradoresData = [
@@ -31,7 +33,7 @@ const compradoresData = [
 export default function CompradoresList({
     dataCompradores = compradoresData
 }) {
-  const [compradores, setCompradores] = useState(compradoresData);
+  const [compradores, setCompradores] = useState(dataCompradores);
   const [selected, setSelected] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -52,11 +54,11 @@ export default function CompradoresList({
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Lista de Compradores</h2>
-
+    <div className="">
+      <Title1 className="text-xl">Compradores ({compradores?.length})</Title1>
+      <Separator2/>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dataCompradores.map((comprador) => (
+        {compradores.map((comprador) => (
           <div
             key={comprador.id}
             onClick={() => handleEditClick(comprador)}

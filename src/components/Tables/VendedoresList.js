@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Title1 from "../elements/Title1";
+import Separator2 from "../elements/Separator2";
 
 // Datos de prueba
 const vendedoresData = [
@@ -52,9 +54,9 @@ const [vendedores, setVendedores] = useState(dataVendedores);
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Lista de Vendedores</h2>
-
+    <div className="">
+      <Title1 className="text-xl">Vendedores ({vendedores?.length})</Title1>
+      <Separator2/>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vendedores.map((comprador) => (
           <div

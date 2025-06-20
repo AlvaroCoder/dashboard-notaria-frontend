@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`font-poppins text-[#0C1019]`}
       >
         <TopBarNavigationMain/>
         {children}
