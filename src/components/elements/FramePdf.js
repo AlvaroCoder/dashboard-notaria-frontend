@@ -5,7 +5,8 @@ import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
 
 export default function FramePdf({
-    directory
+    directory,
+    handlePdf=null  
 }) {
     const URL_PDF = "http://localhost:8000/home/minuta";
     const [dataPdf, setDataPdf] = useState(null);
@@ -25,6 +26,9 @@ export default function FramePdf({
                 const blob = await data.blob();
                 const pdf = URL.createObjectURL(blob);       
                 setDataPdf(pdf);
+                if (handlePdf) {
+                    handlePdf(blob);
+                }
             } catch (err) {
                 console.log(err);
                 

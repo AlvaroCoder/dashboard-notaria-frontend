@@ -1,8 +1,11 @@
 'use client'
+import { parseTextoToJSON } from '@/common/parserText';
 import FramePdf from '@/components/elements/FramePdf';
+import Loading from '@/components/elements/Loading';
 import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
 import { Button } from '@/components/ui/button';
+import { DocumentRenderer } from '@/components/Views';
 import { useFetch } from '@/hooks/useFetch';
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -10,9 +13,13 @@ import { toast } from 'react-toastify';
 
 export default function Page() {
   const URL_CONTRACT_ID = "http://localhost:8000/home/contract/contractId/?idContract=";
+  const URL_PROCESS_DATA = "http://localhost:8000/contracts/processMinuta/";
   const params = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
+  const [pdf, setPdf] = useState(null);
+  const [loadingProcess, setLoadingProcess] = useState(false);
+  const [parseDataProcess, setParseDataProcess] = useState(null);
 
   useEffect(()=>{
     async function getData() {
@@ -36,10 +43,41 @@ export default function Page() {
   },[]);
   const handleClickProcess=async(evt)=>{
     evt.preventDefault();
+    console.log(pdf);
+    try {
+      setLoadingProcess(true)
+      const formData = new FormData();
+      formData.append("minutaFile", pdf);
+      const response = await fetch(URL_PROCESS_DATA,{
+        method : 'POST',
+        body : formData,
+        redirect : 'follow'
+      });
+
+      const responseJSON = await response.json();
+      toast("Se proceso la información",{
+        type : 'success',
+        position : 'bottom-right'
+      });
+      const parserText = parseTextoToJSON(responseJSON?.minuta_content);
+      setParseDataProcess(parserText?.data);
+      console.log(parserText);
+      
+
+    } catch (err) {
+      toast("Surgio un error con el servidor",{
+        type : 'error',
+        position : 'bottom-center'
+      });
+      setLoadingProcess(false);
+
+    } finally{
+      setLoadingProcess(false)
+    }
     
   }
-  const vistaMinuta=(idStatus, directory)=>{
-    if (idStatus == 1) {
+  const vistaMinuta=(idStatus, directory, parserData)=>{
+    if (idStatus == 1 && !parserData) {
       return(
         <div>
           <section>
@@ -48,6 +86,7 @@ export default function Page() {
           </section>
           <FramePdf
             directory={directory}
+            handlePdf={setPdf}
           />
         </div>
       )
@@ -56,14 +95,25 @@ export default function Page() {
       return (
         <div>
           <section>
-
+            <h1>Se proceso la data</h1>
           </section>
+        </div>
+      )
+    }
+    if (parserData) {
+      return (
+        <div className='h-screen overflow-y-auto pb-52 flex-1 my-8'>
+          
+          <DocumentRenderer initialData={parserData} />
         </div>
       )
     }
   }
   return (
     <div className='p-8 w-full h-screen '>
+      <Loading isOpen={loadingProcess} />
+      {
+        !parseDataProcess &&
         <section className='flex flex-row items-center justify-between'>
           <div>
             <Title1 className='text-3xl'>Editor</Title1>
@@ -78,11 +128,14 @@ export default function Page() {
             </Button>
           </div>
         </section>
-        <Separator/>
-        <section>
+      }
+      {!parseDataProcess &&  <Separator/>}
+        <section className=''>
           {vistaMinuta(
             data?.status,
-            data?.minutaDirectory)}
+            data?.minutaDirectory,
+            parseDataProcess
+            )}
         </section>
     </div>
   )
