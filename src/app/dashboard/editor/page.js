@@ -6,6 +6,7 @@ import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
 import { Button } from '@/components/ui/button';
 import { DocumentRenderer } from '@/components/Views';
+import EditorView from '@/components/Views/EditorView';
 import { useFetch } from '@/hooks/useFetch';
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -102,9 +103,8 @@ export default function Page() {
     }
     if (parserData) {
       return (
-        <div className='h-screen overflow-y-auto pb-52 flex-1 my-8'>
-          
-          <DocumentRenderer initialData={parserData} />
+        <div className='relative h-screen overflow-y-auto w-full pb-52 flex-1 '>
+          <EditorView data={parserData} />
         </div>
       )
     }
