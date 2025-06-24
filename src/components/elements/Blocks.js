@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import {motion} from "framer-motion"
+import {hover, motion} from "framer-motion"
 import Title1 from './Title1';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -10,28 +10,7 @@ import ParagraphEditorTiptap from './ParagraphEditorTipTap';
 function TopBarTool({
     onClick
 }) {
-    const titlesOptions =[
-        {title : "Titulo 1", className : "text-4xl", isSelected : true},
-        {title : "Titulo 2", className : "text-3xl", isSelected : false},
-        {title : "Titulo 3", className : "text-2xl", isSelected : false},
-    ]
-    const [titleOpt, setTitleOpt] = useState(titlesOptions);
-    const handleChangeTitle=(idx)=>{
-        const newOptionTitle=titleOpt?.map((item, index)=>{
-            if (index === idx) {
-                return {
-                    ...item,
-                    isSelected : true
-                }
-            }
-            return {
-                ...item,
-                isSelected : false
-            }
-        });
-        setTitleOpt(newOptionTitle);
-        onClick('className', newOptionTitle?.filter(item=>item.isSelected)[0]?.className)
-    }
+
     return(
         <section className="z-50 absolute -top-14 left-0 w-max p-2 flex items-center gap-2 bg-white shadow-md border rounded-md"> 
             <div className='flex flex-row   items-center justify-center gap-2'>
@@ -153,6 +132,7 @@ export default function Blocks({
           return <pre className='w-[20px]'></pre>
           }
     }
+
     return(
         <motion.div
             className="relative group p-4 rounded-lg "
