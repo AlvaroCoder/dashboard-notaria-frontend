@@ -13,14 +13,18 @@ export default function EditorView({
       const handleChange=(idx, newContent, type)=>{
         const newData = [...dataEditor];
         if (type === "heading-one") {
+            
             newData[idx].content = newContent;
             newData[idx].html = "<h1>"+newContent+"</h1>";
 
         }
+        if (type === "paragraph") {
+            newData[idx] = newContent;
+        }
         setDataEditor(newData);
       }
   return (
-    <div className=' w-full h-screen grid grid-cols-5 bg-gray-50'>
+    <div className=' w-full min-h-screen grid grid-cols-5 bg-gray-100'>
         <div className='col-span-4 w-full p-10'>
             <section className='bg-white p-4'>
                 {

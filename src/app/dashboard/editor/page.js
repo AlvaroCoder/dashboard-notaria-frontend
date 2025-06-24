@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { DocumentRenderer } from '@/components/Views';
 import EditorView from '@/components/Views/EditorView';
 import { useFetch } from '@/hooks/useFetch';
+import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
@@ -103,14 +104,14 @@ export default function Page() {
     }
     if (parserData) {
       return (
-        <div className='relative h-screen overflow-y-auto w-full pb-52 flex-1 '>
+        <div className='relative h-screen overflow-y-auto w-full pb-24 flex-1 '>
           <EditorView data={parserData} />
         </div>
       )
     }
   }
   return (
-    <div className='p-8 w-full h-screen '>
+    <div className={cn('p-8 w-full h-screen ', parseDataProcess && "p-0")}>
       <Loading isOpen={loadingProcess} />
       {
         !parseDataProcess &&

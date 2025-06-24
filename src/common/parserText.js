@@ -19,13 +19,21 @@ export function parseTextoToJSON(textoPlano) {
   
     const flushParrafo = () => {
       if (bufferParrafo.length === 0) return;
-  
-      const contenido = bufferParrafo.join(" ");
+    
+      const contenido = bufferParrafo.join(" ").trim();
+    
       data.push({
         type: "paragraph",
-        content: contenido,
+        content: [
+          {
+            type: "text",
+            content: contenido,
+            html: contenido
+          }
+        ],
         html: `<p>${contenido}</p>`
       });
+    
       bufferParrafo = [];
     };
   

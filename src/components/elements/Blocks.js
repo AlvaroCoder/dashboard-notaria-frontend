@@ -5,6 +5,7 @@ import Title1 from './Title1';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
+import ParagraphEditorTiptap from './ParagraphEditorTipTap';
 
 function TopBarTool({
     onClick
@@ -32,28 +33,7 @@ function TopBarTool({
         onClick('className', newOptionTitle?.filter(item=>item.isSelected)[0]?.className)
     }
     return(
-        <section className="z-50 absolute -top-14 left-0 w-max p-2 flex items-center gap-2 bg-white shadow-md border rounded-md">
-            <div className=' '>
-                <DropdownMenu >
-                    <DropdownMenuTrigger asChild>
-                        <Button variant={"outline"} className={"w-full"}>
-                            <Title1>{titleOpt?.filter((item)=>item.isSelected)[0]?.title}</Title1>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        {
-                            titleOpt?.map((title, idx)=>
-                            <DropdownMenuCheckboxItem
-                              key={idx} 
-                              checked={title.isSelected}
-                              onCheckedChange={()=>handleChangeTitle(idx)} 
-                            ><Title1  className={cn(title.className)}>{title.title}</Title1>
-                            </DropdownMenuCheckboxItem>
-                            )
-                        }
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>    
+        <section className="z-50 absolute -top-14 left-0 w-max p-2 flex items-center gap-2 bg-white shadow-md border rounded-md"> 
             <div className='flex flex-row   items-center justify-center gap-2'>
                 <Button
                     variant={"outline"}
@@ -73,12 +53,6 @@ function TopBarTool({
                 >
                    <span>T</span> 
                 </Button>
-            </div>
-            <div>
-                
-            </div>
-            <div>
-
             </div>
         </section>
     )
@@ -148,72 +122,13 @@ function TitleOneEditor({ data, onUpdate }) {
       </div>
     );
 }
-  
-function ParagraphEditor({
-    data,
-    onUpdate
-}) {
-    const [isHovered, setIsHovered] = useState(false);
-    const [isClicked, setIsClicked] = useState(false);
-    const [measuredHeight, setMeasuredHeight] = useState('auto');
-    const [optionsText, setOptionsText] = useState({
-        className : "text-4xl",
-        style : ""
-    });
 
-    const paragraphRef = useRef(null);
-    const displayRef = useRef(null);
 
-    useEffect(() => {
-        if (isClicked && displayRef.current) {
-          const height = displayRef.current.offsetHeight;
-          setMeasuredHeight(`${height}px`);
-        }
-      }, [isClicked]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-          if (paragraphRef.current && !paragraphRef.current.contains(event.target)) {
-            setIsClicked(false);
-          }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-      }, []);
-    return (
-        <div
-            ref={paragraphRef}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => setIsClicked(true)}
-            className={cn(
-              "relative border-transparent transition-all",
-              isHovered && "border border-[#0C1019] rounded-md"
-            )}
-        >
-            {
-
-            }
-            {
-                isClicked ? 
-                (
-                    <textarea
-                        className='w-full p-2 h-full  outline-none'
-                        value={data}
-                        style={{height : measuredHeight}}
-                    />
-                ) : 
-                <p ref={displayRef} className='p-2 cursor-text'>{data}</p>
-            }
-        </div>
-    )
-}
 export default function Blocks({
     blockData={},
     onUpdateBlock
 }) {
     const [hovered, setHovered] = useState(false);
-    const [isSelected, setIsSelected] = useState(false);
 
     const typeLabel = {
         "heading-one": "Título principal (h1)",
@@ -231,22 +146,9 @@ export default function Blocks({
                         onUpdate={onUpdate}
                     />
             case "paragraph":
-                if (Array.isArray(block?.content)) {
-                    return(
-                        <p>
-                            {block.content?.map((item, idx)=>{
-                                if (item?.type === "bold") {
-                                    return <strong key={idx}>{item?.content}</strong>
-                                }
-                                if (item?.type === 'italic') {
-                                    return <i key={idx}>{item?.content}</i>
-                                }
-                                return <span key={idx}>{item?.content}</span>
-                            })}
-                        </p>
-                    )
-                } 
-                return <ParagraphEditor data={block?.content} />
+                return <ParagraphEditorTiptap 
+                data={block} 
+                onUpdate={onUpdate} />
             default :
           return <pre className='w-[20px]'></pre>
           }
