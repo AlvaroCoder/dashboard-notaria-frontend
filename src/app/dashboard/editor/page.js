@@ -104,7 +104,7 @@ export default function Page() {
     }
     if (parserData) {
       return (
-        <div className='relative h-screen overflow-y-auto w-full pb-24 flex-1 '>
+        <div className='relative h-screen overflow-y-auto w-full flex-1 '>
           <EditorView data={parserData} />
         </div>
       )

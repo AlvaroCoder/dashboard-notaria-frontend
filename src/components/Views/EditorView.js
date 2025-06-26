@@ -26,14 +26,14 @@ export default function EditorView({
         setDataEditor(newData);
       }
   return (
-    <div className=' w-full min-h-screen grid grid-cols-5 bg-gray-100'>
+    <div className=' w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-24'>
         <div className='col-span-4 w-full p-10'>
             <section className='bg-white p-4 flex flex-col gap-0'>
                 {
                     dataEditor?.map((block, idx)=>{
                         const [hoverLine, setHoverLine] = useState(false);
                         return(
-                            <>
+                            <div key={idx}>
                             <Blocks 
                             key={idx} 
                             blockData={block} 
@@ -42,7 +42,7 @@ export default function EditorView({
                             <div 
                             onMouseEnter={()=>setHoverLine(true)}
                             onMouseLeave={()=>setHoverLine(false)}
-                            className='h-4 flex justify-center items-center'>
+                            className='flex justify-center items-center'>
                              <section className={cn('relative w-full my-0 border-b border-b-white ', hoverLine && 'border-b-[#0C1019]')}>
                                 {
                                     hoverLine && (
@@ -62,26 +62,13 @@ export default function EditorView({
                                 }
                              </section>
                             </div>
-                        </>
+                        </div>
                         )
                     })
                 }
             </section>
            
         </div>
-        <div className="col-span-1 border-l pl-4 space-y-4 bg-white">
-        <div className="mb-2 border-b border-b-gray-200">
-            <Title1>Bloques</Title1>
-        </div>
-        <section className="grid grid-cols-2 gap-2">
-            <Button onClick={()=>console.log(data)} variant="outline" className="w-full flex flex-col h-[100px] items-center gap-2">
-            <TitleIcon className="w-4 h-4" /> <span>Título</span>
-            </Button>
-            <Button variant="outline" className="w-full flex flex-col items-center gap-2 h-[100px]">
-            <NotesIcon className="w-4 h-4" /> <span>Párrafo</span>
-            </Button>
-        </section>
-      </div>
     </div>
   )
 };

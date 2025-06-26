@@ -6,6 +6,10 @@ import StarterKit from '@tiptap/starter-kit'
 import Bold from '@tiptap/extension-bold'
 import Italic from '@tiptap/extension-italic'
 import { Button } from '../ui/button'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import NorthIcon from '@mui/icons-material/North';
+import SouthIcon from '@mui/icons-material/South';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // 🔁 Convertimos el JSON personalizado a HTML para TipTap
 function convertJSONToHTML(json) {
@@ -48,7 +52,7 @@ export default function ParagraphEditor({ data, onUpdate }) {
             }
         }),
         Bold,
-        Italic
+        Italic,
         ],
         content: `<p>${convertJSONToHTML(data)}</p>`,
         editable: isEditing,
@@ -81,7 +85,7 @@ export default function ParagraphEditor({ data, onUpdate }) {
     <div
         ref={editorRef}
 
-        className="relative border  p-4 rounded-sm hover:border-[#0C1019]"
+        className="relative border border-white  p-4 rounded-sm hover:border-[#0C1019]"
         onClick={() => {
             setIsEditing(true);
             setIsClicked(true);
@@ -90,27 +94,73 @@ export default function ParagraphEditor({ data, onUpdate }) {
       {
         isClicked ? 
         <section>
-            <div className="z-50 absolute -top-14 left-0 w-max p-2 flex items-center gap-2 bg-gray-200 shadow-md border rounded-md">
-            <section className='flex flex-row   items-center justify-center gap-2'>
-                <Button
-                variant={"outline"}
-                onClick={(e) => {
-                e.stopPropagation()
-                editor?.chain().focus().toggleBold().run()
-                }}
-            >
-                <b>B</b>
-            </Button>
-            <Button
-                variant={"outline"}
-                onClick={(e) => {
-                e.stopPropagation()
-                editor?.chain().focus().toggleItalic().run()
-                }}
-                >
-                <i>I</i>
-            </Button>
-            </section>
+            <div className="z-50 absolute -top-14 left-0 w-max p-2 flex items-center gap-2 bg-white shadow-md border rounded-md grid-cols-3">
+              <section className='px-4 border-r border-r-[#0C1019]'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button>
+                        Titulo
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuCheckboxItem>
+                        <Button>
+                          Subtitulo
+                        </Button>
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuCheckboxItem>
+                        <Button>
+                          Parrafo
+                        </Button>
+                      </DropdownMenuCheckboxItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+              </section>
+              <section className='flex flex-row   items-center justify-center gap-2 px-2 border-r border-r-[#0C1019] '>
+                  <Button
+                  variant={"outline"}
+                  onClick={(e) => {
+                  e.stopPropagation()
+                  editor?.chain().focus().toggleBold().run()
+                  }}
+                  >
+                      <b>B</b>
+                  </Button>
+                  <Button
+                      variant={"outline"}
+                      onClick={(e) => {
+                      e.stopPropagation()
+                      editor?.chain().focus().toggleItalic().run();
+                      }}
+                      >
+                      <i>I</i>
+                  </Button>
+                  <Button
+                    variant={"outline"}
+                    onClick={(e)=>{
+                      // Boton para convertir el texto a parrafo simple
+                      e.stopPropagation();
+                      editor?.chain().focus().unsetBold().unsetItalic().run();
+                    }}
+                  >
+                    <p>T</p>
+                  </Button>
+              </section>
+              <section className='flex flex-row gap-2'>
+                  <Button 
+                    variant={"outline"}>
+                      <NorthIcon/>
+                  </Button>
+                  <Button 
+                  variant={"outline"}>
+                      <SouthIcon/>
+                  </Button>
+                  <Button
+                    variant={"outline"}
+                  >
+                    <DeleteIcon/>
+                  </Button>
+              </section>
         </div>
             <EditorContent className='outline-none border-none' editor={editor} />
         </section> :

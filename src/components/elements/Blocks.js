@@ -3,9 +3,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import {hover, motion} from "framer-motion"
 import Title1 from './Title1';
 import { cn } from '@/lib/utils';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import ParagraphEditorTiptap from './ParagraphEditorTipTap';
+import TitleEditorTipTap from './TitleEditorTipTap';
 
 function TopBarTool({
     onClick
@@ -38,70 +38,6 @@ function TopBarTool({
 }
 
 
-function TitleOneEditor({ data, onUpdate }) {
-    const [isHovered, setIsHovered] = useState(false);
-    const [isClicked, setIsClicked] = useState(false);
-    const [optionsText, setOptionsText] = useState({
-      className: "text-4xl",
-      style: "font-bold",
-    });
-  
-    const editorRef = useRef(null);
-  
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (editorRef.current && !editorRef.current.contains(event.target)) {
-          setIsClicked(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-  
-    return (
-      <div
-        ref={editorRef}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={() => setIsClicked(true)}
-        className={cn(
-          "relative border-transparent transition-all",
-          isHovered && "border border-[#0C1019] rounded-md"
-        )}
-      >
-        {isClicked && (
-          <TopBarTool
-            onClick={(label, value) =>
-              setOptionsText({ ...optionsText, [label]: value })
-            }
-          />
-        )}
-        {isClicked ? (
-          <input
-            className={cn(
-              "border-none p-2 outline-none w-full font-oxford bg-white rounded-sm",
-              optionsText.className,
-              optionsText.style
-            )}
-            value={data}
-            onChange={(e) => onUpdate(e.target.value)}
-            autoFocus
-          />
-        ) : (
-          <Title1
-            className={cn(
-              "cursor-text font-oxford p-2",
-              optionsText.className,
-              optionsText.style
-            )}
-          >
-            {data}
-          </Title1>
-        )}
-      </div>
-    );
-}
-
 
 export default function Blocks({
     blockData={},
@@ -120,10 +56,10 @@ export default function Blocks({
     const handlerBlock=(block, onUpdate)=>{
         switch(block?.type){
             case "heading-one":
-                return <TitleOneEditor 
-                        data={block?.content} 
-                        onUpdate={onUpdate}
-                    />
+                return <TitleEditorTipTap
+                  data={block}
+                  onUpdate={onUpdate}
+                />
             case "paragraph":
                 return <ParagraphEditorTiptap 
                 data={block} 
