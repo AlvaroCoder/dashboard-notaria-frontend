@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { Building2, Car, Home, HomeIcon } from 'lucide-react'
+import { Building2, Car, Home } from 'lucide-react'
 import Link from 'next/link';
 import React, { useState } from 'react'
 
@@ -18,7 +18,7 @@ export default function SideBarNavigationContracts() {
     }
 
   return (
-    <aside className='min-w-[180px] h-full shadow'>
+    <aside className={cn('h-full shadow w-20 xl:min-w-[180px] ')}>
         <ul className='flex flex-col px-2 gap-2 mt-4'>
             {
                 dataRoutes.map((item, idx)=>{
@@ -32,7 +32,7 @@ export default function SideBarNavigationContracts() {
                             className='flex flex-row gap-2' 
                             href={item.routePath}>
                                 <Icon/>
-                                <p>{item.routename}</p>
+                                <p className='hidden xl:block'>{item.routename}</p>
                             </Link>
                         </li>
                     )

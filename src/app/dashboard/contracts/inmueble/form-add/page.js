@@ -1,17 +1,17 @@
 'use client'
+import { checkEmptyFieldsFormCompra, checkEvidenceEmpty } from '@/common/checkInputsFormInmueble';
+import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
+import UploadMinuta from '@/components/elements/ButtonUploadMinuta';
+import ErrorCard from '@/components/elements/ErrorCard';
 import Title1 from '@/components/elements/Title1';
 import { Button } from '@/components/ui/button';
+import { useContextCard } from '@/context/ContextCard';
 import { cn } from '@/lib/utils';
-import { FormControl, InputLabel, MenuItem, Select, Step, StepLabel, Stepper, TextField } from '@mui/material';
-import React, { createContext, useContext, useState } from 'react'
+import { FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, Step, StepLabel, Stepper, TextField } from '@mui/material';
+import { Trash2 } from 'lucide-react';
+import React, {  useState } from 'react'
+import { toast } from 'react-toastify';
 
-const ContextCard = createContext({
-    tipoProceso : 'compra',
-    isProcessStart : false,
-    establecerTipoProceso : ()=>{}
-});
-
-const useContextCard = ()=>useContext(ContextCard);
 
 function CardRequirements({
     nombre,
@@ -31,10 +31,7 @@ function CardRequirements({
                 </p>
                 <Button
                     className={"bg-[#102945] w-full hover:bg-[#0C1019]"}
-                    onClick={()=>{
-                        console.log('Has hecho click');
-                        console.log(slug);
-                        
+                    onClick={()=>{                        
                         establecerTipoProceso(slug)
                     }}
                 >
@@ -53,22 +50,32 @@ function CardRequirements({
     )
 }
 
+
 function FormStepper() {
     const {tipoProceso} = useContextCard();
     const stepsCompra = ['Comprador(es)','Vendedor(es)', 'Comprobante de Pago' , 'Minuta'];
     const stepsVenta = ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago' , 'Minuta'];
     const [activeStep, setActiveStep] = useState(0);
+    const [activeStepCompra, setActiveStepCompra] = useState(0);
+    const [activeStepVenta, setActiveStepVenta] = useState(0);
+    const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
+    const [errorCompra, setErrorCompra] = useState([]);
+    const [dataSendCompra, setDataSendCompra] = useState({
+        minuta : '',
+        paymentMethod : ''
+    });
+
     const [compradores, setCompradores] = useState([
         {
             firstName: '',
             lastName: '',
             dni: '',
-            gender: 'Masculino',
+            gender: '',
             nationality: '',
             age: '',
             job: '',
             maritalStatus: {
-              value : 'Soltero'
+              value : ''
             },
             address: {
               district : "",
@@ -80,8 +87,28 @@ function FormStepper() {
         }
     ]);
 
-    const [vendedores, setVendedores] = useState([]);
-    const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
+    const [vendedores, setVendedores] = useState([
+        {
+            firstName: '',
+            lastName: '',
+            dni: '',
+            gender: '',
+            nationality: '',
+            age: '',
+            job: '',
+            maritalStatus: {
+              value : ''
+            },
+            address: {
+              district : "",
+              province : "",
+              department : "",
+              name : ""
+            },
+            job :''
+        }
+    ]);
+    
 
     const handleChange=(index, field, value, type='venta')=>{
         const list = type === 'venta' ? [...vendedores] : [...compradores];
@@ -96,7 +123,33 @@ function FormStepper() {
           }
         type === 'venta' ? setVendedores(list) : setCompradores(list);
     }
+    const addPerson = (type = 'vendedor') => {
+        const newPerson = {
+          firstName: '',
+          lastName: '',
+          dni: '',
+          gender: '',
+          nationality: '',
+          age: '',
+          job: '',
+          maritalStatus: {
+            value : ""
+          },
+          address: {
+            name : "",
+            district : "",
+            province : "",
+            department : ""
+        }
+        };
+        type === 'venta' ? setVendedores([...vendedores, newPerson]) : setCompradores([...compradores, newPerson]);
+      };
 
+    const deletePerson =(idx, type='vendedor')=>{
+        const currentData = type === 'vendedor' ? [...vendedores] : [...compradores];
+        const newData = currentData?.filter((_, index)=>idx !== index);        
+        type === 'vendedor' ? setVendedores(newData) : setCompradores(newData);
+    }
     const getMaritalOptions = (gender) => {
         if (gender === 'Femenino') return ['Soltera', 'Casada', 'Viuda', 'Divorciada'];
         if (gender === 'Masculino') return ['Soltero', 'Casado', 'Viudo', 'Divorciado'];
@@ -108,68 +161,100 @@ function FormStepper() {
             <Stepper activeStep={active} alternativeLabel>
                 {
                     steps?.map((label)=>(
-                        <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
+                        <Step key={label} >
+                            <StepLabel >{label}</StepLabel>
                         </Step>
                     ))
                 }
             </Stepper>
         )
     }
+    const handleChangeImageMinuta=(files)=>{
+        setDataImagesMinuta([
+            ...dataImagesMinuta,
+            files
+        ]);
+    }
 
-
-    const renderPersonForm=(data=[], handleChange)=>{
-        const nombreProceso = tipoProceso === 'venta' ? 'Vendedor' : 'Comprador';
+    const handleChangeDeleteImageMinuta=(idx)=>{
+        const newDataImage = dataImagesMinuta.filter((_,index)=>index!==idx);
+        setDataImagesMinuta(newDataImage)       
+    }
+    const renderPersonForm=(data=[], handleChange, type, handleDelete, errores=[])=>{
+        const nombreProceso = type === 'venta' ? 'Vendedor' : 'Comprador';
         return data?.map((person, idx)=>
-            <section key={idx} className={cn('min-w-3xl', 'bg-white shadow rounded-lg')}>
+            <section key={idx} className={cn('min-w-3xl relative', 'bg-white shadow rounded-lg')}>
+                {
+                    idx > 0 &&
+                    <Button 
+                        onClick={()=>handleDelete(idx, type === 'venta' ? 'vendedor' : 'comprador')}
+                        className='absolute top-0 px-8 py-5 right-0 bg-[#5F1926] cursor-pointer hover:bg-red-400 rounded-full text-white'>
+                        <Trash2/>
+                    </Button>
+                }
+                {
+                    (errores?.length > 0) && 
+                    (errores[idx]?.error &&
+                        <div className='w-full p-4' >
+                            <ErrorCard
+                                title={'Error'}
+                                message={errores[idx]?.value}
+                            /> 
+                        </div>
+                    )
+                }
                 <div className='p-8 mb-6'>
-
                     <div className='mb-4'>
-                        <Title1 className='text-2xl'>{nombreProceso}</Title1>
+                        <Title1 className='text-2xl'>{nombreProceso} {idx+1}</Title1>
                         <p>Información del {nombreProceso}</p>
                     </div>
                     <div className='grid grid-cols-2 gap-4'>
-                        <TextField label="Primer Nombre" value={person.firstName} onChange={(e) => handleChange(idx, 'firstName', e.target.value, tipoProceso)} fullWidth required />
-                        <TextField label="Apellido" value={person.lastName} onChange={(e) => handleChange(idx, 'lastName', e.target.value, tipoProceso)} fullWidth required />
-                        <TextField label="DNI" value={person.dni} onChange={(e) => handleChange(idx, 'dni', e.target.value, tipoProceso)} type='number' fullWidth required/>
+                        <TextField label="Primer Nombre" value={person.firstName} onChange={(e) => handleChange(idx, 'firstName', e.target.value, type)} fullWidth required />
+                        <TextField label="Apellido" value={person.lastName} onChange={(e) => handleChange(idx, 'lastName', e.target.value, type)} fullWidth required />
+                        <TextField label="DNI" value={person.dni} onChange={(e) => handleChange(idx, 'dni', e.target.value, type)} type='number' fullWidth required/>
                         <FormControl>
                             <InputLabel>Género</InputLabel>
                             <Select
                                 value={person?.gender}
                                 label="Genero"
+                                onChange={(e)=>handleChange(idx, 'gender', e.target.value, type)}
                             >
                                 <MenuItem value="Masculino">Masculino</MenuItem>
                                 <MenuItem value="Femenino">Femenino</MenuItem>
                             </Select>
                         </FormControl>
-                        <TextField label="Nacionalidad" value={person?.nationality} />
-                        <TextField label="Edad" value={person.age} />
-                        <TextField label="Trabajo" value={person?.job} />
-                        <FormControl fullWidth>
-                            <InputLabel>Estado Civil</InputLabel>
-                            <Select
-                                value={person?.maritalStatus?.value}
-                                label="Estado Civil"
-                                
-                            >
-                                {
-                                    getMaritalOptions(person?.gender)?.map((option, idx)=>(
-                                        <MenuItem key={idx}>{option}</MenuItem>
-                                    ))
-                                }
-                            </Select>
-                        </FormControl>
+                        <TextField label="Nacionalidad" value={person.nationality} onChange={(e) => handleChange(idx, 'nationality', e.target.value, type)}  fullWidth required />
+                        <TextField label="Edad" name="age" type="number" value={person.age} onChange={(e) => handleChange(idx, 'age', e.target.value, type)} fullWidth required/>
+                        <TextField label="Trabajo" value={person.job} onChange={(e) => handleChange(idx, 'job', e.target.value, type)} fullWidth  required/>
+                        <section className='w-full flex flex-row gap-2 '>
+                            <FormControl fullWidth>
+                                <InputLabel>Estado Civil</InputLabel>
+                                <Select
+                                    value={person?.maritalStatus?.value}
+                                    label="Estado Civil"
+                                    defaultValue={person?.maritalStatus?.value}
+                                    onChange={(e)=>handleChange(idx, 'maritalStatus', e.target.value, type)}
+                                >
+                                    {
+                                        getMaritalOptions(person?.gender)?.map((option, idx)=>(
+                                            <MenuItem key={idx} value={option}>{option}</MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                            </FormControl>
+                        </section>
+
                         <div className='col-span-2'>
-                            <TextField label="Distrito" value={person?.address?.district} fullWidth required/>
+                            <TextField label="Distrito"  value={person.address?.district} onChange={(e) => handleChange(idx, 'district', e.target.value, type)} fullWidth required/>
                         </div>
                         <div className='col-span-2'> 
-                            <TextField label="Provincia" value={person?.address?.province} fullWidth required/>
+                            <TextField label="Provincia" value={person.address?.province} onChange={(e) => handleChange(idx, 'province', e.target.value, type)} fullWidth required />
                         </div>
                         <div className='col-span-2'>
-                            <TextField label="Departamento" value={person?.address?.department} fullWidth required />
+                            <TextField label="Departamento" value={person.address?.department} onChange={(e) => handleChange(idx, 'department', e.target.value, type)}  fullWidth required/>
                         </div>
                         <div className='col-span-2'>
-                            <TextField label="Direccion de domicilio" value={person?.address?.name} fullWidth required />
+                            <TextField label="Direccion de Domicilio" value={person.address?.name} onChange={(e) => handleChange(idx, 'address', e.target.value, type)} fullWidth required/>
                         </div>
                     </div>
                 </div>
@@ -177,18 +262,20 @@ function FormStepper() {
             </section>
         )
     }
+
     switch (tipoProceso) {
         case 'compra':
             return (
                 <div className='p-6'>
-                    {renderStepper(stepsCompra, activeStep)}
+                    {renderStepper(stepsCompra, activeStepCompra)}
                     <div className='mt-8'>
                         {
-                            activeStep === 0 && (
+                            activeStepCompra === 0 && (
                                 <>
-                                  {renderPersonForm(compradores, handleChange)}  
+                                    {renderPersonForm(compradores, handleChange, 'compra', deletePerson, errorCompra)}  
                                     <section className='flex flex-row gap-2'>
                                         <Button
+                                            onClick={()=>addPerson('comprador')}
                                             className={"flex-1 py-4"}
                                         >
                                         Agregar Comprador
@@ -197,14 +284,96 @@ function FormStepper() {
                                 </>
                             )
                         }
+                        {
+                            activeStepCompra === 1 && (
+                                <section>
+                                    {renderPersonForm(vendedores, handleChange, 'venta', deletePerson)}
+                                    <section className='flex flex-row gap-2'>
+                                        <Button
+                                            onClick={()=>addPerson('comprador')}
+                                            className={"flex-1 py-4"}
+                                        >
+                                        Agregar Comprador
+                                        </Button>
+                                    </section>
+                                </section>
+                            )
+                        }
+                        {
+                            activeStepCompra === 2 && (
+                                <div className='min-w-3xl h-96 p-4 bg-white rounded-xl shadow-sm font-bold text-xl'>
+                                    
+                                    <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
+                                    <p className='text-center'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
+                                    <ButtonUploadImageMinuta
+                                        handleChangeImage={handleChangeImageMinuta}
+                                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
+                                    />
+                                    {
+                                        dataImagesMinuta.length > 0 &&
+                                        <div className='w-full mt-8'>
+                                            <TextField className='w-full' onChange={(e)=>setDataSendCompra({...dataSendCompra, paymentMethod : e.target.value})}  label="Indique el medio de pago" required />
+                                        </div> 
+                                    }
+                                </div>
+                            )
+                        }
+                        {
+                            activeStepCompra === 3 && (
+                                <section className='min-w-3xl bg-white p-8'>
+                                    <div className='mb-4'>
+                                        <Title1 className='text-2xl'>Sube la minuta</Title1>
+                                        <p>Sube la minuta en formato PDF</p>
+                                    </div>
+                                    <UploadMinuta
+                                        handleSetFile={(data)=>setDataSendCompra({...dataSendCompra, minuta : data})}
+                                    />
+                                </section>
+                            )
+                        }
                     </div>
                     <div className="flex justify-between mt-6">
-                        <Button disabled={activeStep === 0} onClick={() => setActiveStep((prev) => prev - 1)}>
+                        <Button disabled={activeStepCompra === 0} onClick={() => setActiveStepCompra((prev) => prev - 1)}>
                             Atrás
                         </Button>
                         <Button
+                            onClick={(e)=>{
+                                e.preventDefault();
+                                if (activeStepCompra === 0) {
+                                    const errores = checkEmptyFieldsFormCompra(compradores);
+                                    if (errores.length > 0) {
+                                        setErrorCompra(errores);
+                                        toast("Formulario incompleto",{
+                                            type : 'error'
+                                        })
+                                        return;
+                                    }
+                                }
+                                if (activeStepCompra === 1) {
+                                    const errores = checkEmptyFieldsFormCompra(vendedores);
+                                    if (errores.length > 0) {
+                                        setErrorCompra(errores);
+                                        toast("Formulario incompleto",{
+                                            type :'error'
+                                        });
+                                        return;
+                                    }
+                                }
+                                if (activeStepCompra === 2) {
+                                    const errores = checkEvidenceEmpty(dataImagesMinuta);
+                                    if (errores.error) {
+                                        setErrorCompra([errores]);
+                                        toast("Evidencias incompletas",{
+                                            type : 'error'
+                                        });
+                                        return;
+                                    }
+                                }
+                                
+                                setActiveStepCompra((prev) => (prev < stepsCompra.length - 1 ? prev + 1 : prev));
+                            }}
                         >
-                            {activeStep === stepsCompra.length - 1 ? 'Finalizar' : 'Siguiente'}
+                            {activeStepCompra === stepsCompra.length - 1 ? 'Finalizar' : 'Siguiente'}
                         </Button>
                     </div>
                 </div>
@@ -291,25 +460,9 @@ function RenderCardsFormStepper() {
 }
 
 export default function Page() {
-    const [isProcessStart, setIsProcessStart] = useState(false);
-    const [tipoProceso, setTipoProceso] = useState('');
-
-    const establecerTipoProceso=(tipo='compra')=>{
-        setTipoProceso(tipo);
-        setIsProcessStart(true);
-    }
-
     return (
-        <ContextCard
-            value={{
-                establecerTipoProceso,
-                tipoProceso,
-                isProcessStart
-            }}
-        >
-                <section className='w-full h-screen overflow-y-auto grid grid-cols-1 p-8 gap-2'>
-                    <RenderCardsFormStepper/>
-                </section>
-        </ContextCard>
+        <section className='w-full min-h-screen pb-24 grid grid-cols-1 p-8 gap-2'>
+            <RenderCardsFormStepper/>
+        </section>
   )
 };
