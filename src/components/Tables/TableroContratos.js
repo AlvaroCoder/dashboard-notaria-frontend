@@ -9,6 +9,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Title1 from "../elements/Title1";
 import CardContract from "../elements/CardContract";
+import { useRouter } from "next/navigation";
 
 const estadosContrato = [
   {id : 1, title : "PROCESO INICIADO", bgColor : "bg-green-50"},
@@ -26,6 +27,7 @@ export default function TableroContratos({
   dataContracts=[]
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
+  const router = useRouter();
 
   return (
     <div className="w-full rounded-sm shadow-sm bg-white p-4">
@@ -34,6 +36,12 @@ export default function TableroContratos({
           {titulo}
         </Title1>
         <div className="flex justify-end gap-2">
+          <Button
+            className={"bg-[#0C1019]"}
+            onClick={()=>router.push("inmueble/form-add")}
+          >
+            Agregar Contrato
+          </Button>
           <Button
             className='text-[#0C1019] text-center'
             variant={vista === "tabla" ? "outline" : 'ghost'}

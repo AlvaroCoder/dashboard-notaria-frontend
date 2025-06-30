@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import NotesIcon from '@mui/icons-material/Notes';
 import TitleIcon from '@mui/icons-material/Title';
 import { cn } from '@/lib/utils';
+import { useContratoContext } from '@/context/ContratosContext';
 
 function BlockEditorRenderer({
     block, idx, handleChange, handleaddBlock
@@ -62,7 +63,7 @@ export default function EditorView({
     data=[]
 }) {
     const [dataEditor, setDataEditor] = useState(data);
-
+    const { dataBloquesMinuta } = useContratoContext();
     const handleChange=(idx, newContent, type)=>{
       const newData = [...dataEditor];
       if (type === "heading-one") {

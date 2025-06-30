@@ -5,10 +5,8 @@ import Loading from '@/components/elements/Loading';
 import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
 import { Button } from '@/components/ui/button';
-import { DocumentRenderer } from '@/components/Views';
 import EditorView from '@/components/Views/EditorView';
 import { useContratoContext } from '@/context/ContratosContext';
-import { useFetch } from '@/hooks/useFetch';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -65,7 +63,7 @@ export default function Page() {
       const parserText = parseTextoToJSON(responseJSON?.minuta_content);
       setParseDataProcess(parserText?.data);
       inicializarBloquesMinuta(parserText?.data);
-      
+
     } catch (err) {
       toast("Surgio un error con el servidor",{
         type : 'error',
