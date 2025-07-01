@@ -78,40 +78,57 @@ export default function EditorView({
       setDataEditor(newData);
     }
 
-    const handleAdd=(idx, type)=>{
-        const newData = [...dataEditor].slice(0,idx+1) 
-        const restante = [...dataEditor].slice(idx+1);
-        if (type === "heading-one") {
-            newData.push({
-                type,
-                content : "Titulo",
-                html : "<h1 style='center'>Titulo</h1>"
-            })
+    const handleAdd = (idx, type) => {
+        const before = dataEditor.slice(0, idx + 1);
+        const after = dataEditor.slice(idx + 1);
+      
+        let newBlock = null;
+      
+        switch (type) {
+          case "heading-one":
+            newBlock = {
+              type,
+              content: "Título",
+              html: "<h1 style='text-align:center;'>Título</h1>",
+            };
+            break;
+      
+          case "heading-two":
+            newBlock = {
+              type,
+              content: "Subtítulo",
+              html: "<h1 style='text-align:left;'>Subtítulo</h1>",
+            };
+            break;
+      
+          case "paragraph":
+            newBlock = {
+              type,
+              content: [
+                {
+                  type: "text",
+                  content: "Texto",
+                  html: "<p>Texto</p>",
+                },
+              ],
+            };
+            break;
+      
+          default:
+            console.warn("Tipo no reconocido:", type);
+            return;
         }
-        if (type === "paragraph") {
-            newData.push({
-                type,
-                content : [
-                    {type : 'text', content : 'Texto',  html : '<p>Texto</p>'}
-                ]
-            })
-        }
-        if (type === "heading-two") {
-            newData.push({
-                type,
-                content : "Subtitulo",
-                html : "<h1>Subtitulo</h1>"
-            })
-        }
-        setDataEditor([...newData, ...restante])
-        
-    }
+      
+        const updated = [...before, newBlock, ...after];
+        setDataEditor(updated);
+      };
   return (
     <div className=' w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-24'>
         <div className='col-span-4 w-full p-10'>
             <section className='bg-white p-4 flex flex-col gap-0'>
                 {
                     dataEditor?.map((block, idx)=> <BlockEditorRenderer 
+                    key={idx}
                     idx={idx} 
                     block={block} 
                     handleChange={handleChange} 

@@ -1,10 +1,6 @@
 'use client'
-import { useFetch } from '@/hooks/useFetch'
 import React, { useEffect, useState } from 'react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Plus, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { TableroContratos } from '@/components/Tables';
 import TableroContratosCarga from '@/components/Tables/TableroContratoCarga';
 import Title1 from '@/components/elements/Title1';

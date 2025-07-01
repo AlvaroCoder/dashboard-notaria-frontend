@@ -4,13 +4,13 @@ import React from 'react'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Button } from '@/components/ui/button';
 import SaveIcon from '@mui/icons-material/Save';
-import ContratoContext from '@/context/ContratosContext';
+import ContratoContext, { useContratoContext } from '@/context/ContratosContext';
 
 
 function ButtonsTop() {
     
     const {back} = useRouter();
-
+    const {generarContrato} = useContratoContext();
     return (
         <nav className='p-4 w-full shadow-sm h-20 flex flex-row items-center justify-between'>
             <div className='flex flex-row items-center text-gray-500  text-sm'>
@@ -23,9 +23,9 @@ function ButtonsTop() {
                 <Button 
                     className={'bg-green-900 rounded-sm hover:opacity-30 text-white'} 
                     variant={"outlined"}
-                    onClick={()=>{
+                    onClick={async()=>{
                         console.log("Guardar");
-
+                        await generarContrato();
                     }}
                 >
                     <SaveIcon/>

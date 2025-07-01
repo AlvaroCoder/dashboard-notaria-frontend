@@ -21,12 +21,13 @@ export default function Page() {
   const [pdf, setPdf] = useState(null);
   const [loadingProcess, setLoadingProcess] = useState(false);
   const [parseDataProcess, setParseDataProcess] = useState(null);
-  const {inicializarBloquesMinuta} = useContratoContext()
+  const {inicializarBloquesMinuta, inicializarDataMinuta} = useContratoContext()
   useEffect(()=>{
     async function getData() {
       try {
         setLoading(true);
         const response = await fetch(URL_CONTRACT_ID+params.get("idContract"));
+        inicializarDataMinuta(params.get('idContract'));
         const responseJSON = await response.json();
         setData(responseJSON?.data);
 

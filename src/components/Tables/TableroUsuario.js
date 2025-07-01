@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { LayoutGrid, Table2 } from "lucide-react";
 
 const mockUsers = [
   {
@@ -31,7 +32,7 @@ const mockUsers = [
 
 export default function UsuarioTablero() {
   const [viewType, setViewType] = useState("table");
-
+  
   return (
     <div className="space-y-4">
       {/* Selector de vista */}
@@ -40,13 +41,13 @@ export default function UsuarioTablero() {
           variant={viewType === "table" ? "default" : "outline"}
           onClick={() => setViewType("table")}
         >
-          Tabla
+          <Table2/>
         </Button>
         <Button
           variant={viewType === "card" ? "default" : "outline"}
           onClick={() => setViewType("card")}
         >
-          Tarjetas
+          <LayoutGrid/>
         </Button>
       </div>
 

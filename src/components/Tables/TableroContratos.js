@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableHead, TableRow, TableHeader, TableCell, TableBody } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
-import { List, LayoutGrid, Users } from "lucide-react";
+import { List, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Title1 from "../elements/Title1";
@@ -102,7 +101,11 @@ export default function TableroContratos({
                   </TableCell>
                   <TableCell><p className="text-sm break-words whitespace-normal w-20">
                   {contrato.paymentMethod?.caption}</p></TableCell>
-                  <TableCell>{contrato.estado}</TableCell>
+                  <TableCell>
+                    {estadosContrato?.filter((_, idx)=>contrato.status === idx+1).map((item)=>(
+                      <p className={cn(item.bgColor, 'w-32 p-1 rounded-sm text-wrap')}>{item?.title}</p>
+                    ))}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
