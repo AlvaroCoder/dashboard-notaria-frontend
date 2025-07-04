@@ -1,11 +1,11 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { motion} from "framer-motion"
 import ParagraphEditorTiptap from './ParagraphEditorTipTap';
 import TitleEditorTipTap from './TitleEditorTipTap';
 
-
 export default function Blocks({
+    index =0,
     blockData={},
     onUpdateBlock
 }) {
@@ -22,14 +22,23 @@ export default function Blocks({
     const handlerBlock=(block, onUpdate)=>{
         switch(block?.type){
             case "heading-one":
-                return <TitleEditorTipTap
-                  data={block}
-                  onUpdate={onUpdate}
-                />
+                return (
+                <section>
+                    <TitleEditorTipTap
+                    index={index}
+                    data={block}
+                    onUpdate={onUpdate}
+                    />
+                </section>
+                )
             case "paragraph":
-                return <ParagraphEditorTiptap 
-                data={block} 
-                onUpdate={onUpdate} />
+                return( 
+                <section>
+                    <ParagraphEditorTiptap 
+                        index={index}
+                        data={block} 
+                        onUpdate={onUpdate} />
+                </section>)
             default :
           return <pre className='w-[20px]'></pre>
           }
@@ -48,6 +57,7 @@ export default function Blocks({
                     </div>
                 )
             }
+
             {handlerBlock(blockData, onUpdateBlock)}
         </motion.div>
     )

@@ -37,7 +37,12 @@ function convertEditorToCustomJSON(editor) {
   }
 }
 
-export default function ParagraphEditor({ data, onUpdate }) {
+export default function ParagraphEditor({ 
+  index,
+  data, 
+  onUpdate 
+}) {
+    
     const [isEditing, setIsEditing] = useState(false)
     const editorRef = useRef(null);
     const [isClicked, setIsClicked] = useState(false);
@@ -54,7 +59,7 @@ export default function ParagraphEditor({ data, onUpdate }) {
         Bold,
         Italic,
         ],
-        content: `<p>${convertJSONToHTML(data)}</p>`,
+        content: data?.html,
         editable: isEditing,
         onUpdate: ({ editor }) => {
         const updated = convertEditorToCustomJSON(editor)
@@ -88,7 +93,7 @@ export default function ParagraphEditor({ data, onUpdate }) {
         className="relative border border-white  p-4 rounded-sm hover:border-[#0C1019]"
         onClick={() => {
             setIsEditing(true);
-            setIsClicked(true);
+            setIsClicked(false);
         }}
     >
       {

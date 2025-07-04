@@ -6,6 +6,7 @@ import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
 import { Button } from '@/components/ui/button';
 import EditorView from '@/components/Views/EditorView';
+import { useEditorContext } from '@/context/ConextEditor';
 import { useContratoContext } from '@/context/ContratosContext';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation'
@@ -22,6 +23,7 @@ export default function Page() {
   const [loadingProcess, setLoadingProcess] = useState(false);
   const [parseDataProcess, setParseDataProcess] = useState(null);
   const {inicializarBloquesMinuta, inicializarDataMinuta} = useContratoContext()
+  const {agregarBloques} = useEditorContext(); 
   useEffect(()=>{
     async function getData() {
       try {
@@ -64,7 +66,7 @@ export default function Page() {
       const parserText = parseTextoToJSON(responseJSON?.minuta_content);
       setParseDataProcess(parserText?.data);
       inicializarBloquesMinuta(parserText?.data);
-
+      agregarBloques(parserText?.data);
     } catch (err) {
       toast("Surgio un error con el servidor",{
         type : 'error',

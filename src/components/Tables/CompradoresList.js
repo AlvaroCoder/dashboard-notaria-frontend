@@ -58,9 +58,9 @@ export default function CompradoresList({
       <Title1 className="text-xl">Compradores ({compradores?.length})</Title1>
       <Separator2/>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {compradores.map((comprador) => (
+        {compradores.map((comprador, idxk) => (
           <div
-            key={comprador.id}
+            key={idxk}
             onClick={() => handleEditClick(comprador)}
             className="border p-4 rounded-xl shadow hover:bg-gray-50 cursor-pointer transition"
           >

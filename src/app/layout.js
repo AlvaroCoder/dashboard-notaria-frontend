@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopBarNavigationMain from "@/components/Navigation/TopBarNavigationMain";
 import { ToastContainer } from "react-toastify";
+import EditorContext from "@/context/ConextEditor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,12 +25,14 @@ export default function RootLayout({ children }) {
       <body
         className={`font-poppins text-[#0C1019]`}
       >
-        <TopBarNavigationMain/>
-        {children}
-        
-        <ToastContainer
-          position="bottom"
-        />
+        <EditorContext>
+          <TopBarNavigationMain/>
+          {children}
+          
+          <ToastContainer
+            position="bottom"
+          />
+        </EditorContext>
       </body>
     </html>
   );
