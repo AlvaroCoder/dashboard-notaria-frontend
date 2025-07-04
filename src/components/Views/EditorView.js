@@ -1,20 +1,27 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Blocks from '../elements/Blocks';
 import { Button } from '../ui/button';
 import NotesIcon from '@mui/icons-material/Notes';
 import TitleIcon from '@mui/icons-material/Title';
-import { cn } from '@/lib/utils';
+import { cn, generarIdRandom } from '@/lib/utils';
 import { useEditorContext } from '@/context/ConextEditor';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 function BlockEditorRenderer({
-    block, idx, handleChange, handleaddBlock
+    block, 
+    idx, 
+    handleChange, 
+    handleaddBlock,
+    handleSubirBloque,
+    handleBajarBloque,
+    handleEliminarBloque
 }) {
     const [hoverLine, setHoverLine] = useState(false);
-
+    const [isClicked, setIsClicked] = useState(false);
+    
+    const editorRef = useRef(null);
     const renderHoverLine=(isHovered=false)=>{
         if (isHovered) {
             return(
@@ -42,8 +49,28 @@ function BlockEditorRenderer({
         }
         return null
     }
+    useEffect(()=>{
+      const handleClickOutside =(evt)=>{
+        if (editorRef.current && !editorRef.current.contains(evt.target)) {
+          setIsClicked(false);
+        }
+      }
+      document.addEventListener('mousedown', handleClickOutside);
+      return ()=>{
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
+    },[]);
     return(
-        <div>
+        <div
+          ref={editorRef}
+          onClick={()=>{
+            setIsClicked(true);
+          }}
+          onDoubleClick={()=>{
+            setIsClicked(false)
+          }}
+          className='relative'
+        >
             <div
                 onMouseEnter={()=>setHoverLine(true)}
                 onMouseLeave={()=>setHoverLine(false)}
@@ -52,15 +79,23 @@ function BlockEditorRenderer({
               <section
                   className={cn('relative w-full my-0 border-b border-b-white', hoverLine && 'border-b-[#0C1019]')}
               >
-                  {renderHoverLine(hoverLine)}
+                {renderHoverLine(hoverLine)}
               </section>
             </div>
+            {
+              isClicked && 
+              <BlockToolsOneclick
+                handleUpBlock={()=>handleSubirBloque()}
+                handleDownBlock={()=>handleBajarBloque()}
+                handleDeleteBlock={()=>handleEliminarBloque()}
+              />
+            }
             <Blocks
-                index={idx}
-                blockData={block}
-                onUpdateBlock={(data)=>handleChange(idx, data, block?.type)}
+              index={idx}
+              blockData={block}
+              onUpdateBlock={(data)=>handleChange(idx, data, block?.type)}
             />
-
+            
         </div>
     )
 }
@@ -74,29 +109,6 @@ function BlockToolsOneclick({
       <div 
         className='z-50 absolute -top-7 left-0 w-max p-2 flex items-center gap-2 bg-white shadow-md border rounded-md grid-cols-3'
       >
-        <section 
-          className='px-4 border-r border-r-[#0C1019]'
-        >
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                Titulo
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuCheckboxItem>
-                <Button>
-                  Subtitulo
-                </Button>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>
-                <Button>
-                  Parrafo
-                </Button>
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </section>
         <section className='flex flex-row gap-2'>
           <Button
             variant={"outline"}
@@ -121,28 +133,16 @@ function BlockToolsOneclick({
     )
 }
 
-export default function EditorView({
-    data=[]
-}) {
-    const [dataEditor, setDataEditor] = useState(data);
+export default function EditorView() {
     const {
       dataBloques, 
+      blockEditing,
       insertarBloque, 
       subirBloque, 
       bajarBloque, 
-      eliminarBloque
+      eliminarBloque,
+      handleChangeBloque
     } = useEditorContext();
-    const handleChange=(idx, newContent, type)=>{
-      const newData = [...dataEditor];
-      if (type === "heading-one") {
-        newData[idx].content = newContent;
-        newData[idx].html = "<h1>"+newContent+"</h1>";
-      }
-      if (type === "paragraph") {
-        newData[idx] = newContent;
-      }
-      setDataEditor(newData);
-    }
 
     const handleAdd = (idx, type) => {
         let newBlock = null;
@@ -150,6 +150,7 @@ export default function EditorView({
         switch (type) {
           case "heading-one":
             newBlock = {
+              id: generarIdRandom(),
               type,
               content: "Título",
               html: "<h1 style='text-align:center;'>Título</h1>",
@@ -158,6 +159,7 @@ export default function EditorView({
       
           case "heading-two":
             newBlock = {
+              id: generarIdRandom(),
               type,
               content: "Subtítulo",
               html: "<h1 style='text-align:left;'>Subtítulo</h1>",
@@ -166,6 +168,7 @@ export default function EditorView({
       
           case "paragraph":
             newBlock = {
+              id: generarIdRandom(),
               type,
               content: [
                 {
@@ -185,40 +188,49 @@ export default function EditorView({
         insertarBloque(idx, newBlock);
     };
   return (
-    <div className=' w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-24'>
+    <div className='relative w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-24'>
+      {
+        blockEditing && 
+        <section className='fixed w-full h-12 shadow-sm bg-gray-300 z-50 flex flex-row items-center gap-2 justify-center'>
+          <div className='flex flex-row items-center justify-center gap-2'>
+            <Button
+              variant={"outline"}
+            >
+              <b>B</b>
+            </Button>
+            <Button
+              variant={"outline"}
+            >
+              <i>I</i>
+            </Button>
+            <Button
+              variant={"outline"}
+            >
+              <p>T</p>
+            </Button>
+          </div>
+        </section>
+      }
+        <section className=''>
+          <p className='text-white'>{ blockEditing && blockEditing?.id}</p>
+        </section>
         <div className='col-span-4 w-full p-10'>
             <section className='bg-white p-4 flex flex-col gap-0'>
                 {
                     dataBloques?.map((block, idx)=> (
-                      <div 
-                        key={idx}
-                        className='relative'>
-                          <BlockToolsOneclick
-                            handleUpBlock={(e)=>{
-                              e.preventDefault();
-                              subirBloque(idx);
-                            }}
-                            handleDownBlock={(e)=>{
-                              e.preventDefault();
-                              bajarBloque(idx);
-                            }}
-                            handleDeleteBlock={(e)=>{
-                              e.preventDefault();
-                              eliminarBloque(idx);
-                            }}
-                          />
-                          <BlockEditorRenderer
-                            block={block}
-                            idx={idx}
-                            handleChange={handleChange}
-                            handleaddBlock={handleAdd}
-                          />
-
-                        </div>
-                      ))
+                        <BlockEditorRenderer
+                          key={block?.id}
+                          block={block}
+                          idx={idx}
+                          handleChange={(idx, newContent, type)=>handleChangeBloque(idx, newContent, type)}
+                          handleaddBlock={handleAdd}
+                          handleSubirBloque={()=>subirBloque(idx)}
+                          handleBajarBloque={()=>bajarBloque(idx)}
+                          handleEliminarBloque={()=>eliminarBloque(idx)}
+                        />
+                    ))
                 }
             </section>
-           
         </div>
     </div>
   )

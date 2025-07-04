@@ -39,6 +39,8 @@ export default function Page() {
           type : 'error',
           position : 'bottom-center'
         })
+
+        
       } finally{
         setLoading(false);
       }
@@ -73,6 +75,7 @@ export default function Page() {
         position : 'bottom-center'
       });
       setLoadingProcess(false);
+      console.log(err);
 
     } finally{
       setLoadingProcess(false)
@@ -103,10 +106,10 @@ export default function Page() {
         </div>
       )
     }
-    if (parserData) {
+  if (parserData) {
       return (
         <div className='relative h-screen overflow-y-auto w-full flex-1 '>
-          <EditorView data={parserData} />
+          <EditorView />
         </div>
       )
     }
@@ -136,8 +139,7 @@ export default function Page() {
           {vistaMinuta(
             data?.status,
             data?.minutaDirectory,
-            parseDataProcess
-            )}
+            parseDataProcess)}
         </section>
     </div>
   )

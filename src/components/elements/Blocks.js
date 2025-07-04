@@ -3,16 +3,16 @@ import React, { useState } from 'react'
 import { motion} from "framer-motion"
 import ParagraphEditorTiptap from './ParagraphEditorTipTap';
 import TitleEditorTipTap from './TitleEditorTipTap';
+import Title2Editor from './Title2Editor';
 
 export default function Blocks({
-    index =0,
     blockData={},
     onUpdateBlock
 }) {
     const [hovered, setHovered] = useState(false);
-
     const typeLabel = {
         "heading-one": "Título principal (h1)",
+        "heading-two" : "Titulo secundario (h2)",
         "paragraph": "Párrafo",
         "bullet-list": "Lista con viñetas",
         "numbered-list": "Lista numerada",
@@ -25,9 +25,8 @@ export default function Blocks({
                 return (
                 <section>
                     <TitleEditorTipTap
-                    index={index}
-                    data={block}
-                    onUpdate={onUpdate}
+                        data={block}
+                        onUpdate={onUpdate}
                     />
                 </section>
                 )
@@ -35,12 +34,22 @@ export default function Blocks({
                 return( 
                 <section>
                     <ParagraphEditorTiptap 
-                        index={index}
                         data={block} 
-                        onUpdate={onUpdate} />
-                </section>)
+                        onUpdate={onUpdate} 
+                    />
+                </section>
+                )
+            case "heading-two":
+                return(
+                    <section>
+                        <Title2Editor
+                            data={block}
+                            onUpdate={onUpdate}
+                        />
+                    </section>
+                )
             default :
-          return <pre className='w-[20px]'></pre>
+                return <pre className='w-[20px]'></pre>
           }
     }
 
@@ -52,12 +61,11 @@ export default function Blocks({
         >
             {
                 hovered && (
-                    <div className="z-50 absolute top-2 right-2 text-xs bg-black text-white rounded px-2 py-1">
+                    <div className="z-30 absolute top-2 right-2 text-xs bg-black text-white rounded px-2 py-1">
                         {typeLabel}
                     </div>
                 )
             }
-
             {handlerBlock(blockData, onUpdateBlock)}
         </motion.div>
     )

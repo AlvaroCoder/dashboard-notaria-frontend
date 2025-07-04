@@ -1,15 +1,20 @@
 'use client';
 
+import { generarIdRandom } from "@/lib/utils";
 import {createContext, useContext, useState} from "react";
 
 const EditorMinuta = createContext({
+    blockEditing : null,
     dataBloques : [],
     agregarBloques : ()=>{},
     insertarBloque : ()=>{},
     eliminarBloque : ()=>{},
     subirBloque : ()=>{},
     bajarBloque : ()=>{},
-    mostrarBloqueId : ()=>{}
+    mostrarBloqueId : ()=>{},
+    handleChangeBloque : ()=>{},
+    handleEditingBlock : ()=>{},
+    removeEditingBlock : ()=>{}
 });
 
 export const useEditorContext =()=>useContext(EditorMinuta);
@@ -19,9 +24,15 @@ export default function EditorContext({
 }) {
 
     const [dataBloques, setDataBloques] = useState([]);
-
+    const [blockEditing, setBlockEditing] = useState(null);
     const agregarBloques=(data=[])=>{
-        setDataBloques(data);
+        const nuevaLista = data?.map((item)=>({id : generarIdRandom(), ...item}));
+        
+        setDataBloques(nuevaLista);
+    }
+    const handleEditingBlock=(idBlock)=>{
+        const blockSelected = dataBloques?.filter(({id})=> idBlock === id)[0];
+        setBlockEditing(blockSelected)
     }
     const insertarBloque=(index, jsonData={})=>{
         const nuevaLista = [
@@ -53,16 +64,38 @@ export default function EditorContext({
     const mostrarBloqueId=(index)=>{
         return dataBloques.filter((_,idx)=>idx === index)[0]
     }
+    const handleChangeBloque=(idx, newContent, type)=>{
+        let nuevoJson = {}
+        if (type === "heading-one") {
+            nuevoJson['type'] = type
+            nuevoJson['content'] = newContent?.target?.value;
+            nuevoJson['html'] = "<h1 style='text-align:center;'>"+newContent?.target?.value+"</h1>";
+        }
+        if (type === 'paragraph') {
+            nuevoJson = newContent
+        }
+        const nuevaLista = [...dataBloques].map((block, index)=>
+            index === idx ? nuevoJson : block
+        );
+        setDataBloques(nuevaLista);
+    }
+    const removeEditingBlock=()=>{
+        setBlockEditing(null);
+    }
     return(
         <EditorMinuta.Provider
             value={{
                 dataBloques,
+                blockEditing,
                 agregarBloques,
                 insertarBloque,
                 subirBloque,
                 bajarBloque,
                 eliminarBloque,
-                mostrarBloqueId
+                mostrarBloqueId,
+                handleChangeBloque,
+                handleEditingBlock,
+                removeEditingBlock
             }}
         >
             {children}
