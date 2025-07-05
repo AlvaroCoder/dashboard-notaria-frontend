@@ -4,9 +4,9 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { usePathname } from 'next/navigation';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { HomeIcon } from 'lucide-react';
+import { CircleUserIcon, HomeIcon,  UserIcon } from 'lucide-react';
+import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 
-import PersonIcon from '@mui/icons-material/Person';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -29,10 +29,22 @@ export default function SideBarNavigation() {
         selected : false
     },
     {
-        routeName : "Usuarios",
-        routePath : "/dashboard/usuarios",
-        routeIcon : PersonIcon,
-        selected : false
+      routeName : "Clientes",
+      routePath : "/dashboard/clientes",
+      routeIcon : UserIcon,
+      selected : false
+    },
+    {
+      routeName : "Juniors",
+      routePath : "/dashboard/juniors",
+      routeIcon : CircleUserIcon,
+      selected : false
+    },
+    {
+      routeName : "Seniors",
+      routePath : "/dashboard/seniors",
+      routeIcon : LocalPoliceIcon,
+      selected : false
     }
 ];
   const [dataRoutes, setDataRoutes] = useState(routes);

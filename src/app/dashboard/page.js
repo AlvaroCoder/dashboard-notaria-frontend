@@ -1,6 +1,6 @@
 'use client'
 import Title1 from '@/components/elements/Title1'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DescriptionIcon from '@mui/icons-material/Description';
 import { LayoutGrid, List, ShieldUser, User } from 'lucide-react';
 import Person4Icon from '@mui/icons-material/Person4';
@@ -12,20 +12,62 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@mui/material';
 import Separator from '@/components/elements/Separator';
+import { toast } from 'react-toastify';
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [queryCliente, setQueryCliente] = useState('');
   const [vista, setVista] = useState("tabla");
   const [dataDocumentos, setdataDocumentos] = useState([]);
+  const [indicadoresGeneral, setIndicadoresGeneral] = useState([]);
 
-  const indicatorsGeneral=[
-    {id:1, title : 'Contratos', value : 200, icon : DescriptionIcon},
-    {id:2, title : 'Clientes', value : 20, icon : Person4Icon},
-    {id:3, title : 'Juniors', value : 120, icon : User},
-    {id:4, title : 'Seniors', value : 60, icon : ShieldUser}
-  ];
 
+/**
+ *   const indicatorsGeneral=[
+  {id:1, title : 'Contratos', value : 200, icon : DescriptionIcon},
+  {id:2, title : 'Clientes', value : 20, icon : Person4Icon},
+  {id:3, title : 'Juniors', value : 120, icon : User},
+  {id:4, title : 'Seniors', value : 60, icon : ShieldUser}
+];
+
+ */
+
+  useEffect(()=>{
+    async function getData() {
+        try {
+            setLoading(true);
+            const responseSenior = await fetch('http://localhost:8000/home/senior');
+            const jsonResponseSenior = await responseSenior.json();
+
+            const responseJunior = await fetch('http://localhost:8000/home/junior');
+            const jsonResponseJunior = await responseJunior.json();
+
+            const responseClient = await fetch('http://localhost:8000/home/client');
+            const jsonResponseClient = await responseClient.json();
+            
+            const nuevaLista = [
+              {id : 1, title : 'Clientes', value : jsonResponseClient?.data?.length, icon : Person4Icon},
+              {id : 2, title : 'Juniors', value : jsonResponseJunior?.data?.length, icon : User},
+              {id : 3, title : 'Seniors', value : jsonResponseSenior?.data?.length, icon : ShieldUser},
+
+            ];
+            toast("Data enviada correctamente",{
+              type : 'success'
+            })
+            setIndicadoresGeneral(nuevaLista);
+
+        } catch (err) {
+          toast("Error",{
+            type : 'error'
+          });
+
+        } finally {
+          setLoading(false)
+        }
+        
+    }
+    getData();
+  },[]);
 
   return (
     <main className='w-full min-h-screen p-8'>
@@ -35,8 +77,8 @@ export default function Page() {
       <section className='w-full my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
         {
           loading ? 
-          Array.from(['a','b','c','d']).map((item, key)=><CardIndicatorLoading key={key} />) : 
-          indicatorsGeneral?.map((item, key)=><CardIndicator key={key} indicator={item} />)
+          Array.from(['a','b','c','d']).map((_, key)=><CardIndicatorLoading key={key} />) : 
+          indicadoresGeneral?.map((item, key)=><CardIndicator key={key} indicator={item} />)
         }
       </section>
       
