@@ -159,7 +159,7 @@ export default function Page() {
                 className={"w-full md:w-auto"}
                 onClick={()=>router.push("clientes/form-add")}
             >
-                Agregar nuevo usuario
+                Agregar nuevo cliente
             </Button>
         </section>
         <div className='space-y-6'>
