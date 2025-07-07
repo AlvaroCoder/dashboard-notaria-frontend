@@ -1,75 +1,11 @@
 'use client'
 import Title1 from '@/components/elements/Title1'
 import { Button, Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
-import React, { useRef, useState } from 'react'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import React, { useState } from 'react'
+
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-
-function formatearFecha(fechaStr) {
-  const [dia, mes, anio] = fechaStr.split('/');
-  return `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-}
-
-function FechaNacimientoSelector({
-  handleChange
-}) {
-  const [fechaNacimiento, setFechaNacimiento] = useState(null);
-  const [abrirPicker, setAbrirPicker] = useState(false);
-
-  const anchorRef = useRef(null);
-
-  const fechaMostrada = fechaNacimiento ? fechaNacimiento : dayjs();
-
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className="flex flex-col gap-4 items-start relative ">
-        <section className='grid grid-cols-2 gap-4 w-full'>
-          <div className='flex items-center justify-center'>
-          <Title1 className='text-gray-600 text-lg'>Fecha de Nacimiento : </Title1>
-          </div>
-          <Button
-            ref={anchorRef}
-            onClick={() => setAbrirPicker(true)}
-            className="w-full   py-4 px-4 rounded normal-case"
-          >
-            {` ${fechaMostrada.format('DD/MM/YYYY')}`}
-          </Button>
-        </section>
-
-        <DatePicker
-          open={abrirPicker}
-          onClose={() => setAbrirPicker(false)}
-          value={fechaNacimiento}
-          onChange={(nuevaFecha) => {
-            setFechaNacimiento(nuevaFecha);
-            handleChange(formatearFecha(nuevaFecha.format('DD/MM/YYYY')))
-          }}
-          slotProps={{
-            textField: {
-              hidden: true,
-            },
-            popper: {
-              anchorEl: anchorRef.current, 
-              placement: 'bottom-start',
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [0, 8],
-                  },
-                },
-              ],
-            },
-          }}
-        />
-      </div>
-    </LocalizationProvider>
-  );
-}
+import ButtonDatePicker from '@/components/elements/ButtonDatePicker';
 
 export default function Page() {
   const [dataJunior, setDataJunior] = useState({
@@ -247,10 +183,9 @@ export default function Page() {
             value={dataJunior.address.department}
             onChange={(evt)=>setDataJunior((prev)=>({...dataJunior, address : {...prev.address, department : evt.target.value}}))}
           />
-          <section className=' col-span-2 w-full '>
-            <FechaNacimientoSelector
-              handleChange={(fechaNacimiento)=>setDataJunior({...dataJunior, birthYear : fechaNacimiento})}
-            />
+          <section className=' col-span-2 w-full grid grid-cols-2 gap-4'>
+          <p className='place-content-center text-gray-600 font-poppins'>Fecha Nacimiento</p>
+          <ButtonDatePicker handleChange={(fechaNacimiento)=>setDataJunior({...dataJunior, birthYear: fechaNacimiento})} />
           </section>
         </section>
         <Button
