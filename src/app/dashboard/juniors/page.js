@@ -7,20 +7,33 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LayoutGrid, Table2 } from 'lucide-react';
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MoreVert } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 const headers=[
     {value : "Nombre"},
     {value : "Usuario"},
     {value : "DNI"},
     {value : "Email"},
     {value : "Telefono"},
-    {value : "Dirección"}
+    {value : "Dirección"},
+    {value : <ModeEditIcon/>}
 ]
 
 function JuniorsTablero({
     data=[]
 }) {
     const [viewType, setViewType] = useState("table");
+    const handleEditBlock=(idBlock)=>{
+
+    }
+    const handleDeleteBlock=(idBlock)=>{
+        
+    }
     const handlerViewType=()=>{
         switch (viewType) {
             case "table":
@@ -61,6 +74,30 @@ function JuniorsTablero({
                                             <TableCell>
                                                 {junior?.address?.name}
                                             </TableCell>
+                                            <TableCell>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant={"outline"}>
+                                                            <MoreVert/>
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className={"w-fit p-2"}>
+                                                        <div className='flex flex-col gap-2 w-fit'>
+                                                            <Button
+                                                                
+                                                                variant={"ghost"}
+                                                            >
+                                                                <EditIcon/> Editar
+                                                            </Button>
+                                                            <Button
+                                                                onClick={()=>handleDeleteBlock(junior?.id)}
+                                                            >
+                                                                <DeleteIcon/> Eliminar
+                                                            </Button>
+                                                        </div>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 }
@@ -95,6 +132,7 @@ function JuniorsTablero({
                                         <div className='text-sm text-gray-500'>
                                             {junior?.address?.name}
                                         </div>
+                                       
                                     </CardContent>
                                 </Card>
                             ))
@@ -172,7 +210,9 @@ export default function Page() {
                 <TableroCarga
                     headers={headers}
                 /> :
-                <JuniorsTablero data={dataJuniors} />
+                <JuniorsTablero 
+                    data={dataJuniors} 
+                />
             }
         </div>
     </div>
