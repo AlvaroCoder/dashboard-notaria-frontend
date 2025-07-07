@@ -186,7 +186,7 @@ export default function Page() {
     },[]);
     const currentData = useMemo(()=>{
         return dataJuniors.filter((item)=>item?.firstName?.toUpperCase().includes(queryInput.toUpperCase()) || item?.lastName?.toUpperCase().includes(queryInput.toUpperCase()))
-    }, [queryInput])
+    }, [queryInput, dataJuniors])
   return (
     <div className='p-6'>
         <section className='mb-6'>

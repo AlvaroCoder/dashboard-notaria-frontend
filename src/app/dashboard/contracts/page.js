@@ -6,9 +6,9 @@ import Title1 from '@/components/elements/Title1'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { OtherHouses } from '@mui/icons-material'
 import { Building2, Car, FilePlus2, LayoutGrid, List, Plus, Search } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify';
 
 const estadosContrato = [
   {title : "PROCESO INICIADO", bgColor : "bg-green-50"},
@@ -27,25 +27,44 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [vista, setVista] = useState("tabla");
   const [dataDocumentos, setDataDocumentos] = useState([]);
+  const [dataInmuebles, setDataInmuebles] = useState([]);
+  const [dataVehiculos, setDataVehiculos] = useState([]);
+  const [indicators, setIndicators] = useState([]);
 
   useEffect(() => {
     async function getData() {
       try {
-        
+        setLoading(true);
+        const responseInmuebles = await fetch('http://localhost:8000/home/contracts/propertyCompraVenta');
+        const jsonResponseImuebles = await responseInmuebles.json();
+        const dInmuebles = typeof(jsonResponseImuebles?.data) === 'string' ? [] : jsonResponseImuebles?.data;
+        setDataInmuebles(dInmuebles);
+
+        const responseVehiculos = await fetch('http://localhost:8000/home/contracts/vehicleCompraVenta');
+        const jsonResponseVehiculos = await responseVehiculos.json();
+        const dVehiculos = typeof(jsonResponseVehiculos?.data) === 'string' ? [] : jsonResponseVehiculos?.data;
+        setDataVehiculos(dVehiculos);
+
+
+        setIndicators([
+          {id : 1, title : 'Inmuebles', value : dInmuebles?.length, icon : Building2},
+          {id : 2, title : 'Vehiculos', value : dVehiculos?.length, icon : Car}
+        ]);
+        toast("Data exitosa",{
+          type : 'success'
+        })
       } catch (error) {
-        
+        console.log(error);
+        toast("Ocurrio un error ",{
+          type : 'error'
+        });
+      } finally{
+        setLoading(false);
       }
     }
     getData();
   }, [])
   
-
-  const indicators = [
-    {id : 1, title : 'Nuevos', value : 200, icon : FilePlus2},
-    {id : 2, title : 'Propiedad', value : 150, icon : Building2},
-    {id : 3, title : 'Vehiculos', value : 100, icon : Car},
-    {id : 4, title : 'Otros', value : 150, icon : OtherHouses}
-  ]
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -56,7 +75,7 @@ export default function Page() {
       <section className='w-full my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
         {
           loading ? 
-          Array.from([1,2,3,4]).map((_, idx)=><CardIndicatorLoading key={idx} />) : 
+          Array.from({length : 4},(_, idx)=><CardIndicatorLoading key={idx} />) : 
           indicators?.map((item, key)=><CardIndicator key={key} indicator={item} />)
         }
       </section>
@@ -104,12 +123,12 @@ export default function Page() {
                     loading ?
                     Array.from([1,2,3,4])?.map((_, key)=>
                     <TableRow>
-
+                      
                     </TableRow>
                     ) : 
                     dataDocumentos > 0?
                     dataDocumentos?.map((item, idx)=>
-                    <TableRow>
+                    <TableRow key={idx}>
                         <TableCell><h1>Columna</h1></TableCell>
                         <TableCell><h1>Columna</h1></TableCell>
                         <TableCell><h1>Columna</h1></TableCell>
