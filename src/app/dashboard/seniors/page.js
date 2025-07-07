@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LayoutGrid, Table2 } from 'lucide-react';
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 const headers = [
   {value : "Nombre"},
@@ -23,6 +23,7 @@ const headers = [
 function SeniorsTablero({
   data=[]
 }) {
+
   const [viewType, setViewType] = useState("table");
   const handlerViewType=()=>{
     switch(viewType){
@@ -136,6 +137,7 @@ export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [dataSeniors, setDataSeniors] = useState([]);
+  const [queryInput, setQueryInput] = useState("");
 
   useEffect(()=>{
     async function fetchDatSeniors() {
@@ -152,8 +154,10 @@ export default function Page() {
       }
     }
     fetchDatSeniors();
-
   },[]);
+  const currentData = useMemo(()=>{
+    return dataSeniors.filter((item)=>item?.firstName?.toUpperCase().includes(queryInput.toUpperCase()) || item?.lastName?.toUpperCase().includes(queryInput.toUpperCase()))
+  }, [queryInput])
   return (
     <div className='p-6'>
       <section className='mb-6'>
@@ -167,7 +171,8 @@ export default function Page() {
       >
         <Input
           className={"w-full"}
-          placeholder="Buscar por usuario, nombre o correo ...."
+          placeholder="Buscar por usuario o nombre"
+          onChange={(evt)=>setQueryInput(evt.target.value)}
         />
         <Button
           onClick={()=>router.push("seniors/form-add")}
@@ -182,7 +187,7 @@ export default function Page() {
           <TableroCarga
             headers={headers}
           />:
-          <SeniorsTablero data={dataSeniors} />
+          <SeniorsTablero data={currentData} />
         }
       </div>
     </div>

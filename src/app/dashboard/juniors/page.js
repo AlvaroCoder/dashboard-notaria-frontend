@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LayoutGrid, Table2 } from 'lucide-react';
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { MoreVert } from '@mui/icons-material';
@@ -166,6 +166,8 @@ export default function Page() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [dataJuniors, setDataJuniors] = useState([]);
+    const [queryInput, setQueryInput] = useState("");
+
     useEffect(()=>{
         async function fetchDataJuniors() {
             try {
@@ -182,6 +184,9 @@ export default function Page() {
         }
         fetchDataJuniors();
     },[]);
+    const currentData = useMemo(()=>{
+        return dataJuniors.filter((item)=>item?.firstName?.toUpperCase().includes(queryInput.toUpperCase()) || item?.lastName?.toUpperCase().includes(queryInput.toUpperCase()))
+    }, [queryInput])
   return (
     <div className='p-6'>
         <section className='mb-6'>
@@ -195,6 +200,7 @@ export default function Page() {
         >
             <Input
                 className={"w-full"}
+                onChange={(evt)=>setQueryInput(evt.target.value)}
                 placeholder="Buscar por usuario, nombre o correo ..."
             />
             <Button
@@ -211,7 +217,7 @@ export default function Page() {
                     headers={headers}
                 /> :
                 <JuniorsTablero 
-                    data={dataJuniors} 
+                    data={currentData} 
                 />
             }
         </div>

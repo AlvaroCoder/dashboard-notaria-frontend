@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { LayoutGrid, Table2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 const headers = [
     {value : "Nombre"},
@@ -123,6 +123,7 @@ export default function Page() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [dataClientes, setDataClientes] = useState([]);
+    const [queryInput, setQueryInput] = useState("");
 
     useEffect(()=>{
         async function fetchDataCliente() {
@@ -139,6 +140,9 @@ export default function Page() {
         }  
         fetchDataCliente();
     },[]);
+    const currentData = useMemo(()=>{
+        return dataClientes.filter((item)=>item?.firstName?.toUpperCase().includes(queryInput.toUpperCase()) || item?.lastName?.toUpperCase().includes(queryInput.toUpperCase()))
+    },[queryInput])
   return (
     <div className='p-6'>
         <section
@@ -154,6 +158,7 @@ export default function Page() {
             <Input
                 className={"w-full"}
                 placeholder="Buscar usuario por nombre, correo ..."
+                onChange={(evt)=>setQueryInput(evt.target.value)}
             />
             <Button
                 className={"w-full md:w-auto"}
@@ -169,7 +174,7 @@ export default function Page() {
                     headers={headers}
                 /> : 
                 <ClienteTablero
-                    data={dataClientes}
+                    data={currentData}
                 />
             }
         </div>

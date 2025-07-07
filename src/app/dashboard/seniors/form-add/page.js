@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 
-
-
 export default function page() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
