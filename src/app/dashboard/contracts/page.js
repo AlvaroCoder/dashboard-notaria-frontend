@@ -3,9 +3,12 @@ import CardIndicator from '@/components/elements/CardIndicator'
 import CardIndicatorLoading from '@/components/elements/CardIndicatorLoading'
 import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
+import TableLoading from '@/components/Tables/TableLoading';
+import TableManageDocuments from '@/components/Tables/TableManageDocuments';
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { Divider, Skeleton } from '@mui/material';
 import { Building2, Car, FilePlus2, LayoutGrid, List, Plus, Search } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
@@ -19,6 +22,24 @@ const estadosContrato = [
   {title : "PENDIENTE DE RESPUESTA DEL SID", bgColor : "bg-gray-50"},
   {title : "TACHADO", bgColor : "bg-red-100"},
   {title : "INSCRITO", bgColor : "bg-green-100"},
+];
+
+const headersInmuebles = [
+  {value: "Tipo de Contrato"},
+  {value: "Tipo de Bien"},
+  {value: "Compradores"},
+  {value: "Vendedores"},
+  {value: "Minuta"},
+  {value: "Estado"}
+];
+
+const headersVehiculos = [
+  {value: "Tipo de Contrato"},
+  {value: "Tipo de Bien"},
+  {value: "Compradores"},
+  {value: "Vendedores"},
+  {value: "Minuta"},
+  {value: "Estado"}
 ];
 
 export default function Page() {
@@ -45,11 +66,11 @@ export default function Page() {
         const dVehiculos = typeof(jsonResponseVehiculos?.data) === 'string' ? [] : jsonResponseVehiculos?.data;
         setDataVehiculos(dVehiculos);
 
-
         setIndicators([
           {id : 1, title : 'Inmuebles', value : dInmuebles?.length, icon : Building2},
           {id : 2, title : 'Vehiculos', value : dVehiculos?.length, icon : Car}
         ]);
+
         toast("Data exitosa",{
           type : 'success'
         })
@@ -66,107 +87,42 @@ export default function Page() {
   }, [])
   
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 h-screen overflow-y-auto">
       <div>
         <Title1 className='text-4xl'>Gestión de Contratos</Title1>
         <p className="text-gray-600">Gestión de los contratos subidos por los clientes.</p>
       </div>
       <Title1>Indicadores</Title1>
-      <section className='w-full my-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
+      <section className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3'>
         {
           loading ? 
           Array.from({length : 4},(_, idx)=><CardIndicatorLoading key={idx} />) : 
           indicators?.map((item, key)=><CardIndicator key={key} indicator={item} />)
         }
       </section>
-      <Separator/>
-      <section className='w-full rounded-sm shadow-sm bg-white p-4'>
-        <div className='flex flex-row items-center justify-between'>
-          <Title1 className='text-2xl'>
-            Documentos
-          </Title1>
-          <div className='flex justify-end gap-2'>
-            <Button
-              className='text-[#0C1019] text-center'
-              variant={vista === "tabla" ? "outline" : 'ghost'}
-              onClick={() => setVista("tabla")}
-            >
-              <List className='w-4 h-8 text-lg'/>
-            </Button>
-            <Button
-              className='text-[#0C1019]'
-              variant={vista === "canvas" ? "outline" : "ghost"}
-              onClick={() => setVista("canvas")}
-            >
-              <LayoutGrid className="w-4 h-8 text-lg"/>
-            </Button>
-          </div>
-        </div>
-        {
-          vista === "tabla" && (
-            <div className='overflow-auto mt-8'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Número</TableHead>
-                    <TableHead>Tipo de Contrato</TableHead>
-                    <TableHead>Tipo de Bien</TableHead>
-                    <TableHead>Compradores</TableHead>
-                    <TableHead>Vendedores</TableHead>
-                    <TableHead>Minuta</TableHead>
-                    <TableHead>Tipo de Pago</TableHead>
-                    <TableHead>Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {
-                    loading ?
-                    Array.from([1,2,3,4])?.map((_, key)=>
-                    <TableRow>
-                      
-                    </TableRow>
-                    ) : 
-                    dataDocumentos > 0?
-                    dataDocumentos?.map((item, idx)=>
-                    <TableRow key={idx}>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                        <TableCell><h1>Columna</h1></TableCell>
-                    </TableRow>
-                    ) :
-                    <TableRow>
-                      <TableCell className={"text-center h-48"} colSpan={8}><Title1>No hay documentos</Title1></TableCell>
-                    </TableRow>
-                  }
-                </TableBody>
-              </Table>
-            </div>
-          )
-        }
-        {
-          vista === "canvas" && (
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-              {
-                dataDocumentos?.length > 0 ?
-                estadosContrato?.map((estado, idx)=>(
-                  <section key={idx}>
-                    <h1 className={cn('text-sm p-2 rounded-lg', estado.bgColor)}>{estado?.title}</h1>
-                  </section>
-                )) :
-                <section className='col-span-4 flex flex-col justify-center items-center border-3 border-gray-400  border-dotted rounded-sm h-[300px]'>
-                  <Title1>No hay documentos</Title1>
-                  <p className="text-gray-600">No se han subido documentos aún</p>
-                </section>
-              }              
-            </div>
-          )
-        }
+      {
+        loading ?
+        <TableLoading headers={headersInmuebles} rows={6} /> :
+        <TableManageDocuments
+          data={[]}
+          headers={headersInmuebles}
+          title="Gestión de Inmuebles"
+          handleAddDocument={()=>{}}
+        />
+      }
+      <section className='w-full mb-6'>
+      <Divider className='my-2 '/>
       </section>
+      {
+        loading ?
+        <TableLoading headers={headersVehiculos} rows={6} /> :
+        <TableManageDocuments
+          data={[]}
+          headers={headersVehiculos}
+          title="Gestión de Vehículos"
+          handleAddDocument={()=>{}}
+        />
+      }
     </div>
   )
 }
