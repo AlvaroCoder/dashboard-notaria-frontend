@@ -1,15 +1,12 @@
 'use client';
 import CardIndicator from '@/components/elements/CardIndicator'
 import CardIndicatorLoading from '@/components/elements/CardIndicatorLoading'
-import Separator from '@/components/elements/Separator';
 import Title1 from '@/components/elements/Title1'
 import TableLoading from '@/components/Tables/TableLoading';
 import TableManageDocuments from '@/components/Tables/TableManageDocuments';
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { cn } from '@/lib/utils';
-import { Divider, Skeleton } from '@mui/material';
-import { Building2, Car, FilePlus2, LayoutGrid, List, Plus, Search } from 'lucide-react'
+import { Divider } from '@mui/material';
+import { Building2, Car} from 'lucide-react'
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
@@ -43,6 +40,8 @@ const headersVehiculos = [
 ];
 
 export default function Page() {
+  const router = useRouter();
+
   const URL_TIPO_CONTRATOS = "";
 
   const [loading, setLoading] = useState(false);
@@ -107,7 +106,7 @@ export default function Page() {
           data={[]}
           headers={headersInmuebles}
           title="Gestión de Inmuebles"
-          handleAddDocument={()=>{}}
+          handleAddDocument={()=>router.push('contracts/inmueble/form-add')}
         />
       }
       <section className='w-full mb-6'>
@@ -120,7 +119,7 @@ export default function Page() {
           data={[]}
           headers={headersVehiculos}
           title="Gestión de Vehículos"
-          handleAddDocument={()=>{}}
+          handleAddDocument={()=>router.push('contracts/vehiculo/form-add')}
         />
       }
     </div>
