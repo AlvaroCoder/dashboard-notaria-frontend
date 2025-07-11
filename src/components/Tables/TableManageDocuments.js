@@ -65,11 +65,22 @@ export default function TableManageDocuments({
                                     data?.map((documento, idx) => (
                                         <TableRow key={idx}>
                                             {
-                                                headers?.map((header, idxHeader) => (
-                                                    <TableCell key={idxHeader}>
-                                                        {documento[header?.value] || "N/A"}
-                                                    </TableCell>
-                                                ))
+                                                headers?.map((header, idxHeader) =>{
+                                                    if (Array.isArray(header.head)) {
+                                                        return (
+                                                            <TableCell key={idxHeader}>
+                                                                {header.head.map((headItem, idxHeadItem) => (
+                                                                    <span key={idxHeadItem}>{documento[headItem]}</span>
+                                                                ))}
+                                                            </TableCell>
+                                                        )
+                                                    }
+                                                    return(
+                                                        <TableCell key={idxHeader}>
+                                                            {documento[header?.head] || "-"}
+                                                        </TableCell>
+                                                    )
+                                                })
                                             }
                                         </TableRow>
                                     ))

@@ -24,7 +24,7 @@ export default function FormPerson({
     const [bienesMancomunados, setBienesMancomunados] = useState(true);
 
   return data?.map((person, idx)=>
-        <section key={idx} className={cn('min-w-3xl relative', 'bg-white shadow rounded-lg ', person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada' ? 'flex flex-row' : '')}>
+        <section key={idx} className={cn('min-w-3xl relative h-fit', 'bg-white shadow rounded-lg ', person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada' ? 'flex flex-row' : '')}>
             {
                 idx > 0 &&
                 <Button 
@@ -98,47 +98,45 @@ export default function FormPerson({
                 </div>
                 
             </div>
-            <div className='flex-1 p-8 mb-6 border-l border-gray-200'>
-                {
-                    (person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada') && (
-                        <section>
-                            <Title1 className='text-2xl'>Información del Conyuge</Title1>
-                            <p className='text-sm'>Información del conyuge del {nombreProceso}</p>
-                            <div className='grid grid-cols-2 gap-4 mt-2'>
-                                <Button
-                                    variant={bienesMancomunados ? "" : "outline"}
-                                    onClick={()=>setBienesMancomunados(true)}
-                                    
-                                >
-                                    Con bienes mancomunados
-                                </Button>
-                                <Button
-                                    variant={!bienesMancomunados ? "" : "outline"}
-                                    onClick={()=>setBienesMancomunados(false)}
-                                >
-                                    Con bienes separados
-                                </Button>
-                            </div>
-                            <div className='grid grid-cols-2 gap-4 mt-8'>
-                                <TextField disabled={!bienesMancomunados} label="Primer Nombre" />
-                                <TextField disabled={!bienesMancomunados} label="Apellido" />
-                                <TextField disabled={!bienesMancomunados} label="DNI" type='number' />
-                                <FormControl disabled={true}>
-                                    <InputLabel>Género</InputLabel>
-                                    <Select value={person?.gender}>
-                                        <MenuItem value={person?.gender}>{person?.gender === 'Masculino' ? 'Femenino' : 'Masculino'}</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <TextField disabled={!bienesMancomunados} label="Nacionalidad"  />
-                                <TextField disabled={!bienesMancomunados} label="Edad" />
-                                <TextField disabled={!bienesMancomunados} label="Trabajo"  />
+            {
+                (person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada') && (
+                    <section className='flex-1 p-8 mb-6 border-l border-gray-200'>
+                        <Title1 className='text-2xl'>Información del Conyuge</Title1>
+                        <p className='text-sm'>Información del conyuge del {nombreProceso}</p>
+                        <div className='grid grid-cols-2 gap-4 mt-2'>
+                            <Button
+                                variant={bienesMancomunados ? "" : "outline"}
+                                onClick={()=>setBienesMancomunados(true)}
+
+                            >
+                                Con bienes mancomunados
+                            </Button>
+                            <Button
+                                variant={!bienesMancomunados ? "" : "outline"}
+                                onClick={()=>setBienesMancomunados(false)}
+                            >
+                                Con bienes separados
+                            </Button>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4 mt-8'>
+                            <TextField disabled={!bienesMancomunados} label="Primer Nombre" />
+                            <TextField disabled={!bienesMancomunados} label="Apellido" />
+                            <TextField disabled={!bienesMancomunados} label="DNI" type='number' />
+                            <FormControl disabled={true}>
+                                <InputLabel>Género</InputLabel>
+                                <Select value={person?.gender}>
+                                <MenuItem value={person?.gender}>{person?.gender === 'Masculino' ? 'Femenino' : 'Masculino'}</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TextField disabled={!bienesMancomunados} label="Nacionalidad"  />
+                            <TextField disabled={!bienesMancomunados} label="Edad" />
+                            <TextField disabled={!bienesMancomunados} label="Trabajo"  />
     
-                            
-                            </div>
-                        </section>
+
+                        </div>
+                    </section>
                 )
-                }
-                </div>
+            }
         </section>
     )
 }

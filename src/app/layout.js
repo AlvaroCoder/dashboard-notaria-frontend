@@ -3,6 +3,7 @@ import "./globals.css";
 import TopBarNavigationMain from "@/components/Navigation/TopBarNavigationMain";
 import { ToastContainer } from "react-toastify";
 import EditorContext from "@/context/ConextEditor";
+import ContratoContext from "@/context/ContratosContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,12 +27,14 @@ export default function RootLayout({ children }) {
         className={`font-poppins text-[#0C1019]`}
       >
         <EditorContext>
+          <ContratoContext>
           <TopBarNavigationMain/>
           {children}
           
           <ToastContainer
             position="bottom"
           />
+          </ContratoContext>
         </EditorContext>
       </body>
     </html>

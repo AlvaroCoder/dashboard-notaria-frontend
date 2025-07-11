@@ -48,7 +48,8 @@ function BlockEditorRenderer({
             )
         }
         return null
-    }
+    };
+
     useEffect(()=>{
       const handleClickOutside =(evt)=>{
         if (editorRef.current && !editorRef.current.contains(evt.target)) {
@@ -60,6 +61,7 @@ function BlockEditorRenderer({
         document.removeEventListener('mousedown', handleClickOutside);
       }
     },[]);
+
     return(
         <div
           ref={editorRef}
@@ -128,6 +130,23 @@ function BlockToolsOneclick({
           >
             <DeleteIcon/>
           </Button>
+          <section className='mx-2 border-l border-gray-400 flex flex-row gap-2 px-2'>
+            <Button
+              variant={"outline"}
+            >
+              <b>B</b>
+            </Button>
+            <Button
+              variant={"outline"}
+            >
+              <i>I</i>
+            </Button>
+            <Button
+              variant={"outline"}
+            >
+              <p>T</p>
+            </Button>
+          </section>
         </section>
       </div>
     )
@@ -188,7 +207,7 @@ export default function EditorView() {
         insertarBloque(idx, newBlock);
     };
   return (
-    <div className='relative w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-24'>
+    <div className='relative w-full min-h-screen grid grid-cols-1 bg-gray-100 pb-2'>
       {
         blockEditing && 
         <section className='fixed w-full h-12 shadow-sm bg-gray-300 z-50 flex flex-row items-center gap-2 justify-center'>

@@ -14,7 +14,8 @@ const EditorMinuta = createContext({
     mostrarBloqueId : ()=>{},
     handleChangeBloque : ()=>{},
     handleEditingBlock : ()=>{},
-    removeEditingBlock : ()=>{}
+    removeEditingBlock : ()=>{},
+    parserData : ()=>{}
 });
 
 export const useEditorContext =()=>useContext(EditorMinuta);
@@ -27,7 +28,6 @@ export default function EditorContext({
     const [blockEditing, setBlockEditing] = useState(null);
     const agregarBloques=(data=[])=>{
         const nuevaLista = data?.map((item)=>({id : generarIdRandom(), ...item}));
-        
         setDataBloques(nuevaLista);
     }
     const handleEditingBlock=(idBlock)=>{
@@ -82,6 +82,9 @@ export default function EditorContext({
     const removeEditingBlock=()=>{
         setBlockEditing(null);
     }
+    const parserData=()=>{
+        return dataBloques?.map(({id, ...resto})=>resto)
+    }
     return(
         <EditorMinuta.Provider
             value={{
@@ -95,7 +98,8 @@ export default function EditorContext({
                 mostrarBloqueId,
                 handleChangeBloque,
                 handleEditingBlock,
-                removeEditingBlock
+                removeEditingBlock,
+                parserData
             }}
         >
             {children}
