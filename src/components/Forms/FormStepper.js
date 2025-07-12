@@ -1,6 +1,6 @@
 'use client';
 import { useContextCard } from '@/context/ContextCard'
-import { Step, StepLabel, Stepper, TextField } from '@mui/material';
+import { Divider, Step, StepLabel, Stepper, TextField } from '@mui/material';
 import React, { useState } from 'react'
 import FormPerson from './FormPerson';
 import { Button } from '../ui/button';
@@ -8,10 +8,17 @@ import Title1 from '../elements/Title1';
 import ButtonUploadImageMinuta from '../elements/ButtonUploadImageMinuta';
 import { checkEmptyFieldsFormCompra, checkEvidenceEmpty } from '@/common/checkInputsFormInmueble';
 import { useContratoContext } from '@/context/ContratosContext';
+import { useFetch } from '@/hooks/useFetch';
+import TableSelectedUser from '../Tables/TableSelectedUser';
+
+const headers = [
+    {value : "Nombre", head : ["firstName", "lastName"]},
+    {value : "Usuario", head : "userName"},
+]
 
 export default function FormStepper() {
-    const {tipoProceso, client} = useContextCard();
-    const stepsCompra = ['Comprador(es)','Vendedor(es)',  'Comprobante de Pago',  ];
+    const {tipoProceso} = useContextCard();
+    const stepsCompra = ['Comprador(es)','Vendedor(es)',  'Comprobante de Pago', 'Notario' ];
     const stepsVenta = ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago' , 'Minuta'];
     const [activeStep, setActiveStep] = useState(0);
     const [activeStepCompra, setActiveStepCompra] = useState(0);
@@ -19,7 +26,19 @@ export default function FormStepper() {
     const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
     const [errorCompra, setErrorCompra] = useState([]);
 
-    const {dataPreMinuta} = useContratoContext();
+    const {
+        data : dataNotario, 
+        loading : loadingDataNotario, 
+        error : errorDataNotario
+    } = useFetch('http://localhost:8000/home/senior');
+
+    const {
+        dataPreMinuta, 
+        selectNotario,
+        notarioSelected,
+        subirInformacionMinuta,
+        subirEvidencias
+    } = useContratoContext();
 
     const [dataSendCompra, setDataSendCompra] = useState({
         minuta : '',
@@ -36,7 +55,7 @@ export default function FormStepper() {
             age: '',
             job: '',
             maritalStatus: {
-              value : ''
+              civilStatus : ''
             },
             address: {
               district : "",
@@ -58,7 +77,7 @@ export default function FormStepper() {
             age: '',
             job: '',
             maritalStatus: {
-              value : ''
+              civilStatus : ''
             },
             address: {
               district : "",
@@ -75,7 +94,7 @@ export default function FormStepper() {
             field === 'address' ? list[index]['address']['name'] = value : list[index]['address'][field] = value;;
         }
         else if (field === 'maritalStatus') {
-            list[index]['maritalStatus']['value'] = value;
+            list[index]['maritalStatus']['civilStatus'] = value?.toLowerCase();
           }
           else{
             list[index][field] = value;
@@ -134,23 +153,7 @@ export default function FormStepper() {
         const newDataImage = dataImagesMinuta.filter((_,index)=>index!==idx);
         setDataImagesMinuta(newDataImage)       
     }
-    const handleUploadMinuta=async(e)=>{
-        // Aquí puedes manejar la lógica para subir la minuta
-        e.preventDefault();
-        if (!dataSendCompra.minuta) {
-            toast("Por favor, sube la minuta en formato PDF", {
-                type: 'error' });
-        }
-        const formData = new FormData();
-        formData.append('minutaFile', dataSendCompra.minuta);
 
-        const response = await fetch('http://lcalhost:8000/home/contracts/sendMinuta', {
-            method : 'POST',
-            body : formData
-        });
-
-
-    }
     switch (tipoProceso) {
         case 'compra':
             return (
@@ -226,6 +229,37 @@ export default function FormStepper() {
                             )
                         }
                     </section>
+                    <section>
+                        {
+                            activeStepCompra === 3 && (
+                                <div className='flex flex-col gap-4'>
+                                    <TableSelectedUser
+                                        title='Selecciona un notario'
+                                        descripcion='Selecciona la informacion del notario'
+                                        slugCrear={'/dashboard/seniors/form-add'}
+                                        headers={headers}
+                                        data={dataNotario?.data}
+                                        handleClickSelect={selectNotario}
+                                    />
+                                    <Divider/>
+                                    {
+                                        notarioSelected && (
+                                            <div >
+                                                <Title1>Notario seleccionado : </Title1>
+                                                <p>Informacion del notario seleccionado</p>
+
+                                                <section className='bg-white rounded-sm shadow p-4 '>
+                                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
+                                                    <h1>Usuario : {notarioSelected?.userName}</h1>
+                                                </section>
+                                            </div>     
+                                        )
+                                       }
+
+                                </div>
+                            )
+                        }
+                    </section>
                     <div className="flex justify-between mt-6">
                         <Button disabled={activeStepCompra === 0} onClick={() => setActiveStepCompra((prev) => prev - 1)}>
                             Atrás
@@ -262,40 +296,35 @@ export default function FormStepper() {
                                         });
                                         return;
                                     }
-
-                                    const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta/',{
-                                        method : 'POST',
-                                        headers : {
-                                            'Content-Type' : 'application/json'
-                                        },
-                                        body : JSON.stringify(dataPreMinuta)
-                                    });
-                                    
-                                    const jsonDataPreMinuta = await responseDataPreMinuta.json();
-                                    
-                                    const contractId = jsonDataPreMinuta?.contractId;
-                                    const newDataSend = {
-                                        contractId,
-                                        sellers : {
-                                            people : vendedores
-                                        },
-                                        buyers : {
-                                            people : compradores
-                                        },
-                                        creationDay : dataPreMinuta?.datesDocument?.processInitiate,
-                                        notario : {
-                                            firstName : "Javier",
-                                            lastName : 'Rojas',
-                                            dni : '123456',
-                                            ruc : '1234567'
-                                        },
-                                        minuta : {
-                                            
-                                        }
-                                    }
                                 }
                                 
-                                                
+                                if (activeStepCompra === 3) {
+                                    try {
+                                        const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
+                                            method : 'POST',
+                                            headers : {
+                                                'Content-type':'application/json'
+                                            },
+                                            body : JSON.stringify(dataPreMinuta)
+                                        });
+    
+                                        const jsonDataPreMinuta = await responseDataPreMinuta.json();
+                                        console.log(jsonDataPreMinuta);
+                                        
+                                        const contractId = jsonDataPreMinuta?.contractId;
+    
+                                        const imagenesEvidencias = await subirEvidencias(dataImagesMinuta);
+                                        
+                                        await subirInformacionMinuta(contractId, vendedores, compradores, {
+                                            caption : dataSendCompra?.paymentMethod,
+                                            evidences : imagenesEvidencias
+                                        })
+                                    } catch (err) {
+                                        console.log(err);
+                                        
+                                    }
+                                }
+                                   
                                 setActiveStepCompra((prev) => (prev < stepsCompra.length - 1 ? prev + 1 : prev));
                             }}
                         >

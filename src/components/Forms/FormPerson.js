@@ -8,8 +8,8 @@ import Title1 from '../elements/Title1';
 import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const getMaritalOptions = (gender) => {
-    if (gender === 'Femenino') return ['Soltera', 'Casada', 'Viuda', 'Divorciada'];
-    if (gender === 'Masculino') return ['Soltero', 'Casado', 'Viudo', 'Divorciado'];
+    if (gender === 'Femenino') return ['soltera', 'casada', 'viuda', 'divorciada'];
+    if (gender === 'Masculino') return ['soltero', 'casado', 'viudo', 'divorciado'];
     return [];
 };
 
@@ -71,13 +71,13 @@ export default function FormPerson({
                         <FormControl fullWidth>
                             <InputLabel>Estado Civil</InputLabel>
                             <Select
-                                value={person?.maritalStatus?.value || ''}
+                                value={person?.maritalStatus?.civilStatus || ''}
                                 label="Estado Civil"
                                 onChange={(e)=>handleChange(idx, 'maritalStatus', e.target.value, type)}
                             >
                                 {
                                     getMaritalOptions(person?.gender)?.map((option, idx)=>(
-                                        <MenuItem key={idx} value={option}>{option}</MenuItem>
+                                        <MenuItem key={idx} value={option}>{option?.charAt(0).toUpperCase() + option?.slice(1).toLowerCase()}</MenuItem>
                                     ))
                                 }       
                             </Select> 

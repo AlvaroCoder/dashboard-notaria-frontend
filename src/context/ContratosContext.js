@@ -15,6 +15,7 @@ function formatearFecha(fechaInput) {
 
 const Contratos = createContext({
     dataMinuta : null,
+    notarioSelected : null,
     dataBloquesMinuta : [],
     dataPreMinuta : null,
     inicializarBloquesMinuta : (bloques)=>{},
@@ -24,7 +25,10 @@ const Contratos = createContext({
     handleChangeDataPreMinuta : ()=>{},
     handleChangeNumeroMinuta : ()=>{},
     handleChangeDataPreMinutaFileLocation : ()=>{},
-    handleChangePreMinutaDate : ()=>{}
+    handleChangePreMinutaDate : ()=>{},
+    selectNotario: ()=>{},
+    subirInformacionMinuta : async()=>{},
+    subirEvidencias : async(dataImagesMinuta)=>{}
 });
 
 export const useContratoContext = ()=>useContext(Contratos);
@@ -43,11 +47,16 @@ export default function ContratoContext ({
         datesDocument : {},
         directory : ''
     });
-    const handleChangeDataPreMinutaFileLocation=(fileLocation)=>{
+    const [notarioSelected, setNotarioSelected] = useState(null);
+    const [fileLocationPdf, setFileLocationPdf] = useState(null);
+
+    const handleChangeDataPreMinutaFileLocation=(fileLocation)=>{ 
+        const {directory, fileName} = fileLocation;
         setDataPreMinuta({...dataPreMinuta,
-            minutaDirectory :`DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-            directory : `DB_evidences/${fileLocation?.directory}`
+            minutaDirectory :`DB_evidences/${directory}/${fileName}`,
+            directory : `DB_evidences/${directory}`
         });
+        setFileLocationPdf(fileLocation);
     }
     const handleChangeDataPreMinuta=(key, value)=>{
         setDataPreMinuta({...dataPreMinuta, [key] : value});
@@ -59,7 +68,8 @@ export default function ContratoContext ({
 
     const inicializarDataMinuta =(idContract)=>{
         setDataMinuta({...dataMinuta, contractId : idContract});
-    }
+    };
+
     const inicializarBloquesMinuta=(bloques)=>{
         setDataBloquesMinuta(bloques);
         const setNewDataMinuta=(data)=>{
@@ -78,7 +88,7 @@ export default function ContratoContext ({
             }
         }
         setDataMinuta({...dataMinuta, minuta : setNewDataMinuta(bloques)})
-    }
+    };
 
     const agregarBloqueMinuta=(blocksParser)=>{
         setDataMinuta((prev)=>({
@@ -90,7 +100,8 @@ export default function ContratoContext ({
                 }
             }
         }))
-    }
+    };
+
     const handleChangeNumeroMinuta=(numeroMinuta)=>{
         setDataMinuta((prev)=>({
             ...dataMinuta,
@@ -99,9 +110,110 @@ export default function ContratoContext ({
                 minutaNumber : numeroMinuta
             }
         }))
-    }
-    const handlerGeneralJSONContract=()=>{
+    };
 
+    const subirEvidencias=(evidencias=[])=>{
+        try {
+            const respuestas = evidencias?.map(async (evidencia)=>{
+                const formDataEvidence = new FormData();
+                formDataEvidence.append('evidence', evidencia[0]);
+    
+                const response = await fetch(`http://127.0.0.1:8000/contracts/sendEvidence/?dir=${fileLocationPdf?.directory}`,{
+                    method : 'POST',
+                    body : formDataEvidence
+                });
+
+                const responseJSON = await response.json();
+                console.log(responseJSON);
+                
+                const file = responseJSON?.fileLocation;
+                return `DB_evidences/${file?.directory}/${file?.fileName}`;
+            });
+    
+            return Promise.all(respuestas);
+        } catch (err) {
+            console.log(err);
+            
+            throw new Error('Ocurrio algo al subir la imagen');
+        }
+    };
+
+    const subirInformacionMinuta=async(contractId, vendedores, compradores, paymentMethod)=>{
+        try {
+            const newDataSend ={
+                contractId,
+                sellers : {
+                    people : vendedores
+                },
+                buyers : {
+                    people : compradores
+                },
+                creationDay : {
+                    date : dataPreMinuta?.datesDocument?.processInitiate
+                },
+                notario : {
+                    firstName : "Javier",
+                    lastName : 'Rojas',
+                    dni : '123456',
+                    ruc : '1234567'
+                },
+                minuta : {
+                    ...dataMinuta?.minuta,
+                    creationDay : {
+                        date : dataPreMinuta?.datesDocument?.processInitiate
+                    },
+                    place : {
+                        name : 'NO IMPORTA',
+                        district : 'Piura'
+                    }
+                },
+                paymentMethod,
+                header:{
+                    numeroDocumentoNotarial:123,
+                    numeroRegistroEscritura:456,
+                    year:2025,
+                    folio:12,
+                    tomo:"XXIV",
+                    kardex:"I1234O"
+                },
+                fojaData:{
+                    start:{
+                        number:"1123",
+                        serie:"C"
+                    },
+                    end:{
+                        number:"1125V",
+                        serie:"C"
+                    }
+                }
+    
+            };
+            console.log(newDataSend);
+            
+            const response = await fetch('http://localhost:8000/contracts/compra_venta/inmueble/escritura/',{
+                mode : 'cors',
+                method : 'POST',
+                headers : {
+                    'Content-type' : 'application/json'
+                },
+                body : JSON.stringify(newDataSend),
+                
+            });
+    
+            const responseJSON = await response.json();
+            console.log(responseJSON);
+        } catch (err) {
+            console.log(err);
+            
+        }
+        
+    }
+    const selectNotario = (notarioData)=>{
+        setDataMinuta({
+            ...dataMinuta,
+            notario : notarioData
+        });
+        setNotarioSelected(notarioData);
     }
     const generarContrato=async()=>{
         console.log(dataMinuta);
@@ -144,6 +256,7 @@ export default function ContratoContext ({
                 dataMinuta,
                 dataBloquesMinuta,
                 dataPreMinuta,
+                notarioSelected,
                 inicializarDataMinuta,
                 inicializarBloquesMinuta,
                 agregarBloqueMinuta,
@@ -151,7 +264,10 @@ export default function ContratoContext ({
                 handleChangeDataPreMinuta,
                 handleChangeNumeroMinuta,
                 handleChangeDataPreMinutaFileLocation,
-                handleChangePreMinutaDate
+                handleChangePreMinutaDate,
+                selectNotario,
+                subirInformacionMinuta,
+                subirEvidencias
             }}
         >
             {children}

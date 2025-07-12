@@ -117,7 +117,7 @@ function RenderCardsFormStepper() {
                                                                 onClick={()=>{
                                                                     handleChangeDataPreMinuta('clientId', cliente?.id);
                                                                     initializeClient(cliente);
-                                                                    toast("Cliente seleccionado",{ type : 'success'});
+                                                                    toast("Cliente seleccionado",{ type : 'info'});
                                                                 }}
                                                                 variant={"ghost"}
                                                                 className={"border-gray-700 border hover:bg-gray-200"}>
@@ -128,7 +128,9 @@ function RenderCardsFormStepper() {
                                                 ))
                                             ) : (
                                                 <TableRow key={0} >
-                                                    <TableCell colSpan={3} className='text-center h-32 text-gray-500'>
+                                                    <TableCell 
+                                                    colSpan={3} 
+                                                    className='text-center h-32 text-gray-500'>
                                                         <p> No se encontraron clientes</p>
                                                         <Button
                                                             onClick={crearCliente}
