@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import CreateIcon from '@mui/icons-material/Create';
 import { toast } from 'react-toastify';
-import { useContratoContext } from '@/context/ContratosContext';
-
 
 export default function TableSelectedUser({
     title="Selecciona un usuario",

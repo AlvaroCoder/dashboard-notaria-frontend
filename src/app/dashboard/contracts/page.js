@@ -10,58 +10,44 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
-const estadosContrato = [
-  {title : "PROCESO INICIADO", bgColor : "bg-green-50"},
-  {title : "EN REVISIÓN", bgColor : "bg-amber-100"},
-  {title : "OBSERVADO", bgColor : "bg-slate-100"},
-  {title : "PENDIENTE DE FIRMA", bgColor : "bg-blue-200 "},
-  {title : "FIRMADO", bgColor : "bg-amber-200"},
-  {title : "PENDIENTE DE RESPUESTA DEL SID", bgColor : "bg-gray-50"},
-  {title : "TACHADO", bgColor : "bg-red-100"},
-  {title : "INSCRITO", bgColor : "bg-green-100"},
-];
-
 const headersInmuebles = [
-  {value: "Tipo de Contrato"},
-  {value: "Tipo de Bien"},
-  {value: "Compradores"},
-  {value: "Vendedores"},
-  {value: "Minuta"},
-  {value: "Estado"}
+  {value: "Tipo de Contrato", head : 'contractType'},
+  {value: "Tipo", head: 'case'},
+  {value : 'Cliente', head : 'clientId'},
+  {value: "Minuta", head : 'minutaDirectory', isPdf : true},
+  {value: "Estado", head : 'status'}
 ];
 
 const headersVehiculos = [
-  {value: "Tipo de Contrato"},
-  {value: "Tipo de Bien"},
-  {value: "Compradores"},
-  {value: "Vendedores"},
-  {value: "Minuta"},
-  {value: "Estado"}
+  {value: "Tipo de Contrato", head : 'contractType'},
+  {value: "Tipo", head : 'case'},
+  {value: "Client", head : 'clientId'},
+  {value: "Minuta", head : 'minutaDirectory', isPdf : true},
+  {value: "Estado", head : 'status'}
 ];
 
 export default function Page() {
   const router = useRouter();
 
-  const URL_TIPO_CONTRATOS = "";
-
   const [loading, setLoading] = useState(false);
-  const [vista, setVista] = useState("tabla");
-  const [dataDocumentos, setDataDocumentos] = useState([]);
   const [dataInmuebles, setDataInmuebles] = useState([]);
   const [dataVehiculos, setDataVehiculos] = useState([]);
   const [indicators, setIndicators] = useState([]);
-
+  
+  
   useEffect(() => {
     async function getData() {
       try {
         setLoading(true);
-        const responseInmuebles = await fetch('http://localhost:8000/home/contracts/propertyCompraVenta');
+        const responseInmuebles = await fetch('http://localhost:8000/home/contracts/compraVentaPropiedad');
         const jsonResponseImuebles = await responseInmuebles.json();
+        
         const dInmuebles = typeof(jsonResponseImuebles?.data) === 'string' ? [] : jsonResponseImuebles?.data;
         setDataInmuebles(dInmuebles);
-
-        const responseVehiculos = await fetch('http://localhost:8000/home/contracts/vehicleCompraVenta');
+        
+        const responseVehiculos = await fetch('http://localhost:8000/home/contracts/compraVentaVehiculo');
         const jsonResponseVehiculos = await responseVehiculos.json();
+                
         const dVehiculos = typeof(jsonResponseVehiculos?.data) === 'string' ? [] : jsonResponseVehiculos?.data;
         setDataVehiculos(dVehiculos);
 
@@ -103,7 +89,7 @@ export default function Page() {
         loading ?
         <TableLoading headers={headersInmuebles} rows={6} /> :
         <TableManageDocuments
-          data={[]}
+          data={dataInmuebles}
           headers={headersInmuebles}
           title="Gestión de Inmuebles"
           handleAddDocument={()=>router.push('contracts/inmueble/form-add')}
@@ -116,7 +102,7 @@ export default function Page() {
         loading ?
         <TableLoading headers={headersVehiculos} rows={6} /> :
         <TableManageDocuments
-          data={[]}
+          data={dataVehiculos}
           headers={headersVehiculos}
           title="Gestión de Vehículos"
           handleAddDocument={()=>router.push('contracts/vehiculo/form-add')}

@@ -200,8 +200,8 @@ export default function ContratoContext ({
                 
             });
     
-            const responseJSON = await response.json();
-            console.log(responseJSON);
+            const blobResponse = await response.blob();
+            return blobResponse;
         } catch (err) {
             console.log(err);
             

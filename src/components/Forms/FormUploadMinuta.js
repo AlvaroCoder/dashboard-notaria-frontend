@@ -74,25 +74,25 @@ export default function FormUploadMinuta() {
     if (loading ) {
         return(<p>Cargando ....</p>)
     }
- if (isEditorMode) {
-    return(
-    <div className='relative h-screen overflow-y-auto w-full flex-1'>
-        <EditorView/>
-        <Button 
-        onClick={()=>{
-            const dataParseada = parserData();
-            handleChangePreMinutaDate();
-            agregarBloqueMinuta(dataParseada);
-            continuarCompletarFormulario();
+    if (isEditorMode) {
+        return(
+        <div className='relative h-screen overflow-y-auto w-full flex-1'>
+            <EditorView/>
+            <Button 
+            onClick={()=>{
+                const dataParseada = parserData();
+                handleChangePreMinutaDate();
+                agregarBloqueMinuta(dataParseada);
+                continuarCompletarFormulario();
 
-            console.log(dataPreMinuta);
-            
-        }}
-        className={'w-full mt-4'}>
-            Continuar
-        </Button>
-    </div>)
- }
+                console.log(dataPreMinuta);
+                
+            }}
+            className={'w-full mt-4'}>
+                Continuar
+            </Button>
+        </div>)
+    }
  return (
     <div className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
 

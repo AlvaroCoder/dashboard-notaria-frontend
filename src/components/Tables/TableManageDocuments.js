@@ -4,13 +4,14 @@ import Title1 from '../elements/Title1'
 import { Button } from '../ui/button'
 import { FilePlus2, LayoutGrid, List } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import ButtonDownloadPdf from '../elements/ButtonDownloadPdf'
 
 export default function TableManageDocuments({
     title="Documentos",
     handleAddDocument=()=>{},
     data=[],
     headers=[]
-}) {
+}) {    
     const [vista, setVista] = useState("tabla");
   return (
     <section className='w-full rounded-sm shadow-sm bg-white p-4'>
@@ -72,6 +73,16 @@ export default function TableManageDocuments({
                                                                 {header.head.map((headItem, idxHeadItem) => (
                                                                     <span key={idxHeadItem}>{documento[headItem]}</span>
                                                                 ))}
+                                                            </TableCell>
+                                                        )
+                                                    }
+                                                    if (header?.isPdf) {
+                                                        return (
+                                                            <TableCell>
+                                                                <ButtonDownloadPdf
+                                                                key={idx}
+                                                                minutaDirectory={documento[header?.head]}
+                                                                />
                                                             </TableCell>
                                                         )
                                                     }

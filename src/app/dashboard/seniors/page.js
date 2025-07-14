@@ -11,13 +11,13 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 
 const headers = [
-  {value : "Nombre"},
-  {value : "DNI"},
-  {value : "RUC"},
-  {value : "Usuario"},  
-  {value : "Email"},
-  {value : "Telefono"},
-  {value : "Direccion"}
+  {value : "Nombre", head : ['firstName', 'lastName']},
+  {value : "DNI", head : 'dni'},
+  {value : "RUC", head : 'ruc'},
+  {value : "Usuario", head : 'userName'},  
+  {value : "Email", head : 'email'},
+  {value : "Telefono", head : 'phone'},
+  {value : "Direccion", head : ''}
 ];
 
 function SeniorsTablero({
@@ -132,6 +132,8 @@ function SeniorsTablero({
     </div>
   )
 }
+
+
 
 export default function Page() {
   const router = useRouter();

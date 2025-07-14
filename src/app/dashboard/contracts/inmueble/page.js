@@ -6,7 +6,7 @@ import TableroContratosCarga from '@/components/Tables/TableroContratoCarga';
 import Title1 from '@/components/elements/Title1';
 
 export default function Page() {
-    const typeContract = "propertyCompraVenta"
+    const typeContract = "compraVentaPropiedad"
     const URL_CONTRACTS_INMUEBLES = `http://localhost:8000/home/contracts/${typeContract}`
     const [loadingDataProperties, setLoadingDataProperties] = useState(false);
     const [error, setError] = useState(null);

@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 export default function Loading({
     isOpen
 }) {
-    const features = [
-        "Atención personalizada",
-        "Trámites rápidos y seguros",
-        "Especialistas en derecho notarial",
-        "Más de 20 años de experiencia",
-        "Asesoría legal confiable",
-      ];
+  const features = [
+    "Atención personalizada",
+    "Trámites rápidos y seguros",
+    "Especialistas en derecho notarial",
+    "Más de 20 años de experiencia",
+    "Asesoría legal confiable",
+  ];
 
   return (
     <Dialog

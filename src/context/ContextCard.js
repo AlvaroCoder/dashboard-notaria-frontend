@@ -5,9 +5,10 @@ const ContextCard = createContext({
     isProcessStart : false,
     activeStep : 0,
     establecerTipoProceso : ()=>{},
-    initializeClient : ()=>{},
     handleFileLocation : ()=>{},
     continuarCompletarFormulario : ()=>{},
+    pushActiveStep : ()=>{},
+    initializeClient : ()=>{}
 });
 
 export const useContextCard = ()=> useContext(ContextCard);
@@ -22,10 +23,12 @@ export default function ContextCardComp({
     const [client, setClient] = useState(null);
     const [fileLocation, setFileLocation] = useState(null);
 
+    const pushActiveStep=()=>{
+        setActiveStep(activeStep+1);
+    }
 
     const initializeClient=(newClient)=>{
         setClient(newClient);
-        setActiveStep(1);
     }
 
     const establecerTipoProceso=(tipo='compra')=>{
@@ -43,9 +46,10 @@ export default function ContextCardComp({
         <ContextCard
             value={{
                 establecerTipoProceso,
-                initializeClient,
                 handleFileLocation,
                 continuarCompletarFormulario,
+                pushActiveStep,
+                initializeClient,
                 isProcessStart,
                 activeStep,
                 tipoProceso,

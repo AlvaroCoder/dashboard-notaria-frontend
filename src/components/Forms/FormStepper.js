@@ -25,6 +25,7 @@ export default function FormStepper() {
     const [activeStepVenta, setActiveStepVenta] = useState(0);
     const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
     const [errorCompra, setErrorCompra] = useState([]);
+    const [errorVenta, setErrorVenta] = useState([]);
 
     const {
         data : dataNotario, 
@@ -103,7 +104,7 @@ export default function FormStepper() {
     };
 
 
-    const addPerson = (type = 'vendedor') => {
+    const addPerson = (type = 'venta') => {
         const newPerson = {
           firstName: '',
           lastName: '',
@@ -308,9 +309,7 @@ export default function FormStepper() {
                                             body : JSON.stringify(dataPreMinuta)
                                         });
     
-                                        const jsonDataPreMinuta = await responseDataPreMinuta.json();
-                                        console.log(jsonDataPreMinuta);
-                                        
+                                        const jsonDataPreMinuta = await responseDataPreMinuta.json();                                        
                                         const contractId = jsonDataPreMinuta?.contractId;
     
                                         const imagenesEvidencias = await subirEvidencias(dataImagesMinuta);
@@ -337,13 +336,20 @@ export default function FormStepper() {
             return (
                 <div>
                     {renderStepper(stepsVenta, activeStep)}
-                    <section>
+                    <section className='mt-8'>
                         {
-                            activeStep === 0 && (
+                            activeStepVenta === 0 && (
                                 <>
-                                    
+                                    <FormPerson
+                                        data={vendedores}
+                                        handleChange={handleChange}
+                                        type='venta'
+                                        handleDelete={deletePerson}
+                                        errores={errorVenta}
+                                    />
                                     <section className='flex flex-row gap-2'>
                                         <Button
+                                            onClick={()=>addPerson('venta')}
                                             className={"flex-1 py-4"}
                                         >
                                         Agregar Vendedor
@@ -353,7 +359,59 @@ export default function FormStepper() {
                             )
                         }
                     </section>
-       
+                    <section className='mt-8'>
+                        {
+                            activeStepVenta === 1 && (
+                                <section>
+                                    <FormPerson
+                                        data={compradores}
+                                        handleChange={handleChange}
+                                        type='compra'
+                                        handleDelete={deletePerson}
+                                        errores={errorVenta}
+                                    />
+                                    <div className='flex flex-row gap-2'>
+                                        <Button
+                                            onClick={()=>addPerson('venta')}
+                                            className={'flex-1 py-4'}
+                                        >
+                                            Agregar Comprador
+                                        </Button>
+                                    </div>
+                                </section>
+                            )
+                        }
+                    </section>
+                    <section>
+                        {
+                            activeStepVenta === 3 && (
+                                <div className='flex flex-col gap-4'>
+                                    <TableSelectedUser
+                                        title='Selecciona un notario'
+                                        descripcion='Selecciona la informacion del notario'
+                                        slugCrear={'/dashboard/seniors/form-add'}
+                                        headers={headers}
+                                        data={dataNotario?.data}
+                                        handleClickSelect={selectNotario}
+                                    />
+                                    <Divider/>
+                                    {
+                                        notarioSelected && (
+                                            <div >
+                                                <Title1>Notario seleccionado : </Title1>
+                                                <p>Informacion del notario seleccionado</p>
+
+                                                <section className='bg-white rounded-sm shadow p-4 '>
+                                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
+                                                    <h1>Usuario : {notarioSelected?.userName}</h1>
+                                                </section>
+                                            </div>  
+                                        )
+                                    }
+                                </div>
+                            )
+                        }
+                    </section>
                     <div className="flex justify-between mt-6">
                         <Button disabled={activeStepVenta === 0} onClick={() => setActiveStepVenta((prev) => prev - 1)}>
                             Atrás
