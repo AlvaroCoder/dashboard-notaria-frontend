@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, FileText } from "lucide-react";
+import ButtonDownloadPdf from './ButtonDownloadPdf';
 
 export default function CardContract({
     contract
@@ -49,21 +50,12 @@ export default function CardContract({
             <div>
               <strong>Método de pago:</strong> {paymentMethod?.caption || "No especificado"}
             </div>
-            <div>
-              <strong>Fecha de inicio:</strong>{" "}
-              {datesDocument?.initiateProcess ? new Date(datesDocument.initiateProcess).toLocaleDateString() : "—"}
-            </div>
             <div className="flex items-center gap-2">
               <strong>Minuta:</strong>
               {minutaDirectory ? (
-                <a
-                  href={`/${minutaDirectory}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 underline"
-                >
-                  Ver PDF
-                </a>
+                <ButtonDownloadPdf
+                  minutaDirectory={minutaDirectory}
+                />
               ) : (
                 "No disponible"
               )}

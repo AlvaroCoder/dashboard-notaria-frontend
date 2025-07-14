@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import Title1 from "../elements/Title1";
 import CardContract from "../elements/CardContract";
 import { useRouter } from "next/navigation";
+import ButtonDownloadPdf from "../elements/ButtonDownloadPdf";
 
 const estadosContrato = [
   {id : 1, title : "PROCESO INICIADO", bgColor : "bg-green-50"},
@@ -27,13 +28,16 @@ export default function TableroContratos({
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
   const router = useRouter();
-
+  
   return (
     <div className="w-full rounded-sm shadow-sm bg-white p-4">
       <section className="flex flex-row items-center justify-between">
-        <Title1 className="text-2xl">
-          {titulo}
-        </Title1>
+        <div>
+          <Title1 className="text-2xl">
+            Tablero de {titulo}
+          </Title1>
+          <p className="text-sm text-gray-500">Tablero para visualizar la información</p>
+        </div>
         <div className="flex justify-end gap-2">
           <Button
             className={"bg-[#0C1019]"}
@@ -90,20 +94,16 @@ export default function TableroContratos({
                     contrato?.sellers?.people?.map((person, idx)=><p key={idx}>{person?.firstName} {person?.lastName}</p>)
                     }</TableCell>
                   <TableCell>
-                    <Link
-                      href={`/dashboard/download/?idContract=${contrato?.id}`}
-                      target="_blank"
-                      className="text-blue-600 underline"
-                      rel="noopener noreferrer"
-                    >
-                      Descargar
-                    </Link>
+                    <ButtonDownloadPdf
+                      minutaDirectory={contrato?.minutaDirectory}
+                    />
                   </TableCell>
-                  <TableCell><p className="text-sm break-words whitespace-normal w-20">
-                  {contrato.paymentMethod?.caption}</p></TableCell>
+                  <TableCell>
+                    <p className="text-sm break-words whitespace-normal w-20">
+                      {contrato.paymentMethod?.caption}</p></TableCell>
                   <TableCell>
                     {estadosContrato?.filter((_, idx)=>contrato.status === idx+1).map((item)=>(
-                      <p key={idx} className={cn(item.bgColor, 'w-32 p-1 rounded-sm text-wrap')}>{item?.title}</p>
+                      <p key={idx} className={cn(item.bgColor, 'w-32 p-1 rounded-sm text-wrap text-center')}>{item?.title}</p>
                     ))}
                   </TableCell>
                 </TableRow>

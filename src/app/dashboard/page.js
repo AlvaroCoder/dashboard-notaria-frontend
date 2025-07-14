@@ -21,17 +21,6 @@ export default function Page() {
   const [dataDocumentos, setdataDocumentos] = useState([]);
   const [indicadoresGeneral, setIndicadoresGeneral] = useState([]);
 
-
-/**
- *   const indicatorsGeneral=[
-  {id:1, title : 'Contratos', value : 200, icon : DescriptionIcon},
-  {id:2, title : 'Clientes', value : 20, icon : Person4Icon},
-  {id:3, title : 'Juniors', value : 120, icon : User},
-  {id:4, title : 'Seniors', value : 60, icon : ShieldUser}
-];
-
- */
-
   useEffect(()=>{
     async function getData() {
         try {
@@ -52,8 +41,9 @@ export default function Page() {
 
             ];
             toast("Data enviada correctamente",{
-              type : 'success'
-            })
+              type : 'success',
+              position : 'top-right'
+            });
             setIndicadoresGeneral(nuevaLista);
 
         } catch (err) {

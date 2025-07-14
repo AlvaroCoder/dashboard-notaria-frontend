@@ -1,14 +1,17 @@
 'use client';
+import React from 'react';
 import { TopBarBack } from '@/components/Navigation';
-import React from 'react'
 
 export default function Layout({
     children
 }) {
   return (
-    <section className='w-full h-screen overflow-y-hidden flex flex-col'>
+    <div className='w-full h-screen flex flex-col'>
         <TopBarBack/>
-        {children}
-    </section>
+        <main>
+            {children}
+        </main>
+    </div>
   )
-}
+};
+

@@ -34,7 +34,6 @@ export default function Page() {
   const [dataVehiculos, setDataVehiculos] = useState([]);
   const [indicators, setIndicators] = useState([]);
   
-  
   useEffect(() => {
     async function getData() {
       try {
