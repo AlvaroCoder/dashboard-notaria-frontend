@@ -10,6 +10,7 @@ import { checkEmptyFieldsFormCompra, checkEvidenceEmpty } from '@/common/checkIn
 import { useContratoContext } from '@/context/ContratosContext';
 import { useFetch } from '@/hooks/useFetch';
 import TableSelectedUser from '../Tables/TableSelectedUser';
+import { toast } from 'react-toastify';
 
 const headers = [
     {value : "Nombre", head : ["firstName", "lastName"]},
@@ -17,7 +18,7 @@ const headers = [
 ]
 
 export default function FormStepper() {
-    const {tipoProceso} = useContextCard();
+    const {tipoProceso, pushActiveStep} = useContextCard();
     const stepsCompra = ['Comprador(es)','Vendedor(es)',  'Comprobante de Pago', 'Notario' ];
     const stepsVenta = ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago' , 'Minuta'];
     const [activeStep, setActiveStep] = useState(0);
@@ -41,7 +42,14 @@ export default function FormStepper() {
         subirEvidencias
     } = useContratoContext();
 
+    
+
     const [dataSendCompra, setDataSendCompra] = useState({
+        minuta : '',
+        paymentMethod : ''
+    });
+
+    const [dataSendVenta, setDataSendVenta] = useState({
         minuta : '',
         paymentMethod : ''
     });
@@ -301,6 +309,7 @@ export default function FormStepper() {
                                 
                                 if (activeStepCompra === 3) {
                                     try {
+
                                         const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
                                             method : 'POST',
                                             headers : {
@@ -317,10 +326,15 @@ export default function FormStepper() {
                                         await subirInformacionMinuta(contractId, vendedores, compradores, {
                                             caption : dataSendCompra?.paymentMethod,
                                             evidences : imagenesEvidencias
-                                        })
+                                        });
+
+                                        pushActiveStep();
+
                                     } catch (err) {
                                         console.log(err);
                                         
+                                    } finally {
+
                                     }
                                 }
                                    
@@ -335,7 +349,7 @@ export default function FormStepper() {
         case 'venta':
             return (
                 <div>
-                    {renderStepper(stepsVenta, activeStep)}
+                    {renderStepper(stepsVenta, activeStepVenta)}
                     <section className='mt-8'>
                         {
                             activeStepVenta === 0 && (
@@ -384,6 +398,36 @@ export default function FormStepper() {
                     </section>
                     <section>
                         {
+                            activeStepVenta === 2 &&(
+                                <div className='min-w-3xl p-4 bg-white rounded-xl shadow-sm text-xl'>
+                                    <section className='my-2'>
+                                        <Title1 
+                                            className='text-center text-2xl'>Subr los comprobantes de pago</Title1>
+                                        <p
+                                            className='text-center text-gray-600 text-sm'
+                                        >Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
+                                    </section>
+                                    <ButtonUploadImageMinuta
+                                        handleChangeImage={handleChangeImageMinuta}
+                                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
+                                    />
+                                    {
+                                        dataImagesMinuta?.length > 0 &&
+                                        <section className='w-full mt-8'>
+                                            <TextField 
+                                                className='w-full' 
+                                                onChange={(e)=>setDataSendVenta({...dataSendVenta, paymentMethod : e.target.value})} 
+                                                label="Indique el medio de pago" 
+                                                required 
+                                            />
+                                        </section>
+                                    }
+                                </div>
+                            )
+                        }
+                    </section>
+                    <section>
+                        {
                             activeStepVenta === 3 && (
                                 <div className='flex flex-col gap-4'>
                                     <TableSelectedUser
@@ -417,6 +461,66 @@ export default function FormStepper() {
                             Atrás
                         </Button>
                         <Button
+                            onClick={async(e)=>{
+                                e.preventDefault();
+                                if (activeStepVenta === 0) {
+                                    const errores = checkEmptyFieldsFormCompra(vendedores);
+                                    if (errores.length > 0) {
+                                        setErrorVenta(errores);
+                                        toast('Formulario incompleto', {
+                                            type : 'error'
+                                        });
+                                        return;
+                                    }
+                                }
+                                if (activeStepVenta === 1) {
+                                    const errores = checkEmptyFieldsFormCompra(compradores);
+                                    if (errores.length > 0) {
+                                        setErrorVenta(errores);
+                                        toast('Formulario incompleto',{
+                                            type : 'error'
+                                        });
+                                        return;
+                                    }
+                                }
+                                if (activeStepVenta === 2) {
+                                    const errores = checkEvidenceEmpty(dataImagesMinuta);
+                                    if (errores.error) {
+                                        setErrorVenta([errores]);
+                                        toast('Evidencias incompletas',{
+                                            type : 'error'
+                                        });
+                                        return;
+                                    }
+                                }
+                                if (activeStepVenta === 3) {
+                                    try {
+                                        const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
+                                            method : 'POST',
+                                            headers : {
+                                                'Content-type' : 'application/json'
+                                            },
+                                            body : JSON.stringify(dataPreMinuta)
+                                        });
+                                        const jsonDataPreMinuta = await responseDataPreMinuta.json();
+                                        const contractId = jsonDataPreMinuta?.contractId;
+
+                                        const imagesEvidencias = await subirEvidencias(dataImagesMinuta);
+                                        await subirInformacionMinuta(contractId, vendedores, compradores, {
+                                            caption : dataSendVenta?.paymentMethod,
+                                            evidences : imagesEvidencias
+                                        });
+
+                                        pushActiveStep();
+                                    } catch (err) {
+                                        console.log(err);
+                                        
+                                    } finally {
+
+                                    }
+                                }
+                                setActiveStepVenta((prev)=>(prev<stepsVenta.length - 1 ? prev + 1 : prev))
+                            }}
                         >
                         {activeStepVenta === stepsVenta.length - 1 ? 'Finalizar' : 'Siguiente'}
                         </Button>
@@ -425,125 +529,3 @@ export default function FormStepper() {
             )
     }
 }
-
-/**
- * 
- *                       {
-                            activeStepCompra === 1 && (
-                                <>
-                                    <FormPerson
-                                        data={compradores}
-                                        handleChange={handleChange}
-                                        type='compra'
-                                        handleDelete={deletePerson}
-                                        errores={errorCompra}
-                                    />
-                                    <section className='flex flex-row gap-2 mt-6'>
-                                        <Button
-                                            onClick={()=>addPerson('comprador')}
-                                            className={"flex-1 py-4 cursor-pointer"}
-                                        >
-                                        Agregar Comprador
-                                        </Button>
-                                    </section>
-                                </>
-                            )
-                        }
-                        {
-                            activeStepCompra === 1 && (
-                                <section>
-                                    <FormPerson
-                                        data={vendedores}
-                                        handleChange={handleChange}
-                                        type='venta'
-                                        handleDelete={deletePerson}
-                                        errores={errorCompra}
-                                    />
-                                    <section className='flex flex-row gap-2'>
-                                        <Button
-                                            onClick={()=>addPerson('comprador')}
-                                            className={"flex-1 py-4"}
-                                        >
-                                        Agregar Comprador
-                                        </Button>
-                                    </section>
-                                </section>
-                            )
-                        }
-                        {
-                            activeStepCompra === 2 && (
-                                <div className='min-w-3xl  p-4 bg-white rounded-xl shadow-sm  text-xl'>
-                                    
-                                    <section className='my-2'>
-                                        <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
-                                        <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
-                                    </section>
-                                    <ButtonUploadImageMinuta
-                                        handleChangeImage={handleChangeImageMinuta}
-                                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
-                                    />
-                                    {
-                                        dataImagesMinuta.length > 0 &&
-                                        <div className='w-full mt-8'>
-                                            <TextField className='w-full' onChange={(e)=>setDataSendCompra({...dataSendCompra, paymentMethod : e.target.value})}  label="Indique el medio de pago" required />
-                                        </div> 
-                                    }
-                                </div>
-                            )
-                        }
- */
-
-/**
- * 
- *                     <div className="flex justify-between mt-6">
-                        <Button disabled={activeStepCompra === 0} onClick={() => setActiveStepCompra((prev) => prev - 1)}>
-                            Atrás
-                        </Button>
-                        <Button
-                            onClick={(e)=>{
-                                e.preventDefault();
-                                if (activeStepCompra === 0) {
-                                    const errores = checkEmptyFieldsFormCompra(compradores);
-                                    if (errores.length > 0) {
-                                        setErrorCompra(errores);
-                                        toast("Formulario incompleto",{
-                                            type : 'error'
-                                        })
-                                        return;
-                                    }
-                                }
-                                if (activeStepCompra === 1) {
-                                    const errores = checkEmptyFieldsFormCompra(vendedores);
-                                    if (errores.length > 0) {
-                                        setErrorCompra(errores);
-                                        toast("Formulario incompleto",{
-                                            type :'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                if (activeStepCompra === 2) {
-                                    const errores = checkEvidenceEmpty(dataImagesMinuta);
-                                    if (errores.error) {
-                                        setErrorCompra([errores]);
-                                        toast("Evidencias incompletas",{
-                                            type : 'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                const dataSend = {
-                                    buyers : compradores,
-                                    sellers : {
-                                        people : vendedores
-                                    },
-                                }
-                                console.log(compradores, vendedores, dataImagesMinuta, dataSendCompra);
-                                                             
-                                setActiveStepCompra((prev) => (prev < stepsCompra.length - 1 ? prev + 1 : prev));
-                            }}
-                        >
-                            {activeStepCompra === stepsCompra.length - 1 ? 'Finalizar' : 'Siguiente'}
-                        </Button>
-                    </div>
- */

@@ -1,17 +1,16 @@
 'use client'
-import Title1 from '@/components/elements/Title1'
 import TableroCarga from '@/components/Loading/TableroCarga'
-import TableManageDocuments from '@/components/Tables/TableManageDocuments'
+import TableMangeUser from '@/components/Tables/TableManageUser'
 import { useFetch } from '@/hooks/useFetch'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 
 const headers = [
     {value : "Nombre", head : ["firstName", "lastName"]},
     {value : "Usuario", head : "userName"},
     {value : "Email", head : "email"},
     {value : "Telefono", head : "phone"},
-    {value : "Direccion"}
+    {value : "Direccion", head : 'address'}
 ];
 
 export default function Page() {
@@ -24,14 +23,14 @@ export default function Page() {
     } = useFetch(URL_DATA_CLIENTES);
 
   return (
-    <div className='p-6'>
+    <div className='p-6 h-screen overflow-y-auto'>
         <div className='space-y-6'>
             {
                 loadingDataClientes ? 
                 <TableroCarga
                     headers={headers}
                 /> : 
-                <TableManageDocuments
+                <TableMangeUser
                     title='Clientes'
                     handleAddDocument={()=>router.push("clientes/form-add")}
                     headers={headers}

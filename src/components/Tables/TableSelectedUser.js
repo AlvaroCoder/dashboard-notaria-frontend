@@ -21,11 +21,14 @@ export default function TableSelectedUser({
     const crearUsuario = ()=>router.push(slugCrear);
 
     const currentData = useMemo(()=>{
-        return data?.filter((item)=>item?.firstName?.toUpperCase().includes(queryInput?.toUpperCase()));
+        return data?.filter((item)=>
+            item?.firstName?.toUpperCase().includes(queryInput?.toUpperCase()) ||
+            item?.userName?.toUpperCase().includes(queryInput?.toUpperCase())
+        );
     },[data, queryInput]);
 
   return (
-    <div>
+    <div >
         <section>
             <Title1 className='text-3xl font-bold'>{title}</Title1>
             <p className='text-gray-500 text-sm'>{descripcion}</p>

@@ -14,6 +14,8 @@ function formatearFecha(fechaInput) {
 };
 
 const Contratos = createContext({
+    loadingProcess : false,
+    viewerPdf : null,
     dataMinuta : null,
     notarioSelected : null,
     dataBloquesMinuta : [],
@@ -49,6 +51,9 @@ export default function ContratoContext ({
     });
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [fileLocationPdf, setFileLocationPdf] = useState(null);
+    const [viewerPdf, setViewerPdf] = useState(null);
+
+    const [loadingProcess, setLoadingProcess] = useState(false);
 
     const handleChangeDataPreMinutaFileLocation=(fileLocation)=>{ 
         const {directory, fileName} = fileLocation;
@@ -114,6 +119,7 @@ export default function ContratoContext ({
 
     const subirEvidencias=(evidencias=[])=>{
         try {
+            setLoadingProcess(true);
             const respuestas = evidencias?.map(async (evidencia)=>{
                 const formDataEvidence = new FormData();
                 formDataEvidence.append('evidence', evidencia[0]);
@@ -123,9 +129,7 @@ export default function ContratoContext ({
                     body : formDataEvidence
                 });
 
-                const responseJSON = await response.json();
-                console.log(responseJSON);
-                
+                const responseJSON = await response.json();                
                 const file = responseJSON?.fileLocation;
                 return `DB_evidences/${file?.directory}/${file?.fileName}`;
             });
@@ -135,11 +139,14 @@ export default function ContratoContext ({
             console.log(err);
             
             throw new Error('Ocurrio algo al subir la imagen');
+        } finally{
+            setLoadingProcess(false);
         }
     };
 
     const subirInformacionMinuta=async(contractId, vendedores, compradores, paymentMethod)=>{
         try {
+            setLoadingProcess(true);
             const newDataSend ={
                 contractId,
                 sellers : {
@@ -188,8 +195,7 @@ export default function ContratoContext ({
                 }
     
             };
-            console.log(newDataSend);
-            
+                        
             const response = await fetch('http://localhost:8000/contracts/compra_venta/inmueble/escritura/',{
                 mode : 'cors',
                 method : 'POST',
@@ -201,10 +207,14 @@ export default function ContratoContext ({
             });
     
             const blobResponse = await response.blob();
-            return blobResponse;
+            const url = URL.createObjectURL(blobResponse);
+            setViewerPdf(url);
+
         } catch (err) {
             console.log(err);
-            
+            setLoadingProcess(false);
+        } finally{
+            setLoadingProcess(false);
         }
         
     }
@@ -216,7 +226,7 @@ export default function ContratoContext ({
         setNotarioSelected(notarioData);
     }
     const generarContrato=async()=>{
-        console.log(dataMinuta);
+
         const URL_GENERAR_MINUTA = 'http://localhost:8000/contracts/compra_venta/inmueble'; 
         const response = await fetch(URL_GENERAR_MINUTA,{
             method : 'POST',
@@ -253,6 +263,8 @@ export default function ContratoContext ({
     return(
         <Contratos.Provider
             value={{
+                loadingProcess,
+                viewerPdf,
                 dataMinuta,
                 dataBloquesMinuta,
                 dataPreMinuta,

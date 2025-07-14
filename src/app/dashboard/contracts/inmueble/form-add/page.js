@@ -4,9 +4,8 @@ import Title1 from '@/components/elements/Title1';
 import TableroCarga from '@/components/Loading/TableroCarga';
 import { useContextCard } from '@/context/ContextCard';
 import { useFetch } from '@/hooks/useFetch';
-import { Divider, Step, StepLabel, Stepper, TextField } from '@mui/material';
-import React, {  useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation';
+import { Divider } from '@mui/material';
+import React from 'react'
 import CardRequirements from '@/components/Cards/CardRequirements';
 import FormUploadMinuta from '@/components/Forms/FormUploadMinuta';
 import FormStepper from '@/components/Forms/FormStepper';
@@ -14,6 +13,7 @@ import { useContratoContext } from '@/context/ContratosContext';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { toast } from 'react-toastify';
+import Loading from '@/components/elements/Loading';
 
 
 const headerTableroCliente=[
@@ -65,7 +65,7 @@ function RenderCardsFormStepper() {
         // Primero seleccionamos el cliente que vamos a usar
         case 0:
             return (
-                <div>
+                <div >
                     {
                         loadingDataClientes ? 
                         <TableroCarga
@@ -110,9 +110,13 @@ function RenderCardsFormStepper() {
 }
 
 export default function Page() {
+    const {
+        loadingProcess
+    } = useContratoContext();
 
     return (
-        <section className='w-full min-h-screen pb-24 grid grid-cols-1 p-8 gap-2'>
+        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
+            {loadingProcess && <Loading isOpen={loadingProcess}/>}
             <RenderCardsFormStepper/>
         </section>
   )

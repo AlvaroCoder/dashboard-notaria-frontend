@@ -10,7 +10,7 @@ export default function Layout({
     const {back} = useRouter();
   return (
     <ContextCardComp>
-        <div>
+        <div className='w-full h-screen flex flex-col '>
             <nav className='p-4 w-full shadow-sm h-20 flex flex-row items-center'>
                 <div className='flex flex-row items-center text-gray-500  text-sm'>
                     <ArrowBackIosIcon fontSize='20'/>

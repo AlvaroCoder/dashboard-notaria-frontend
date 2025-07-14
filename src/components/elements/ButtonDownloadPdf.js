@@ -10,7 +10,6 @@ export default function ButtonDownloadPdf({
     const [loading, setLoading] = useState(false);
 
     const handleClick=async()=>{
-        console.log(minutaDirectory);
         try {
             setLoading(true);
             const response = await fetch('http://127.0.0.1:8000/home/minuta/',{
@@ -39,10 +38,10 @@ export default function ButtonDownloadPdf({
     <Button
         onClick={handleClick}
         variant={"ghost"}
-        className={"block z-20 h-full underline text-blue-500 font-bold hover:bg-transparent"}
+        className={"block z-20 h-full underline text-blue-500 font-bold hover:bg-transparent cursor-pointer"}
     >
        {
-        loading ? <Loader2Icon className='animate-spin'/> :  <p>Descargar PDF</p>
+        loading ? <Loader2Icon className='animate-spin'/> :  <p>Ver PDF</p>
        }
     </Button>
   )

@@ -1,8 +1,12 @@
 import React from 'react'
 import Title1 from '../elements/Title1'
 import { Divider } from '@mui/material'
+import { useContratoContext } from '@/context/ContratosContext'
 
 export default function FormViewerPdfEscritura() {
+    const {
+        viewerPdf : dataPdf
+    } = useContratoContext();
   return (
     <section className='p-8'>
         <section className='p-4 bg-white shadow rounded-sm'>
@@ -14,7 +18,6 @@ export default function FormViewerPdfEscritura() {
                 className='my-2'
             />
             <section
-                
             >
                 {
                     dataPdf && (

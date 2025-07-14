@@ -13,12 +13,17 @@ export default function TableMangeUser({
     data=[],
     headers=[]
 }) {    
+    console.log(data);
+    
     const [vista, setVista] = useState("tabla");
     const [queryInput, setQueryInput] = useState('');
 
     const currentData = useMemo(()=>{
-        return data
+        return data?.filter((item)=>
+            item?.userName?.toUpperCase().includes(queryInput?.toUpperCase())
+        )
     },[queryInput, data]);
+
   return (
     <main className='p-6'>
         <section className='mb-6'>
@@ -76,11 +81,19 @@ export default function TableMangeUser({
                             </TableHeader>
                             <TableBody >
                                 {
+                                    // {head : {}}
                                     currentData?.length > 0 ? (
                                         currentData?.map((documento, idx) => (
                                             <TableRow key={idx}>
                                                 {
                                                     headers?.map((header, idxHeader) =>{
+                                                        if (header?.head === 'address') {
+                                                            return (
+                                                                <TableCell key={idxHeader}>
+                                                                    {documento[header?.head] ? <p>{documento[header?.head].name}</p> : '-'}
+                                                                </TableCell>
+                                                            )
+                                                        }
                                                         if (Array.isArray(header.head)) {
                                                             return (
                                                                 <TableCell key={idxHeader}>
@@ -100,6 +113,7 @@ export default function TableMangeUser({
                                                                 </TableCell>
                                                             )
                                                         }
+                                                        
                                                         return(
                                                             <TableCell key={idxHeader}>
                                                                 {documento[header?.head] || "-"}
@@ -144,8 +158,13 @@ export default function TableMangeUser({
                                                         </Title1>
                                                     )
                                                 }
+                                                if (header?.head === 'address') {
+                                                    return (
+                                                        <p>{documento[header?.head] ? documento[header?.head].name : '-'}</p>
+                                                    )
+                                                }
                                                 return(
-                                                    <p>
+                                                    <p key={idxHeader}>
                                                         {documento[header?.head] || '-'}
                                                     </p>
                                                 )

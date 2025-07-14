@@ -5,6 +5,8 @@ import { Button } from '../ui/button'
 import { FilePlus2, LayoutGrid, List } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import ButtonDownloadPdf from '../elements/ButtonDownloadPdf'
+import TableCellClient from './TableCells/TableCellClient'
+import TableCellStatus from './TableCells/TableCellStatus'
 
 export default function TableManageDocuments({
     title="Documentos",
@@ -78,12 +80,28 @@ export default function TableManageDocuments({
                                                     }
                                                     if (header?.isPdf) {
                                                         return (
-                                                            <TableCell>
+                                                            <TableCell key={idxHeader}>
                                                                 <ButtonDownloadPdf
                                                                 key={idx}
                                                                 minutaDirectory={documento[header?.head]}
                                                                 />
                                                             </TableCell>
+                                                        )
+                                                    }
+                                                    if (header?.head === 'clientId') {
+                                                        return (
+                                                            <TableCellClient
+                                                                key={idx}
+                                                                clientId={documento[header?.head]}
+                                                            />
+                                                        )   
+                                                    }   
+                                                    if (header?.head === 'status') {
+                                                        return (
+                                                            <TableCellStatus
+                                                                key={idx}
+                                                                idStatus={documento[header?.head]}
+                                                            />
                                                         )
                                                     }
                                                     return(
