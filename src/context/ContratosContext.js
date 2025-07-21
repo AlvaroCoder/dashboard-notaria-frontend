@@ -246,7 +246,6 @@ export default function ContratoContext ({
             
             return
         }
-        console.log(await response.json());
         
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob)

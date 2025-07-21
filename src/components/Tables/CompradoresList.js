@@ -57,8 +57,9 @@ export default function CompradoresList({
     <div className="">
       <Title1 className="text-xl">Compradores ({compradores?.length})</Title1>
       <Separator2/>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {compradores.map((comprador, idxk) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {compradores?.length > 0 ?
+        compradores.map((comprador, idxk) => (
           <div
             key={idxk}
             onClick={() => handleEditClick(comprador)}
@@ -68,7 +69,10 @@ export default function CompradoresList({
             <p className="text-sm text-gray-600">DNI: {comprador.dni}</p>
             <p className="text-sm text-gray-600">Nacionalidad: {comprador.nationality}</p>
           </div>
-        ))}
+        )) : 
+        <section className="w-full col-span-2 bg-gray-100 min-h-20 flex justify-center items-center rounded-sm text-sm ">
+          <p>Aun no hay Compradores</p>
+        </section>}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

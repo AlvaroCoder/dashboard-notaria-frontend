@@ -21,7 +21,7 @@ export default function FramePdf({
                     headers : {
                         "Content-Type" : "application/json"
                     },
-                    body : JSON.stringify({path : "DB_evidences/"+directory})
+                    body : JSON.stringify({path : directory})
                 });
                 const blob = await data.blob();
                 const pdf = URL.createObjectURL(blob);       

@@ -7,6 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import ButtonDownloadPdf from '../elements/ButtonDownloadPdf'
 import TableCellClient from './TableCells/TableCellClient'
 import TableCellStatus from './TableCells/TableCellStatus'
+import { camelCaseToTitle, cn } from '@/lib/utils'
+import { statusContracts } from '@/lib/commonJSON'
+import { formatearFecha } from '@/lib/fechas'
+import Link from 'next/link'
+
 
 export default function TableManageDocuments({
     title="Documentos",
@@ -78,37 +83,62 @@ export default function TableManageDocuments({
                                                             </TableCell>
                                                         )
                                                     }
-                                                    if (header?.isPdf) {
+                                                    else if (header?.isPdf) {
                                                         return (
                                                             <TableCell key={idxHeader}>
                                                                 <ButtonDownloadPdf
-                                                                key={idx}
+                                                                
                                                                 minutaDirectory={documento[header?.head]}
                                                                 />
                                                             </TableCell>
                                                         )
                                                     }
-                                                    if (header?.head === 'clientId') {
+                                                    else if (header?.head === 'clientId') {
                                                         return (
                                                             <TableCellClient
-                                                                key={idx}
+                                                                key={idxHeader}
                                                                 clientId={documento[header?.head]}
                                                             />
                                                         )   
                                                     }   
-                                                    if (header?.head === 'status') {
+                                                    else if (header?.head === 'status') {
                                                         return (
                                                             <TableCellStatus
-                                                                key={idx}
+                                                                key={idxHeader}
                                                                 idStatus={documento[header?.head]}
                                                             />
                                                         )
                                                     }
-                                                    return(
-                                                        <TableCell key={idxHeader}>
-                                                            {documento[header?.head] || "-"}
-                                                        </TableCell>
-                                                    )
+                                                    else if(header?.head === 'datesDocument'){
+                                                        return (
+                                                            <TableCell
+                                                                key={idxHeader}
+                                                            >   
+                                                                {formatearFecha(documento[header?.head]?.processInitiate)}
+                                                            </TableCell>
+                                                        )
+                                                    }
+                                                    else if(header?.head === 'contractType'){
+                                                        return(
+                                                            <TableCell
+                                                                key={idxHeader}
+                                                            >
+                                                                <Link
+                                                                    href={"/dashboard/contracts/inmueble/"+documento?.id}
+                                                                    className='underline text-blue-700'
+                                                                >
+                                                                    <p className=''>{camelCaseToTitle(documento[header?.head]) || '-'}</p>
+                                                                </Link>
+                                                            </TableCell>
+                                                        )
+                                                    }
+                                                    else{
+                                                        return(
+                                                            <TableCell key={idxHeader}>
+                                                                {camelCaseToTitle(documento[header?.head]) || "-"}
+                                                            </TableCell>
+                                                        )
+                                                    }
                                                 })
                                             }
                                         </TableRow>
@@ -135,9 +165,16 @@ export default function TableManageDocuments({
                         data?.length > 0 ? (
                             data?.map((documento, idx) => (
                                 <div key={idx} className='p-4 border rounded-md shadow-sm'>
-                                    <Title1 className='font-semibold text-lg'>{documento.title}</Title1>
-                                    <p className='text-sm text-gray-500'>{documento.description || "No description available"}</p>
-                                    <p className='text-sm text-gray-500'>Created at: {new Date(documento.createdAt).toLocaleDateString()}</p>
+                                    <Title1 className='font-semibold text-lg'>{camelCaseToTitle(documento?.contractType)}</Title1>
+                                    {
+                                        statusContracts?.filter(({id})=>id === documento?.status).map((item)=><p className={cn('px-2 py-1 w-fit rounded-sm text-sm', item.bgColor)}>{item.title}</p>)
+                                    }
+                                    <section className='mt-2 py-2'>
+                                        <p className='text-sm'>Pago : {documento?.processPayment}</p>
+                                        <p className='text-sm'>Tipo :<b> {documento?.case}</b></p>
+                                        <p className='text-sm'>Fecha : <b>{formatearFecha(documento?.datesDocument?.processInitiate)}</b></p>
+                                        
+                                    </section>
                                 </div>
                             ))
                         ) : (

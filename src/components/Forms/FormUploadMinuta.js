@@ -63,7 +63,8 @@ export default function FormUploadMinuta() {
 
         } catch (err) {
             toast("Error con la vista de minuta",{
-                type : 'error'
+                type : 'error',
+                position : 'bottom-center'
             });
 
         }finally{

@@ -57,8 +57,9 @@ const [vendedores, setVendedores] = useState(dataVendedores);
     <div className="">
       <Title1 className="text-xl">Vendedores ({vendedores?.length})</Title1>
       <Separator2/>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {vendedores.map((comprador) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {vendedores?.length > 0?
+        vendedores.map((comprador) => (
           <div
             key={comprador.id}
             onClick={() => handleEditClick(comprador)}
@@ -68,7 +69,10 @@ const [vendedores, setVendedores] = useState(dataVendedores);
             <p className="text-sm text-gray-600">DNI: {comprador.dni}</p>
             <p className="text-sm text-gray-600">Nacionalidad: {comprador.nationality}</p>
           </div>
-        ))}
+        )) : 
+        <section className="w-full col-span-2 bg-gray-100 min-h-20 flex justify-center items-center rounded-sm text-sm">
+          <p>Aun no hay Vendedores</p>  
+        </section>}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

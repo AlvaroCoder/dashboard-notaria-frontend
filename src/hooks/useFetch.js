@@ -38,6 +38,6 @@ export function useFetch(URL="") {
             }
         }
         fetchData();
-    },[]);
+    },[URL]);
     return {loading, error, data};
 }

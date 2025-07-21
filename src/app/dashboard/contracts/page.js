@@ -15,7 +15,8 @@ const headersInmuebles = [
   {value: "Tipo", head: 'case'},
   {value : 'Cliente', head : 'clientId'},
   {value: "Minuta", head : 'minutaDirectory', isPdf : true},
-  {value: "Estado", head : 'status'}
+  {value: "Estado", head : 'status'},
+  {value : "Fecha Inicio", head : "datesDocument"}
 ];
 
 const headersVehiculos = [
@@ -23,7 +24,8 @@ const headersVehiculos = [
   {value: "Tipo", head : 'case'},
   {value: "Client", head : 'clientId'},
   {value: "Minuta", head : 'minutaDirectory', isPdf : true},
-  {value: "Estado", head : 'status'}
+  {value: "Estado", head : 'status'},
+  {value : "Fecha", head : "datesDocument"}
 ];
 
 export default function Page() {
