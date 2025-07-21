@@ -1,10 +1,11 @@
 'use client'
 import FramePdf from '@/components/elements/FramePdf';
-import Separator from '@/components/elements/Separator';
 import Separator2 from '@/components/elements/Separator2';
 import Title1 from '@/components/elements/Title1';
 import { CompradoresList, VendedoresList } from '@/components/Tables';
 import { Button } from '@/components/ui/button';
+import { useContextCard } from '@/context/ContextCard';
+import { useContratoContext } from '@/context/ContratosContext';
 import { useFetch } from '@/hooks/useFetch';
 import { getDataClientByClientId } from '@/lib/apiConnections';
 import { statusContracts } from '@/lib/commonJSON';
@@ -19,7 +20,8 @@ function RenderPageContracts() {
   const {idContract} = useParams();
   const [client, setClient] = useState(null);
   const [loadingDataClient, setLoadingDataClient] = useState(true);
-
+  const {establecerTipoProceso, flushDataCard} = useContextCard();
+  const {inicializarDataMinuta, flushDataContrato, handleChangeFileLocation} = useContratoContext();
   const {
     data : dataResponseContract, 
     loading : loadingDataContract, 
@@ -28,12 +30,20 @@ function RenderPageContracts() {
   useEffect(()=>{
     async function getClientData() {
       try {
-        if (dataResponseContract) {
+        if (dataResponseContract) {          
+          flushDataCard();
+          flushDataContrato();
+
           const response = await getDataClientByClientId(dataResponseContract?.data?.clientId);
           const responseJSON = await response.json();
-          console.log(responseJSON);
-          
+          establecerTipoProceso(dataResponseContract?.data?.case);
           setClient(responseJSON?.data);
+          inicializarDataMinuta(dataResponseContract?.data?.id);
+          const splitFile = dataResponseContract?.data?.minutaDirectory?.split('/');
+          handleChangeFileLocation({
+            fileName : splitFile[2],
+            directory : splitFile[1]
+          })
         }
       } catch (error) {
         

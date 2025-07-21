@@ -30,10 +30,21 @@ const Contratos = createContext({
     handleChangePreMinutaDate : ()=>{},
     selectNotario: ()=>{},
     subirInformacionMinuta : async()=>{},
-    subirEvidencias : async(dataImagesMinuta)=>{}
+    subirEvidencias : async(dataImagesMinuta)=>{},
+    flushDataContrato : ()=>{},
+    handleChangeFileLocation:()=>{}
 });
 
 export const useContratoContext = ()=>useContext(Contratos);
+
+const initialDataPreMinuta = {
+    case : 'compra',
+    clientId : '',
+    processPayment : 'Pago la mitad',
+    minutaDirectory : '',
+    datesDocument : {},
+    directory : ''
+};
 
 export default function ContratoContext ({
     children
@@ -41,20 +52,20 @@ export default function ContratoContext ({
     const [dataMinuta, setDataMinuta] = useState({
         
     });
-    const [dataPreMinuta, setDataPreMinuta] = useState({
-        case : 'compra',
-        clientId : '',
-        processPayment : 'Pago la mitad',
-        minutaDirectory : '',
-        datesDocument : {},
-        directory : ''
-    });
+    const [dataPreMinuta, setDataPreMinuta] = useState(initialDataPreMinuta);
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [fileLocationPdf, setFileLocationPdf] = useState(null);
     const [viewerPdf, setViewerPdf] = useState(null);
 
     const [loadingProcess, setLoadingProcess] = useState(false);
 
+    const flushDataContrato=()=>{
+        setDataPreMinuta(initialDataPreMinuta);
+        setNotarioSelected(null);
+        setFileLocationPdf(null);
+        setViewerPdf(null);
+        
+    }
     const handleChangeDataPreMinutaFileLocation=(fileLocation)=>{ 
         const {directory, fileName} = fileLocation;
         setDataPreMinuta({...dataPreMinuta,
@@ -62,7 +73,12 @@ export default function ContratoContext ({
             directory : `DB_evidences/${directory}`
         });
         setFileLocationPdf(fileLocation);
+    };
+
+    const handleChangeFileLocation=(fileLocation)=>{
+        setFileLocationPdf(fileLocation);
     }
+
     const handleChangeDataPreMinuta=(key, value)=>{
         setDataPreMinuta({...dataPreMinuta, [key] : value});
     }
@@ -156,7 +172,7 @@ export default function ContratoContext ({
                     people : compradores
                 },
                 creationDay : {
-                    date : dataPreMinuta?.datesDocument?.processInitiate
+                    date : formatearFecha(new Date())
                 },
                 notario : {
                     firstName : "Javier",
@@ -167,7 +183,7 @@ export default function ContratoContext ({
                 minuta : {
                     ...dataMinuta?.minuta,
                     creationDay : {
-                        date : dataPreMinuta?.datesDocument?.processInitiate
+                        date : formatearFecha(new Date())
                     },
                     place : {
                         name : 'NO IMPORTA',
@@ -278,7 +294,9 @@ export default function ContratoContext ({
                 handleChangePreMinutaDate,
                 selectNotario,
                 subirInformacionMinuta,
-                subirEvidencias
+                subirEvidencias,
+                flushDataContrato,
+                handleChangeFileLocation
             }}
         >
             {children}

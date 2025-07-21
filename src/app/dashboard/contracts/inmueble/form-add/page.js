@@ -60,7 +60,9 @@ function RenderCardsFormStepper() {
             type  : 'info'
         });
     }   
+    const handleSaveData=()=>{
 
+    }
     switch(activeStep) {
         // Primero seleccionamos el cliente que vamos a usar
         case 0:
@@ -103,7 +105,9 @@ function RenderCardsFormStepper() {
         case 2:
             return (<FormUploadMinuta/>);
         case 3 :
-            return (<FormStepper/>);
+            return (<FormStepper
+               
+            />);
         case 4:
             return (<FormViewerPdfEscritura/>);
     }
