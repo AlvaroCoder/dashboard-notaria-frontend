@@ -60,9 +60,6 @@ function RenderCardsFormStepper() {
             type  : 'info'
         });
     }   
-    const handleSaveData=()=>{
-
-    }
     switch(activeStep) {
         // Primero seleccionamos el cliente que vamos a usar
         case 0:

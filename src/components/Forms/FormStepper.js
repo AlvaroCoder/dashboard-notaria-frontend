@@ -126,7 +126,7 @@ export default function FormStepper({
           age: '',
           job: '',
           maritalStatus: {
-            value : ""
+            civilStatus : ""
           },
           address: {
             name : "",
@@ -175,7 +175,7 @@ export default function FormStepper({
                                     />
                                     <section className='flex flex-row gap-2 mt-6'>
                                         <Button
-                                            onClick={()=>addPerson('comprador')}
+                                            onClick={()=>addPerson('compra')}
                                             className={"flex-1 py-4 cursor-pointer"}
                                         >
                                         Agregar Comprador
@@ -307,7 +307,6 @@ export default function FormStepper({
                                     }
                                     else{
                                         try {
-                                            console.log(dataMinuta);
                                             const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
                                                 method : 'POST',
                                                 headers : {
@@ -325,7 +324,6 @@ export default function FormStepper({
                                                 evidences : imagenesEvidencias
                                             });
                                             
-                                        
                                         } catch (err) {
                                             console.log(err);
                                             
@@ -386,7 +384,7 @@ export default function FormStepper({
                                     />
                                     <div className='flex flex-row gap-2'>
                                         <Button
-                                            onClick={()=>addPerson('venta')}
+                                            onClick={()=>addPerson('compra')}
                                             className={'flex-1 py-4'}
                                         >
                                             Agregar Comprador
@@ -475,16 +473,23 @@ export default function FormStepper({
                                 }
                                 if (activeStepVenta === 1) {
                                     const errores = checkEmptyFieldsFormCompra(compradores);
+                                    
+                                    console.log(errores);
+                                    console.log(compradores);
+                                    
                                     if (errores.length > 0) {
                                         setErrorVenta(errores);
                                         toast('Formulario incompleto',{
-                                            type : 'error'
+                                            type : 'error',
+                                            position:'bottom-center'
                                         });
                                         return;
                                     }
                                 }
                                 if (activeStepVenta === 2) {
                                     const errores = checkEvidenceEmpty(dataImagesMinuta);
+                                   
+                                    
                                     if (errores.error) {
                                         setErrorVenta([errores]);
                                         toast('Evidencias incompletas',{
@@ -494,29 +499,34 @@ export default function FormStepper({
                                     }
                                 }
                                 if (activeStepVenta === 3) {
-                                    try {
-                                        const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
-                                            method : 'POST',
-                                            headers : {
-                                                'Content-type' : 'application/json'
-                                            },
-                                            body : JSON.stringify(dataPreMinuta)
-                                        });
-                                        const jsonDataPreMinuta = await responseDataPreMinuta.json();
-                                        const contractId = jsonDataPreMinuta?.contractId;
-
-                                        const imagesEvidencias = await subirEvidencias(dataImagesMinuta);
-                                        await subirInformacionMinuta(contractId, vendedores, compradores, {
-                                            caption : dataSendVenta?.paymentMethod,
-                                            evidences : imagesEvidencias
-                                        });
-
-                                        pushActiveStep();
-                                    } catch (err) {
-                                        console.log(err);
-                                        
-                                    } finally {
-
+                                    if (handleSaveData) {
+                                        await handleSaveData(dataImagesMinuta, vendedores, compradores, dataSendVenta)
+                                    }
+                                    else{
+                                        try {
+                                            const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
+                                                method : 'POST',
+                                                headers : {
+                                                    'Content-type' : 'application/json'
+                                                },
+                                                body : JSON.stringify(dataPreMinuta)
+                                            });
+                                            const jsonDataPreMinuta = await responseDataPreMinuta.json();
+                                            const contractId = jsonDataPreMinuta?.contractId;
+    
+                                            const imagesEvidencias = await subirEvidencias(dataImagesMinuta);
+                                            await subirInformacionMinuta(contractId, vendedores, compradores, {
+                                                caption : dataSendVenta?.paymentMethod,
+                                                evidences : imagesEvidencias
+                                            });
+    
+                                            pushActiveStep();
+                                        } catch (err) {
+                                            console.log(err);
+                                            
+                                        } finally {
+    
+                                        }
                                     }
                                 }
                                 setActiveStepVenta((prev)=>(prev<stepsVenta.length - 1 ? prev + 1 : prev))

@@ -11,7 +11,7 @@ export default function CardRequirements({
     requisitos=[],
     slug
 }) {
-    const {establecerTipoProceso} = useContextCard();
+    const {establecerTipoProceso, pushActiveStep} = useContextCard();
     const {handleChangeDataPreMinuta} = useContratoContext();
   return (
     <section className='p-2 w-full max-w-[450px] bg-[#102945] rounded-sm shadow-sm'>
@@ -28,7 +28,8 @@ export default function CardRequirements({
             className={"bg-[#102945] w-full hover:bg-[#0C1019]"}
             onClick={()=>{                    
                 handleChangeDataPreMinuta('case', slug);
-                establecerTipoProceso(slug)
+                establecerTipoProceso(slug);
+                pushActiveStep();
             }}
         >
             Iniciar Proceso
