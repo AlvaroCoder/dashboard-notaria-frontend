@@ -44,20 +44,22 @@ const formsInmueble = [
 ];
 
 function RenderCardsFormStepper() {
+    const URL_GET_DATA_CLIENTES = "http://localhost:8000/home/client";
     const {activeStep, pushActiveStep, initializeClient} = useContextCard();
     const {handleChangeDataPreMinuta} = useContratoContext();
     const {
         data : dataClientes, 
         loading : loadingDataClientes, 
         error : errorDataClientes
-    } = useFetch('http://localhost:8000/home/client');
+    } = useFetch(URL_GET_DATA_CLIENTES);
     
     const handleClickSelectClient=(client)=>{
         pushActiveStep();
         handleChangeDataPreMinuta('clientId', client?.id);
         initializeClient(client);
         toast('Cliente seleccionado',{
-            type  : 'info'
+            type  : 'info',
+            position : 'bottom-right'
         });
     }   
     switch(activeStep) {
