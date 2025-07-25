@@ -11,7 +11,7 @@ export default function TableCellClient({
         data : dataCliente,
         loading : loadingDataCliente,
         error : errorDataCliente
-    } = useFetch(URL_DATA_CLIENT);
+    } = useFetch(URL_DATA_CLIENT, 'force-cache');
 
     return (
         <TableCell>

@@ -3,7 +3,7 @@
 import { getSession } from "@/authentication/lib";
 import { useEffect, useState } from "react";
 
-export function useFetch(URL="") {
+export function useFetch(URL="", cache='no-store') {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
@@ -16,7 +16,8 @@ export function useFetch(URL="") {
                         'Content-Type' : 'application/json',
                     },
                     method : 'GET',
-                    mode : 'cors'
+                    mode : 'cors',
+                    cache
                 }) :  await fetch(URL);
                 
                 if (!response.ok) {

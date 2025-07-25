@@ -24,30 +24,43 @@ export default function Page() {
     async function getData() {
       try {
         setLoading(true);
-        const [resInmuebes, resVehiculos, resAsociacion] = await Promise.all([
+        const [resInmuebes, resVehiculos, resAsociacion, resRS, resSAC, resSCRL] = await Promise.all([
           fetch('http://localhost:8000/home/contracts/compraVentaPropiedad'),
           fetch('http://localhost:8000/home/contracts/compraVentaVehiculo'),
-          fetch('http://localhost:8000/home/contracts/asociacion')
+          fetch('http://localhost:8000/home/contracts/asociacion'),
+          fetch('http://localhost:8000/home/contracts/RS'),
+          fetch('http://localhost:8000/home/contracts/SAC'),
+          fetch('http://localhost:8000/home/contracts/SCRL')
         ]);
         
-        const [jsonInmuebles, jsonVehiculos, jsonAsociacion] = await Promise.all([
+        const [jsonInmuebles, jsonVehiculos, jsonAsociacion, jsonRS, jsonSAC, jsonSCRL] = await Promise.all([
           resInmuebes.json(),
           resVehiculos.json(),
-          resAsociacion.json()
+          resAsociacion.json(),
+          resRS.json(),
+          resSAC.json(),
+          resSCRL.json()
         ]);
 
         const dInmuebles = jsonInmuebles?.data;
         const dVehiculos = jsonVehiculos?.data;
         const dAsociacion = jsonAsociacion?.data;
+        const dRS = jsonRS?.data;
+        const dSAC = jsonSAC?.data;
+        const dSCRL = jsonSCRL;
 
-        setDataInmuebles(jsonInmuebles?.data);
-        setDataVehiculos(jsonVehiculos?.data);
-        setDataAsociacion(jsonAsociacion?.data);
+        setDataInmuebles(dInmuebles);
+        setDataVehiculos(dVehiculos);
+        setDataAsociacion(dAsociacion);
+
 
         setIndicators([
-          {id : 1, title : 'Inmuebles', value : dInmuebles?.length, icon : Building2},
-          {id : 2, title : 'Vehiculos', value : dVehiculos?.length, icon : Car},
-          {id : 3, title : 'Asociacion', value : dAsociacion?.length, icon : User}
+          {id : 1, title : 'Inmuebles', value : dInmuebles?.length || 0, icon : Building2},
+          {id : 2, title : 'Vehiculos', value : dVehiculos?.length || 0, icon : Car},
+          {id : 3, title : 'Asociacion', value : dAsociacion?.length || 0, icon : User},
+          {id : 4, title : 'RS', value : dRS?.length || 0, icon : User},
+          {id : 5, title : 'SAC', value : dSAC?.length || 0, icon  : User},
+          {id : 6, title : 'SCRL', value : dSCRL?.length || 0, icon : User}
         ]);
 
         toast("Data exitosa",{

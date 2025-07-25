@@ -1,17 +1,28 @@
 'use client'
-import React, { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import Title1 from '../elements/Title1'
 import { Button } from '../ui/button'
-import { FilePlus2, LayoutGrid, List } from 'lucide-react'
+import { FilePlus2, LayoutGrid, List, Loader2 } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import ButtonDownloadPdf from '../elements/ButtonDownloadPdf'
-import TableCellClient from './TableCells/TableCellClient'
-import TableCellStatus from './TableCells/TableCellStatus'
 import { camelCaseToTitle, cn } from '@/lib/utils'
 import { statusContracts } from '@/lib/commonJSON'
 import { formatearFecha } from '@/lib/fechas'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 
+const TableCellClient = dynamic(()=>import('@/components/Tables/TableCells/TableCellClient'),{
+    ssr : false,
+    loading: () => <span><Loader2 className='animate-spin'/></span>,
+});
+const TableCellStatus = dynamic(()=>import('@/components/Tables/TableCells/TableCellStatus'),{
+    ssr : false,
+    loading : ()=><span><Loader2 className='animate-spin'/></span>
+});
+
+const ButtonDownloadPdf = dynamic(()=>import('@/components/elements/ButtonDownloadPdf'),{
+    ssr : false,
+    loading : ()=><span><Loader2 className='animate-spin'/></span>
+});
 
 export default function TableManageDocuments({
     title="Documentos",
@@ -54,6 +65,7 @@ export default function TableManageDocuments({
         </div>
         {
             vista === "tabla" && (
+                <Suspense fallback={<Loader2 className='animate-spin' />}>
                 <div className='overflow-auto mt-8'>
                     <Table>
                         <TableHeader>
@@ -156,6 +168,7 @@ export default function TableManageDocuments({
                         </TableBody>
                     </Table>
                 </div>
+                </Suspense>
             )
         }
         {
@@ -167,7 +180,7 @@ export default function TableManageDocuments({
                                 <div key={idx} className='p-4 border rounded-md shadow-sm'>
                                     <Title1 className='font-semibold text-lg'>{camelCaseToTitle(documento?.contractType)}</Title1>
                                     {
-                                        statusContracts?.filter(({id})=>id === documento?.status).map((item)=><p className={cn('px-2 py-1 w-fit rounded-sm text-sm', item.bgColor)}>{item.title}</p>)
+                                        statusContracts?.filter(({id})=>id === documento?.status).map((item, key)=><p key={key} className={cn('px-2 py-1 w-fit rounded-sm text-sm', item.bgColor)}>{item.title}</p>)
                                     }
                                     <section className='mt-2 py-2'>
                                         <p className='text-sm'>Pago : {documento?.processPayment}</p>
