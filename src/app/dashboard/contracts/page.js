@@ -4,29 +4,12 @@ import CardIndicatorLoading from '@/components/elements/CardIndicatorLoading'
 import Title1 from '@/components/elements/Title1'
 import TableLoading from '@/components/Tables/TableLoading';
 import TableManageDocuments from '@/components/Tables/TableManageDocuments';
+import { headersAsociacion, headersInmuebles, headersVehiculos } from '@/data/Headers';
 import { Divider } from '@mui/material';
-import { Building2, Car} from 'lucide-react'
+import { Building2, Car, User} from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
-
-const headersInmuebles = [
-  {value: "Tipo de Contrato", head : 'contractType'},
-  {value: "Tipo", head: 'case'},
-  {value : 'Cliente', head : 'clientId'},
-  {value: "Minuta", head : 'minutaDirectory', isPdf : true},
-  {value: "Estado", head : 'status'},
-  {value : "Fecha Inicio", head : "datesDocument"}
-];
-
-const headersVehiculos = [
-  {value: "Tipo de Contrato", head : 'contractType'},
-  {value: "Tipo", head : 'case'},
-  {value: "Client", head : 'clientId'},
-  {value: "Minuta", head : 'minutaDirectory', isPdf : true},
-  {value: "Estado", head : 'status'},
-  {value : "Fecha", head : "datesDocument"}
-];
 
 export default function Page() {
   const router = useRouter();
@@ -34,34 +17,43 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [dataInmuebles, setDataInmuebles] = useState([]);
   const [dataVehiculos, setDataVehiculos] = useState([]);
+  const [dataAsociacion, setDataAsociacion] = useState([]);
   const [indicators, setIndicators] = useState([]);
   
   useEffect(() => {
     async function getData() {
       try {
         setLoading(true);
-        const responseInmuebles = await fetch('http://localhost:8000/home/contracts/compraVentaPropiedad');
-        const jsonResponseImuebles = await responseInmuebles.json();
+        const [resInmuebes, resVehiculos, resAsociacion] = await Promise.all([
+          fetch('http://localhost:8000/home/contracts/compraVentaPropiedad'),
+          fetch('http://localhost:8000/home/contracts/compraVentaVehiculo'),
+          fetch('http://localhost:8000/home/contracts/asociacion')
+        ]);
         
-        const dInmuebles = typeof(jsonResponseImuebles?.data) === 'string' ? [] : jsonResponseImuebles?.data;
-        setDataInmuebles(dInmuebles);
-        
-        const responseVehiculos = await fetch('http://localhost:8000/home/contracts/compraVentaVehiculo');
-        const jsonResponseVehiculos = await responseVehiculos.json();
-                
-        const dVehiculos = typeof(jsonResponseVehiculos?.data) === 'string' ? [] : jsonResponseVehiculos?.data;
-        setDataVehiculos(dVehiculos);
+        const [jsonInmuebles, jsonVehiculos, jsonAsociacion] = await Promise.all([
+          resInmuebes.json(),
+          resVehiculos.json(),
+          resAsociacion.json()
+        ]);
+
+        const dInmuebles = jsonInmuebles?.data;
+        const dVehiculos = jsonVehiculos?.data;
+        const dAsociacion = jsonAsociacion?.data;
+
+        setDataInmuebles(jsonInmuebles?.data);
+        setDataVehiculos(jsonVehiculos?.data);
+        setDataAsociacion(jsonAsociacion?.data);
 
         setIndicators([
           {id : 1, title : 'Inmuebles', value : dInmuebles?.length, icon : Building2},
-          {id : 2, title : 'Vehiculos', value : dVehiculos?.length, icon : Car}
+          {id : 2, title : 'Vehiculos', value : dVehiculos?.length, icon : Car},
+          {id : 3, title : 'Asociacion', value : dAsociacion?.length, icon : User}
         ]);
 
         toast("Data exitosa",{
           type : 'success'
         })
       } catch (error) {
-        console.log(error);
         toast("Ocurrio un error ",{
           type : 'error'
         });
@@ -97,7 +89,7 @@ export default function Page() {
         />
       }
       <section className='w-full mb-6'>
-      <Divider className='my-2 '/>
+        <Divider className='my-2 '/>
       </section>
       {
         loading ?
@@ -109,6 +101,23 @@ export default function Page() {
           handleAddDocument={()=>router.push('contracts/vehiculo/form-add')}
         />
       }
+      <section className='w-full mb-6'>
+        <Divider className='my-2 '/>
+      </section>
+      {
+        loading ?
+        <TableLoading headers={headersAsociacion} rows={6} /> :
+        <TableManageDocuments
+          data={dataAsociacion}
+          headers={headersAsociacion}
+          title='Gestion de Asociacion'
+          handleAddDocument={()=>router.push('contracts/inmueble/form-add')}
+        />
+      }
+      <section className='w-full mb-6'>
+        <Divider className='my-2 '/>
+      </section>
+      
     </div>
   )
 }

@@ -147,6 +147,7 @@ export default function ContratoContext ({
 
                 const responseJSON = await response.json();                
                 const file = responseJSON?.fileLocation;
+                // Ahora me devuelve un campo llamado fileNames
                 return `DB_evidences/${file?.directory}/${file?.fileName}`;
             });
     

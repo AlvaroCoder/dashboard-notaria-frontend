@@ -1,15 +1,10 @@
 'use client';
+import { routes } from '@/data/RoutesLink';
 import { cn } from '@/lib/utils';
-import { Building2, Car, Home } from 'lucide-react'
 import Link from 'next/link';
 import React, { useState } from 'react'
 
 export default function SideBarNavigationContracts() {
-    const routes = [
-        {routename: "Inicio", routePath : "/dashboard/contracts", icon : Home, selected : true},
-        {routename : "Inmuebles", routePath : "/dashboard/contracts/inmueble", icon : Building2, selected : false},
-        {routename : "Vehiculos", routePath : "/dashboard/contracts/vehiculo", icon : Car, selected : false}
-    ];
 
     const [dataRoutes, setDataRoutes] = useState(routes);
     const handleChange=(idx)=>{

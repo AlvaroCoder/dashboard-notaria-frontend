@@ -1,5 +1,4 @@
 import React from 'react'
-import { Card, CardContent, CardTitle } from '../ui/card'
 import Title1 from './Title1'
 import { Users } from 'lucide-react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -25,3 +24,4 @@ export default function CardIndicator({
     </div>
   )
 };
+

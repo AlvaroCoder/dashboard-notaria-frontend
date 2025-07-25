@@ -24,7 +24,6 @@ export default function FormStepper({
     const {tipoProceso, pushActiveStep} = useContextCard();
     const stepsCompra = ['Comprador(es)','Vendedor(es)',  'Comprobante de Pago', 'Notario' ];
     const stepsVenta = ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago' , 'Minuta'];
-    const [activeStep, setActiveStep] = useState(0);
     const [activeStepCompra, setActiveStepCompra] = useState(0);
     const [activeStepVenta, setActiveStepVenta] = useState(0);
     const [dataImagesMinuta, setDataImagesMinuta] = useState([]);

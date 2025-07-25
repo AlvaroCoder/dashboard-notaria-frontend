@@ -1,7 +1,6 @@
 'use client'
 import Title1 from '@/components/elements/Title1'
 import React, { useEffect, useState } from 'react'
-import DescriptionIcon from '@mui/icons-material/Description';
 import { LayoutGrid, List, ShieldUser, User } from 'lucide-react';
 import Person4Icon from '@mui/icons-material/Person4';
 import CardIndicator from '@/components/elements/CardIndicator';
@@ -11,12 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@mui/material';
-import Separator from '@/components/elements/Separator';
 import { toast } from 'react-toastify';
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
-  const [queryCliente, setQueryCliente] = useState('');
   const [vista, setVista] = useState("tabla");
   const [dataDocumentos, setdataDocumentos] = useState([]);
   const [indicadoresGeneral, setIndicadoresGeneral] = useState([]);
@@ -25,19 +22,26 @@ export default function Page() {
     async function getData() {
         try {
             setLoading(true);
-            const responseSenior = await fetch('http://localhost:8000/home/senior');
-            const jsonResponseSenior = await responseSenior.json();
+            const [resSenior, resJunior, resClient] = await Promise.all([
+              fetch('http://localhost:8000/home/senior'),
+              fetch('http://localhost:8000/home/junior'),
+              fetch('http://localhost:8000/home/client')
+            ]);
 
-            const responseJunior = await fetch('http://localhost:8000/home/junior');
-            const jsonResponseJunior = await responseJunior.json();
+            const [jsonSenior, jsonJunior, jsonClient] = await Promise.all([
+              resSenior.json(),
+              resJunior.json(),
+              resClient.json()
+            ]);
 
-            const responseClient = await fetch('http://localhost:8000/home/client');
-            const jsonResponseClient = await responseClient.json();
-            
+            const jsonResponseSenior =  jsonSenior?.data;
+            const jsonResponseJunior = jsonJunior?.data;
+            const jsonResponseClient = jsonClient?.data;
+
             const nuevaLista = [
-              {id : 1, title : 'Clientes', value : jsonResponseClient?.data?.length, icon : Person4Icon},
-              {id : 2, title : 'Juniors', value : jsonResponseJunior?.data?.length, icon : User},
-              {id : 3, title : 'Seniors', value : jsonResponseSenior?.data?.length, icon : ShieldUser},
+              {id : 1, title : 'Clientes', value : jsonResponseClient?.length, icon : Person4Icon},
+              {id : 2, title : 'Juniors', value : jsonResponseJunior?.length, icon : User},
+              {id : 3, title : 'Seniors', value : jsonResponseSenior?.length, icon : ShieldUser},
 
             ];
             toast("Data enviada correctamente",{

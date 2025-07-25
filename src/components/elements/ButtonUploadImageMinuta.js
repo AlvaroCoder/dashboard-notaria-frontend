@@ -29,7 +29,10 @@ export default function ButtonUploadImageMinuta({
       <div className="flex flex-wrap gap-4 items-center">
         {imagesPreview.map((src, idx) => (
           <section key={idx} className="relative">
-            <div onClick={()=>handleDeleteImage(idx)}  className="absolute cursor-pointer  bg-[#5F1926] hover:bg-red-700 rounded-full text-sm p-2 -top-3 -right-3 text-white "><ClearIcon/></div>
+            <div 
+            onClick={()=>handleDeleteImage(idx)}  
+            className="absolute cursor-pointer  bg-[#5F1926] hover:bg-red-700 rounded-full text-sm p-2 -top-3 -right-3 text-white ">
+              <ClearIcon/></div>
             <img
               key={idx}
               src={src}

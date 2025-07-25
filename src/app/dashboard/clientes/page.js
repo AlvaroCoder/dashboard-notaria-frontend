@@ -1,19 +1,21 @@
 'use client'
-import TableroCarga from '@/components/Loading/TableroCarga'
-import TableMangeUser from '@/components/Tables/TableManageUser'
+import dynamic from 'next/dynamic';
+
+const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'))
+const TableMangeUser = dynamic(()=>import('@/components/Tables/TableManageUser'))
 import { useFetch } from '@/hooks/useFetch'
 import { useRouter } from 'next/navigation'
 import React from 'react';
 
-const headers = [
-    {value : "Nombre", head : ["firstName", "lastName"]},
-    {value : "Usuario", head : "userName"},
-    {value : "Email", head : "email"},
-    {value : "Telefono", head : "phone"},
-    {value : "Direccion", head : 'address'}
-];
-
 export default function Page() {
+    const headers = [
+        {value : "Nombre", head : ["firstName", "lastName"]},
+        {value : "Usuario", head : "userName"},
+        {value : "Email", head : "email"},
+        {value : "Telefono", head : "phone"},
+        {value : "Direccion", head : 'address'}
+    ];
+
     const URL_DATA_CLIENTES = "http://localhost:8000/home/client/";
     const router = useRouter();
     const {

@@ -13,7 +13,6 @@ export default function TableMangeUser({
     data=[],
     headers=[]
 }) {    
-    console.log(data);
     
     const [vista, setVista] = useState("tabla");
     const [queryInput, setQueryInput] = useState('');
