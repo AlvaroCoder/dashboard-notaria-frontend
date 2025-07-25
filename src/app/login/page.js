@@ -7,10 +7,11 @@ import InputStyle from '@/components/elements/InputStyle';
 import Title1 from '@/components/elements/Title1'
 import { LoginForm } from '@/components/Forms';
 import PersonIcon from '@mui/icons-material/Person';
+import { Loader2 } from 'lucide-react';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import { toast } from 'react-toastify';
 
 export default function Page() {
@@ -104,17 +105,19 @@ export default function Page() {
               }
             </div>
             <form onSubmit={handleSubmit} className='space-y-6'>
-              <InputStyle
-                label='Usuario'
-                name='username'
-                value={dataSend.username}
-                Icon={PersonIcon}
-                onChange={handleChangeInput}
-              />
-              <InputPassword
-                value={dataSend.password}
-                onChange={handleChangeInput}
-              />
+              <Suspense fallback={<Loader2  className='animate-spin'/>}>
+                <InputStyle
+                  label='Usuario'
+                  name='username'
+                  value={dataSend.username}
+                  Icon={PersonIcon}
+                  onChange={handleChangeInput}
+                />
+                <InputPassword
+                  value={dataSend.password}
+                  onChange={handleChangeInput}
+                />
+              </Suspense>
               <ButtonSave
                 type='submit'
                 loading={loading}

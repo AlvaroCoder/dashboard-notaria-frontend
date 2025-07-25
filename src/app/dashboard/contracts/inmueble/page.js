@@ -1,51 +1,19 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { TableroContratos } from '@/components/Tables';
-import TableroContratosCarga from '@/components/Tables/TableroContratoCarga';
 import Title1 from '@/components/elements/Title1';
+import { useDataContracts } from '@/hooks/useDataContracts';
+import dynamic from 'next/dynamic';
+
+const TableroContratos = dynamic(()=>import('@/components/Tables/TableroContratos'),{
+    ssr : false,
+    loading : ()=><span>Cargando tabla de inmuebles ...</span>
+})
 
 export default function Page() {
     const typeContract = "compraVentaPropiedad"
-    const URL_CONTRACTS_INMUEBLES = `http://localhost:8000/home/contracts/${typeContract}`
-    const [loadingDataProperties, setLoadingDataProperties] = useState(false);
-    const [error, setError] = useState(null);
-    
-    const [dataResponseProperty, setDataResponseProperty] = useState(null);
-    useEffect(() => {
-      async function fetchData() {
-        try {
-            setLoadingDataProperties(true);
-            console.log(URL_CONTRACTS_INMUEBLES);
-            
-            const response = await fetch(URL_CONTRACTS_INMUEBLES, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                method: 'GET',
-                mode: 'cors',
-                redirect  : 'follow'
-            });
-            if (!response.ok) {
-                const jsonResponse = await response.json();
-                setError(jsonResponse?.detail);
-                return;
-            }
-            const jsonResponse = await response.json();
-            console.log(jsonResponse);
-            
-            setDataResponseProperty(jsonResponse);
-            
-        } catch (err) {
-            console.log(err);
-            
-        } finally{
-            setLoadingDataProperties(false);
-        }
-      }
-      fetchData();
-    }, [])
-    
+
+    const { data: dataResponseProperty} = useDataContracts(typeContract);
 
     return (
     <div className='p-6 space-y-6 h-screen overflow-y-auto'>
@@ -56,13 +24,9 @@ export default function Page() {
         </div>
 
         <div>
-            {
-                (loadingDataProperties ) ?
-                <TableroContratosCarga/> :
-                <TableroContratos
-                    dataContracts={dataResponseProperty?.data}
-                />
-            }
+        <TableroContratos
+                        dataContracts={dataResponseProperty}
+                    />
         </div>
     </div>
   )

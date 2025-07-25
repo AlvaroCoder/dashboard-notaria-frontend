@@ -1,74 +1,77 @@
 'use client';
-import CardIndicator from '@/components/elements/CardIndicator'
-import CardIndicatorLoading from '@/components/elements/CardIndicatorLoading'
 import Title1 from '@/components/elements/Title1'
-import TableLoading from '@/components/Tables/TableLoading';
-import TableManageDocuments from '@/components/Tables/TableManageDocuments';
-import { headersAsociacion, headersInmuebles, headersVehiculos } from '@/data/Headers';
+import { headerRS, headersAsociacion, headerSCRL, headersInmuebles, headersSAC, headersVehiculos } from '@/data/Headers';
 import { Divider } from '@mui/material';
 import { Building2, Car, User} from 'lucide-react'
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
+
+const TableManageDocuments=dynamic(()=>import('@/components/Tables/TableManageDocuments'),{
+  ssr : false,
+  loading : ()=><span>Cargando tabla ...</span>
+});
+
+const TableLoading=dynamic(()=>import('@/components/Tables/TableLoading'),{
+  ssr : false
+});
+const CardIndicator=dynamic(()=>import('@/components/elements/CardIndicator'),{
+  ssr : false
+});
+const CardIndicatorLoading=dynamic(()=>import('@/components/elements/CardIndicatorLoading'),{
+  ssr : false
+});
+
 
 export default function Page() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [dataInmuebles, setDataInmuebles] = useState([]);
-  const [dataVehiculos, setDataVehiculos] = useState([]);
-  const [dataAsociacion, setDataAsociacion] = useState([]);
   const [indicators, setIndicators] = useState([]);
+  const [data, setData] = useState({
+    inmuebles : [],
+    vehiculos : [],
+    asociacion : [],
+    rs : [],
+    sac : [],
+    scrl : []
+  });
   
   useEffect(() => {
     async function getData() {
       try {
         setLoading(true);
-        const [resInmuebes, resVehiculos, resAsociacion, resRS, resSAC, resSCRL] = await Promise.all([
-          fetch('http://localhost:8000/home/contracts/compraVentaPropiedad'),
-          fetch('http://localhost:8000/home/contracts/compraVentaVehiculo'),
-          fetch('http://localhost:8000/home/contracts/asociacion'),
-          fetch('http://localhost:8000/home/contracts/RS'),
-          fetch('http://localhost:8000/home/contracts/SAC'),
-          fetch('http://localhost:8000/home/contracts/SCRL')
-        ]);
+        const endpoints = [
+          'compraVentaPropiedad', 'compraVentaVehiculo', 'asociacion', 'RS', 'SAC', 'SCRL'
+        ];
+
+        const responses = await Promise.all(
+          endpoints?.map(type=>fetch(`http://localhost:8000/home/contracts/${type}`))
+        );
+        const json = await Promise.all(responses.map(res=>res.json()));
         
-        const [jsonInmuebles, jsonVehiculos, jsonAsociacion, jsonRS, jsonSAC, jsonSCRL] = await Promise.all([
-          resInmuebes.json(),
-          resVehiculos.json(),
-          resAsociacion.json(),
-          resRS.json(),
-          resSAC.json(),
-          resSCRL.json()
-        ]);
+        const [inmuebles, vehiculos, asociacion, rs, sac, scrl] = json.map(j=>j?.data || []);
 
-        const dInmuebles = jsonInmuebles?.data;
-        const dVehiculos = jsonVehiculos?.data;
-        const dAsociacion = jsonAsociacion?.data;
-        const dRS = jsonRS?.data;
-        const dSAC = jsonSAC?.data;
-        const dSCRL = jsonSCRL;
-
-        setDataInmuebles(dInmuebles);
-        setDataVehiculos(dVehiculos);
-        setDataAsociacion(dAsociacion);
-
+        setData({inmuebles, vehiculos, asociacion, rs, sac, scrl});
 
         setIndicators([
-          {id : 1, title : 'Inmuebles', value : dInmuebles?.length || 0, icon : Building2},
-          {id : 2, title : 'Vehiculos', value : dVehiculos?.length || 0, icon : Car},
-          {id : 3, title : 'Asociacion', value : dAsociacion?.length || 0, icon : User},
-          {id : 4, title : 'RS', value : dRS?.length || 0, icon : User},
-          {id : 5, title : 'SAC', value : dSAC?.length || 0, icon  : User},
-          {id : 6, title : 'SCRL', value : dSCRL?.length || 0, icon : User}
+          {id : 1, title : 'Inmuebles', value : inmuebles?.length || 0, icon : Building2},
+          {id : 2, title : 'Vehiculos', value : vehiculos?.length || 0, icon : Car},
+          {id : 3, title : 'Asociacion', value : asociacion?.length || 0, icon : User},
+          {id : 4, title : 'RS', value : rs?.length || 0, icon : User},
+          {id : 5, title : 'SAC', value : sac?.length || 0, icon  : User},
+          {id : 6, title : 'SCRL', value : scrl?.length || 0, icon : User}
         ]);
 
-        toast("Data exitosa",{
-          type : 'success'
+        toast("Datos cargados correctamente",{
+          type : 'success',
+          position : 'bottom-right'
         })
       } catch (error) {
         toast("Ocurrio un error ",{
-          type : 'error'
+          type : 'error',
+          position : 'bottom-center'
         });
       } finally{
         setLoading(false);
@@ -76,7 +79,21 @@ export default function Page() {
     }
     getData();
   }, [])
-  
+  const renderDivider = <Divider className='my-4' />
+  const renderTable=(title, dataset, header, path)=>(
+    <>
+      {
+        loading ? 
+        <TableLoading headers={header} rows={6}/> :
+        <TableManageDocuments
+          headers={header}
+          data={dataset}
+          title={title}
+          handleAddDocument={()=>router.push(path)}
+        />
+      }
+    </>
+  )
   return (
     <div className="p-6 space-y-6 h-screen overflow-y-auto">
       <div>
@@ -91,46 +108,14 @@ export default function Page() {
           indicators?.map((item, key)=><CardIndicator key={key} indicator={item} />)
         }
       </section>
-      {
-        loading ?
-        <TableLoading headers={headersInmuebles} rows={6} /> :
-        <TableManageDocuments
-          data={dataInmuebles}
-          headers={headersInmuebles}
-          title="Gestión de Inmuebles"
-          handleAddDocument={()=>router.push('contracts/inmueble/form-add')}
-        />
-      }
-      <section className='w-full mb-6'>
-        <Divider className='my-2 '/>
-      </section>
-      {
-        loading ?
-        <TableLoading headers={headersVehiculos} rows={6} /> :
-        <TableManageDocuments
-          data={dataVehiculos}
-          headers={headersVehiculos}
-          title="Gestión de Vehículos"
-          handleAddDocument={()=>router.push('contracts/vehiculo/form-add')}
-        />
-      }
-      <section className='w-full mb-6'>
-        <Divider className='my-2 '/>
-      </section>
-      {
-        loading ?
-        <TableLoading headers={headersAsociacion} rows={6} /> :
-        <TableManageDocuments
-          data={dataAsociacion}
-          headers={headersAsociacion}
-          title='Gestion de Asociacion'
-          handleAddDocument={()=>router.push('contracts/inmueble/form-add')}
-        />
-      }
-      <section className='w-full mb-6'>
-        <Divider className='my-2 '/>
-      </section>
       
+      {renderTable("Gestión de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add')}
+      {renderDivider}
+      {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add')}
+      {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add')}
+      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/RS/form-add')}
+      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/SAC/form-add')}
+      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/SCRL/form-add')}
     </div>
   )
 }

@@ -32,3 +32,18 @@ export const headersSAC = [
     {value : 'Fecha', head :'datesDocument'}
 ];
 
+export const headerRS=[
+    {value : "Tipo de Contratos", head : 'contractType'},
+    {value : 'Cliente', head : 'clientId'},
+    {value : 'Minuta', heead : 'minutaDirectory', isPdf : true},
+    {value : 'Estado', head : 'status'},
+    {value : 'Fecha', head : 'datesDocument'}
+];
+
+export const headerSCRL=[
+    {value : 'Tipo de Contratos', head : 'contractType'},
+    {value : 'Cliente', head : 'clientId'},
+    {value : 'Minuta', head : 'minutaDirectory', isPdf : true},
+    {value : 'Estado', head : 'status'},
+    {value : 'Fecha', head : 'datesDocument'}
+];
