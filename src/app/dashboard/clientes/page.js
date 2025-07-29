@@ -16,7 +16,7 @@ export default function Page() {
         {value : "Direccion", head : 'address'}
     ];
 
-    const URL_DATA_CLIENTES = "http://localhost:8000/home/client/";
+    const URL_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME+"/client/";
     const router = useRouter();
     const {
         data : dataClientes,

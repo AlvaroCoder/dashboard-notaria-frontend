@@ -1,7 +1,9 @@
-const URL_GET_DATA_CLIENT = "http://localhost:8000/home/client/id/?idUser=";
-const URL_GET_CONTRACT_BY_ID = "http://localhost:8000/home/contract/contractId/?idContract=";
-const URL_PROCESS_MINUTA="http://localhost:8000/contracts/processMinuta";
-const URL_GET_MINUTA = "http://localhost:8000/home/minuta";
+const URL_GET_DATA_CLIENT = process.env.NEXT_PUBLIC_URL_HOME_CLIENT + "/id/?idUser=";
+const URL_GET_CONTRACT_BY_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
+const URL_PROCESS_MINUTA=process.env.NEXT_PUBLIC_URL_CONTRACTS+"/processMinuta";
+const URL_GET_MINUTA = process.env.NEXT_PUBLIC_URL_HOME+"/minuta";
+const URL_REGISTER_CLIENT = process.env.NEXT_PUBLIC_URL_REGISTER_CLIENT;
+const URL_CONTRACTS = process.env.NEXT_PUBLIC_URL_HOME_CONTRACTS;
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -13,6 +15,14 @@ export async function getDataContractByIdContract(idContract) {
     return fetch(`${URL_GET_CONTRACT_BY_ID}${idContract}`,{
         method : 'GET',
         mode : 'cors'
+    })
+}
+
+export async function getDataContractByTypeContract(typeContract) {
+    return fetch(`${URL_CONTRACTS}/${typeContract}`,{
+        method : 'GET',
+        mode : 'cors',
+        redirect : 'follow'
     })
 }
 
@@ -34,4 +44,14 @@ export async function getMinutaFile(minutaDirectory) {
         body : JSON.stringify({ path : minutaDirectory })
     });
     
+};
+
+export async function registerClient(data) {
+    return fetch(URL_REGISTER_CLIENT,{
+        method : 'POST',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        body : JSON.stringify(data)
+    });
 }

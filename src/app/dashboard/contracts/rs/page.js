@@ -8,7 +8,7 @@ import React from 'react'
 const TableroContratos = dynamic(()=>import('@/components/Tables/TableroContratos'),{
     ssr : false,
     loading : ()=><span>Cargando tabla de razon social ...</span>
-})
+});
 
 export default function Page() {
     const typeContract="RS";

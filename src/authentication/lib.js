@@ -8,9 +8,6 @@ const secretKey=process.env.SECRET_KEY;
 const URL_REGISTER_USER = process.env.NEXT_PUBLIC_URL_SIGNUP;
 const URL_LOGIN_USER = process.env.NEXT_PUBLIC_URL_LOGIN;
 
-console.log(URL_LOGIN_USER);
-
-
 const key=new TextEncoder().encode(secretKey);
 const timeExpiration =  30 * 60 * 1000;
 

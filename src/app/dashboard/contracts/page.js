@@ -47,7 +47,7 @@ export default function Page() {
         ];
 
         const responses = await Promise.all(
-          endpoints?.map(type=>fetch(`http://localhost:8000/home/contracts/${type}`))
+          endpoints?.map(type=>fetch(`${process.env.NEXT_PUBLIC_URL_HOME_CONTRACTS}/${type}`))
         );
         const json = await Promise.all(responses.map(res=>res.json()));
         

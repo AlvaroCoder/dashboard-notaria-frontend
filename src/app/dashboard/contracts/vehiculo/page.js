@@ -11,9 +11,8 @@ import Title1 from '@/components/elements/Title1';
 
 export default function Page() {
     const typeContract = "compraVentaVehiculo"
-    const URL_CONTRACTS_INMUEBLES = `http://localhost:8000/home/contracts/${typeContract}`
+    const URL_CONTRACTS_INMUEBLES = process.env.NEXT_PUBLIC_URL_HOME_CONTRACTS+`/${typeContract}`
     const {data : dataResponseVehicles, loading : loadingDataVehicles, error : errorDataProperties} = useFetch(URL_CONTRACTS_INMUEBLES);
-    console.log(dataResponseVehicles);
     
   return (
     <div className='p-6 space-y-6'>

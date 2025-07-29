@@ -15,9 +15,10 @@ import { useParams, useRouter } from 'next/navigation'
 import React, { Suspense, useEffect, useState } from 'react'
 
 function RenderPageContracts() {
-  const URL_CONTRACT_ID = "http://localhost:8000/home/contract/contractId/?idContract=";
+  const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
   const router = useRouter();
   const {idContract} = useParams();
+  
   const [client, setClient] = useState(null);
   const [loadingDataClient, setLoadingDataClient] = useState(true);
   const {establecerTipoProceso, flushDataCard} = useContextCard();

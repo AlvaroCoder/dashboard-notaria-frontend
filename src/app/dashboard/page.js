@@ -23,9 +23,9 @@ export default function Page() {
         try {
             setLoading(true);
             const [resSenior, resJunior, resClient] = await Promise.all([
-              fetch('http://localhost:8000/home/senior'),
-              fetch('http://localhost:8000/home/junior'),
-              fetch('http://localhost:8000/home/client')
+              fetch(process.env.NEXT_PUBLIC_URL_HOME+'/senior'),
+              fetch(process.env.NEXT_PUBLIC_URL_HOME+'/junior'),
+              fetch(process.env.NEXT_PUBLIC_URL_HOME+'/client')
             ]);
 
             const [jsonSenior, jsonJunior, jsonClient] = await Promise.all([

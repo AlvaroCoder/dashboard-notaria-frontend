@@ -15,7 +15,7 @@ const headers=[
 ]
 
 export default function Page() {
-    const URL_DATA_JUNIOR = 'http://localhost:8000/home/junior';
+    const URL_DATA_JUNIOR = process.env.NEXT_PUBLIC_URL_HOME+'/junior';
 
     const router=useRouter();
     const {

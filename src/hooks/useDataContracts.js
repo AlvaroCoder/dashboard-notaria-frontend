@@ -1,3 +1,4 @@
+import { getDataContractByTypeContract } from "@/lib/apiConnections";
 import { useEffect, useState } from "react";
 
 export const useDataContracts=(type="SAC")=>{
@@ -8,11 +9,7 @@ export const useDataContracts=(type="SAC")=>{
     useEffect(()=>{
         async function fetchData() {
             try {
-                const response = await fetch(`http://localhost:8000/home/contracts/${type}`,{
-                    mode : 'cors',
-                    redirect : 'follow',
-                    method :'GET'
-                });
+                const response = await getDataContractByTypeContract(type);
 
                 if (!response.ok) {
                     const jsonResponse = await response.json();
@@ -30,7 +27,7 @@ export const useDataContracts=(type="SAC")=>{
             }
         }
         fetchData();
-    },[]);
+    },[type]);
 
     return {loading, data, error}
 }

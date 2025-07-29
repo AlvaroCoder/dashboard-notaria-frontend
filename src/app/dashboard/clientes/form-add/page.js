@@ -1,6 +1,7 @@
 'use client'
 import InputPasswordMaterialUi from '@/components/elements/InputPasswordMaterialUi'
 import Title1 from '@/components/elements/Title1'
+import { registerClient } from '@/lib/apiConnections'
 import { Button, TextField } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
@@ -33,22 +34,13 @@ export default function Page() {
           value : "client"
         }
       }
-      const response = await fetch('http://localhost:8000/login/register/',{
-        method : 'POST',
-        headers : {
-          'Content-type' : 'application/json'
-        },
-        body : JSON.stringify(newDataClient)
-      });
+      const response = await registerClient(newDataClient);
       const jsonResponseClient = await response.json();
 
-      console.log(jsonResponseClient);
       toast("Se guardo correctamente el cliente", {
         type : 'success'
       });
       router.back();
-
-
     } catch (err) {
       console.log(err);
       toast("Ocurrio un error",{

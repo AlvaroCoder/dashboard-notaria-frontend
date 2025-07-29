@@ -18,7 +18,7 @@ const headers = [
 
 
 export default function Page() {
-  const URL_DATA_SENIORS = 'http://localhost:8000/home/senior';
+  const URL_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
   const router = useRouter();
   const {
     data : dataSeniors,
