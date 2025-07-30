@@ -28,7 +28,8 @@ export default function TableManageDocuments({
     title="Documentos",
     handleAddDocument=()=>{},
     data=[],
-    headers=[]
+    headers=[],
+    slugUrlItem="/dashboard/contracts/inmueble/"
 }) {    
     const [vista, setVista] = useState("tabla");
   return (
@@ -136,7 +137,7 @@ export default function TableManageDocuments({
                                                                 key={idxHeader}
                                                             >
                                                                 <Link
-                                                                    href={"/dashboard/contracts/inmueble/"+documento?.id}
+                                                                    href={slugUrlItem+documento?.id}
                                                                     className='underline text-blue-700'
                                                                 >
                                                                     <p className=''>{camelCaseToTitle(documento[header?.head]) || '-'}</p>

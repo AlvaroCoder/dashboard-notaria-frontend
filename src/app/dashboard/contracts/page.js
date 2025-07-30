@@ -80,7 +80,7 @@ export default function Page() {
     getData();
   }, [])
   const renderDivider = <Divider className='my-4' />
-  const renderTable=(title, dataset, header, path)=>(
+  const renderTable=(title, dataset, header, path, slugUrlItem)=>(
     <>
       {
         loading ? 
@@ -90,6 +90,7 @@ export default function Page() {
           data={dataset}
           title={title}
           handleAddDocument={()=>router.push(path)}
+          slugUrlItem={slugUrlItem}
         />
       }
     </>
@@ -111,11 +112,11 @@ export default function Page() {
       
       {renderTable("Gestión de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add')}
       {renderDivider}
-      {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add')}
-      {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add')}
-      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/RS/form-add')}
-      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/SAC/form-add')}
-      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/SCRL/form-add')}
+      {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
+      {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
+      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/RS/form-add', '/dashboard/contracts/rs/')}
+      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/SAC/form-add', '/dashboard/contracts/sac/')}
+      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/SCRL/form-add','/dashboard/contracts/scrl/')}
     </div>
   )
 }

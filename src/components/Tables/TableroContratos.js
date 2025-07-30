@@ -15,7 +15,8 @@ import { estadosContrato } from "@/data/Features";
 
 export default function TableroContratos({
   titulo="Contratos",
-  dataContracts=[]
+  dataContracts=[],
+  baseSlugIdContract='/dashboard/contracts/inmueble/'
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function TableroContratos({
                 <TableRow key={idx}>
                   <TableCell>{idx}</TableCell>
                   <TableCell>
-                    <Link href={"/dashboard/contracts/inmueble/" + contrato?.id} className="text-blue-600 underline">
+                    <Link href={baseSlugIdContract+ contrato?.id} className="text-blue-600 underline">
                     {contrato?.case}
                     </Link>
                   </TableCell>

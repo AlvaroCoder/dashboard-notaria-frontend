@@ -23,6 +23,7 @@ export default function Page() {
         <div>
             <TableroContratos
                 dataContracts={dataResponseRS}
+                baseSlugIdContract='/dashboard/contracts/rs'
             />
         </div>
     </section>

@@ -25,8 +25,8 @@ export default function Page() {
 
         <div>
         <TableroContratos
-                        dataContracts={dataResponseProperty}
-                    />
+            dataContracts={dataResponseProperty}
+        />
         </div>
     </div>
   )
