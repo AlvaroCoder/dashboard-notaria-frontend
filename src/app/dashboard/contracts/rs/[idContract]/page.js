@@ -78,8 +78,8 @@ function RenderPageContracts() {
     <div className='p-8 pb-12 space-y-6 h-screen overflow-y-auto'>
       <section className='flex flex-row justify-between'>
         <div>
-          <Title1 className='text-3xl'>Detalles del Contrato</Title1>
-          <p>Información detallada del contrato</p> 
+          <Title1 className='text-3xl'>Detalles del Contrato RS</Title1>
+          <p>Información detallada del contrato de Razón Social (RS)</p> 
         </div>
         <div>
           {handleButtonContract(dataContract?.status)}

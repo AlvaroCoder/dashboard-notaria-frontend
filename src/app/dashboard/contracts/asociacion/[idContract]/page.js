@@ -1,13 +1,13 @@
 'use client'
-import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
-import { Loader2, User2 } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
-import { useFetch } from '@/hooks/useFetch'
-import { statusContracts } from '@/lib/commonJSON'
-import { camelCaseToTitle, cn } from '@/lib/utils'
-import { useContractDetails } from '@/hooks/useContractsDetails'
+import { Button } from '@/components/ui/button';
+import { useContractDetails } from '@/hooks/useContractsDetails';
+import { useFetch } from '@/hooks/useFetch';
+import { statusContracts } from '@/lib/commonJSON';
+import { camelCaseToTitle, cn } from '@/lib/utils';
+import { Loader2, User2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useParams, useRouter } from 'next/navigation';
+import React, { Suspense } from 'react'
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -16,26 +16,26 @@ const Title1 = dynamic(() => import('@/components/elements/Title1'));
 const CompradoresList = dynamic(() => import('@/components/Tables').then(m => m.CompradoresList));
 const VendedoresList = dynamic(() => import('@/components/Tables').then(m => m.VendedoresList));
 
+
 function RenderPageContracts() {
-  const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
+  const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
   const router = useRouter();
   const {idContract} = useParams();
-  
+
   const {
-    data : dataResponseContract, 
-    loading : loadingDataContract, 
-    error : errorDataContract} 
-  = useFetch(URL_CONTRACT_ID + idContract);  
-  const {loadingDataClient, client } = useContractDetails(dataResponseContract)
+    data : dataResponseContract,
+    loading : loadingDataContract,
+    error : errorDataContract
+  } = useFetch(URL_CONTRACT_ID+idContract);
+
+  const {loadingDataClient, client} = useContractDetails(dataResponseContract);
+
   const dataContract = dataResponseContract?.data || null;
-  if (loadingDataContract) {
-    return(
-      <div
-      className='p-6 space-y-6'
-    >
+  
+  if (loadingDataContract || loadingDataClient) {
+    return <div className='p-6'>
       <h1>Cargando contrato ...</h1>
     </div>
-    )
   }
   if (errorDataContract) {
     return (
@@ -78,8 +78,8 @@ function RenderPageContracts() {
     <div className='p-8 pb-12 space-y-6 h-screen overflow-y-auto'>
       <section className='flex flex-row justify-between'>
         <div>
-          <Title1 className='text-3xl'>Detalles del Contrato de Inmueble</Title1>
-          <p>Información detallada del contrato de Inmueble</p> 
+          <Title1 className='text-3xl'>Detalles del Contrato de Asociación</Title1>
+          <p className='w-full max-w-2xl'>Información detallada del contrato Constitución de asociación de empresas.</p> 
         </div>
         <div>
           {handleButtonContract(dataContract?.status)}
@@ -88,7 +88,7 @@ function RenderPageContracts() {
       <section className=''>
         <p><b>ID: </b>{idContract}</p>
         <p className='my-1'><b>Estado : </b>{statusContracts?.filter((est)=>est.id === dataContract?.status).map((item)=><span key={item.title} className={cn('px-2 py-1 rounded-sm text-sm space-y-4', item.bgColor)}>{item.title}</span>)}</p>
-        <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.case)}</span></p>
+        <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
         <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
       </section>
       <section className='w-full grid grid-cols-1 lg:grid-cols-2 gap-4'>
@@ -112,10 +112,9 @@ function RenderPageContracts() {
   )
 }
 
-
 export default function Page() {
-  return(
-    <main className='min-h-screen'>
+  return (
+    <main>
       <Suspense
         fallback={<p>Cargando ...</p>}
       >
@@ -123,4 +122,4 @@ export default function Page() {
       </Suspense>
     </main>
   )
-}
+};
