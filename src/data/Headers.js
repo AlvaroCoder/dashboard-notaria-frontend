@@ -47,3 +47,11 @@ export const headerSCRL=[
     {value : 'Estado', head : 'status'},
     {value : 'Fecha', head : 'datesDocument'}
 ];
+
+
+/** TABLERO CLIENTES */
+
+export const headersTableroCliente=[
+    {value : "Nombre", head :['firstName', 'lastName']},
+    {value : "Usuario", head : 'userName'}
+];

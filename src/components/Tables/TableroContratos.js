@@ -16,7 +16,8 @@ import { estadosContrato } from "@/data/Features";
 export default function TableroContratos({
   titulo="Contratos",
   dataContracts=[],
-  baseSlugIdContract='/dashboard/contracts/inmueble/'
+  baseSlugIdContract='/dashboard/contracts/inmueble/',
+  slugCreateProcess='/dashboard/contracts/inmueble/form-add'
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function TableroContratos({
         <div className="flex justify-end gap-2">
           <Button
             className={"bg-[#0C1019]"}
-            onClick={()=>router.push("inmueble/form-add")}
+            onClick={()=>router.push(slugCreateProcess)}
           >
             Agregar Contrato
           </Button>

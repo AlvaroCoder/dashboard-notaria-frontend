@@ -91,7 +91,6 @@ export default function TableSelectedUser({
                                             <Button
                                                 onClick={()=>{
                                                     handleClickSelect(user);
-                                                    toast('Notario seleccionado', {type : 'info'})
                                                 }}
                                             >
                                                 Seleccionar

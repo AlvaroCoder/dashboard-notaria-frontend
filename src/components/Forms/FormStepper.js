@@ -38,7 +38,6 @@ export default function FormStepper({
 
     const {
         dataPreMinuta, 
-        dataMinuta,
         selectNotario,
         notarioSelected,
         subirInformacionMinuta,

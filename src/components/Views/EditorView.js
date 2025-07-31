@@ -162,7 +162,7 @@ export default function EditorView() {
       eliminarBloque,
       handleChangeBloque
     } = useEditorContext();
-
+    
     const handleAdd = (idx, type) => {
         let newBlock = null;
       

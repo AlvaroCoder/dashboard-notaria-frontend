@@ -3,7 +3,7 @@ import Title1 from '../elements/Title1'
 import { Divider } from '@mui/material'
 import { useContratoContext } from '@/context/ContratosContext'
 
-export default function FormViewerPdfEscritura() {
+export default function FormViewerPdfEscritura({viewerPdf=null}) {
     const {
         viewerPdf : dataPdf
     } = useContratoContext();
@@ -22,7 +22,7 @@ export default function FormViewerPdfEscritura() {
                 {
                     dataPdf && (
                         <iframe
-                            src={dataPdf}
+                            src={viewerPdf ? viewerPdf : dataPdf}
                             width={"100%"}
                             height={"600px"}
                             className='mt-4 border rounded'
