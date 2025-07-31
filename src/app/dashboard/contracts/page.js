@@ -115,8 +115,8 @@ export default function Page() {
       {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
       {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
       {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/')}
-      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/SAC/form-add', '/dashboard/contracts/sac/')}
-      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/SCRL/form-add','/dashboard/contracts/scrl/')}
+      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/sac/form-add', '/dashboard/contracts/sac/')}
+      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/scrl/form-add','/dashboard/contracts/scrl/')}
     </div>
   )
 }

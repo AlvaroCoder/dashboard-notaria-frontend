@@ -201,7 +201,7 @@ function RenderApp() {
         directory : `DB_evidences/${fileLocation?.directory}`
       }
 
-      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'rs');
+      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'sac');
       if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
         toast("Error al momento de subir la informacion",{
           type : 'error',
@@ -277,7 +277,7 @@ function RenderApp() {
   const handleSubmitData=async()=>{
     try {
       setLoading(true);
-      const response = await generateScriptContract('razonSocial',dataSendMinuta);
+      const response = await generateScriptContract('sac',dataSendMinuta);
       
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
@@ -528,7 +528,6 @@ function RenderApp() {
           </section>
         )
   }
-
 }
 
 export default function Page() {
@@ -540,8 +539,8 @@ export default function Page() {
     return (
       <main>
         <section className='p-6 w-full'>
-            <Title1 className='text-3xl'>Nuevo Contrato de constitucion de Razon Social</Title1>
-            <p className='text-gray-600 text-sm'>Genera la escritura de la Razon Social</p>
+        <Title1 className='text-3xl'>Nuevo Contrato de Sociedad Anonima Cerrada (SAC)</Title1>
+        <p className='text-gray-600 text-sm'>Generar la escritura del contrato de sociedad anonima cerrada</p>
         </section>
         <RenderApp/>
       </main>
