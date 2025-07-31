@@ -268,22 +268,26 @@ function RenderApp() {
         lastName : senior?.lastName,
         dni : senior?.dni,
         ruc : senior?.ruc
+      },
+      creationDay : {
+        date : formatDateToYMD(new Date())
       }
     });
-    console.log(senior);
-    console.log(dataSendMinuta);
   }
 
   const handleSubmitData=async()=>{
     try {
       setLoading(true);
-      const response = await generateScriptContract('rs',dataSendMinuta);
+      const response = await generateScriptContract('razonSocial',dataSendMinuta);
+      
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
       setViewPdf(url);
       pushActiveStep();
     } catch (err) {
+      console.log(err);
+      
       toast("Surgio un error",{
         type : 'error',
         position : 'bottom-center'

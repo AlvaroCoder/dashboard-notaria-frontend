@@ -7,6 +7,7 @@ export default function FormViewerPdfEscritura({viewerPdf=null}) {
     const {
         viewerPdf : dataPdf
     } = useContratoContext();
+    
   return (
     <section className='p-8'>
         <section className='p-4 bg-white shadow rounded-sm'>
@@ -20,9 +21,9 @@ export default function FormViewerPdfEscritura({viewerPdf=null}) {
             <section
             >
                 {
-                    dataPdf && (
+                    viewerPdf && (
                         <iframe
-                            src={viewerPdf ? viewerPdf : dataPdf}
+                            src={viewerPdf}
                             width={"100%"}
                             height={"600px"}
                             className='mt-4 border rounded'

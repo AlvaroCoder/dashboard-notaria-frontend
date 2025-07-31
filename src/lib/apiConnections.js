@@ -30,7 +30,7 @@ export async function asignJuniorToContracts(idContract, idJunior) {
 }
 
 export async function generateScriptContract(type, bodyScript) {
-    return fetch(`${URL_CREATE_PROCESS}${type}/escritura`,{
+    return fetch(`${URL_CREATE_SCRIPT}/${type}/escritura/`,{
         method : 'POST',
         mode : 'cors',
         headers : {

@@ -51,7 +51,7 @@ export default function Page() {
         );
         const json = await Promise.all(responses.map(res=>res.json()));
         
-        const [inmuebles, vehiculos, asociacion, rs, sac, scrl] = json.map(j=>j?.data || []);
+        const [inmuebles, vehiculos, asociacion, rs, sac, scrl] = json.map(j=>typeof(j?.data) === 'string'? [] : j?.data);
 
         setData({inmuebles, vehiculos, asociacion, rs, sac, scrl});
 
@@ -114,7 +114,7 @@ export default function Page() {
       {renderDivider}
       {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
       {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
-      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/RS/form-add', '/dashboard/contracts/rs/')}
+      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/')}
       {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/SAC/form-add', '/dashboard/contracts/sac/')}
       {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/SCRL/form-add','/dashboard/contracts/scrl/')}
     </div>
