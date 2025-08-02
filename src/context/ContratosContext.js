@@ -52,6 +52,8 @@ export default function ContratoContext ({
     const [dataMinuta, setDataMinuta] = useState({
         
     });
+    const [activeStep, setActiveStep] = useState(0);
+    
     const [dataPreMinuta, setDataPreMinuta] = useState(initialDataPreMinuta);
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [fileLocationPdf, setFileLocationPdf] = useState(null);

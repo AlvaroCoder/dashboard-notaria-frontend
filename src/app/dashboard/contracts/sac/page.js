@@ -21,7 +21,10 @@ export default function Page() {
     </div>
     <div>
       <TableroContratos
-        dataContracts={dataReponseSAC}
+        titulo='Contratos SAC'
+        dataContracts={typeof(dataReponseSAC)==='string' ? [] : dataReponseSAC} 
+        slugCreateProcess='/dashboard/contracts/sac/form-add'
+        baseSlugIdContract='/dashboard/contracts/sac/'
       />
     </div>
   </section>

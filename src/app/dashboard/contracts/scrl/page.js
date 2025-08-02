@@ -22,7 +22,10 @@ export default function Page() {
       </div>
       <div>
         <TableroContratos
-          dataContracts={dataReponseSCRL}
+          titulo='Constitución de Sociedad Comercial de Responsabilidad Limitada'
+          dataContracts={typeof(dataReponseSCRL) === 'string' ? [] : dataReponseSCRL}
+          slugCreateProcess='/dashboard/contracts/scrl/form-add'
+          baseSlugIdContract='/dashboard/contracts/scrl/'
         />
       </div>
     </section>

@@ -4,43 +4,28 @@ import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinu
 import Loading from '@/components/elements/Loading';
 import Title1 from '@/components/elements/Title1';
 import TableroCarga from '@/components/Loading/TableroCarga';
-import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { useContextCard } from '@/context/ContextCard';
 import { useContratoContext } from '@/context/ContratosContext';
+import { cardDataVehiculos } from '@/data/CardData';
 import { useFetch } from '@/hooks/useFetch';
 import { Divider, TextField } from '@mui/material';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
+const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
+  ssr : false,
+  loading : ()=><>Cargando Tabla .... </>
+});
 
 const headerTableroCliente=[
   {value : 'Nombre', head : ['firstName', 'lastName']},
   {value : 'Usuario', head : 'userName'}
 ];
 
-const formsInmueble = [
-  {
-      nombre : "Compra de Vehiculo", 
-      slug : 'compra',
-      descripcion : "Formulario para iniciar un proceso de compra de vehiculo", 
-      requisitos :[
-          "Evidencias del vehiculo",
-          "Pagos del proceso",
-      ]
-  },
-  {
-      nombre : "Venta de Vehiculo",
-      slug : 'venta',
-      descripcion : "Formulario para iniciar un proceso de venta de vehiculo" ,
-      requisitos : [
-        "Evidencias del vehiculo",
-          "Pagos del proceso",
-      ]
-  }
-];
 function RenderCardsFormStepper() {
-  const URL_GET_DATA_CLIENTES = "http://localhost:8000/home/client";
+  const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
 
   const {activeStep, pushActiveStep, initializeClient} = useContextCard();
   const {handleChangeDataPreMinuta} = useContratoContext();
@@ -102,7 +87,7 @@ function RenderCardsFormStepper() {
           <Divider/>
           <section className='flex flex-row items-center justify-center gap-4 mt-5'>
             {
-              formsInmueble?.map((item, idx)=><CardRequirements key={idx} {...item} />)
+              cardDataVehiculos?.map((item, idx)=><CardRequirements key={idx} {...item} />)
             }
           </section>
         </div>

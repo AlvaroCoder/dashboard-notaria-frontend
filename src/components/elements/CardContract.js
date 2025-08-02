@@ -31,7 +31,7 @@ export default function CardContract({
             <FileText className="text-blue-600 w-5 h-5" />
             <div>
                 <h3 className="font-semibold text-gray-800">
-                Contrato de {caseType?.toLowerCase()} - {contractType === "propertyCompraVenta" ? "Compra/Venta" : "Otro"}
+                Contrato de {caseType?.toLowerCase()} - {contractType}
                 </h3>
             </div>
           </div>

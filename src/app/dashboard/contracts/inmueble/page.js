@@ -25,7 +25,8 @@ export default function Page() {
 
         <div>
         <TableroContratos
-            dataContracts={dataResponseProperty}
+            titulo='Inmuebles'
+            dataContracts={typeof(dataResponseProperty) === 'string' ? [] : dataResponseProperty}
         />
         </div>
     </div>

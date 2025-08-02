@@ -23,7 +23,10 @@ export default function Page() {
       </div>
       <div>
         <TableroContratos
-          dataContracts={dataResponseAsociacion}
+          titulo='Constitucion de asociacion'
+          dataContracts={typeof(dataResponseAsociacion) === 'string' ? [] : dataResponseAsociacion}
+          slugCreateProcess='/dashboard/contracts/asociacion/form-add'
+          baseSlugIdContract='/dashboard/contracts/asociacion/'
         />
       </div>
     </section>

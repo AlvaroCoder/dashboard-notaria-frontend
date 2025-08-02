@@ -1,86 +1,277 @@
 'use client'
 
 import Title1 from '@/components/elements/Title1';
-import TableroCarga from '@/components/Loading/TableroCarga';
-import { useContextCard } from '@/context/ContextCard';
 import { useFetch } from '@/hooks/useFetch';
-import { Divider } from '@mui/material';
-import React from 'react'
-import CardRequirements from '@/components/Cards/CardRequirements';
-import FormUploadMinuta from '@/components/Forms/FormUploadMinuta';
+import { Divider, TextField } from '@mui/material';
+import React, { useState } from 'react'
 import FormStepper from '@/components/Forms/FormStepper';
 import { useContratoContext } from '@/context/ContratosContext';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
-import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { toast } from 'react-toastify';
 import Loading from '@/components/elements/Loading';
+import dynamic from 'next/dynamic';
+import { cardDataInmuebles } from '@/data/CardData';
+import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
+import { headersTableroCliente } from '@/data/Headers';
+import { useContracts } from '@/context/ContextContract';
+import { asignJuniorToContracts, processDataMinuta, sendDataMinuta, submitDataPreMinuta, submitDataPreMinuta2 } from '@/lib/apiConnections';
+import { parseTextoToJSON } from '@/common/parserText';
+import { useEditorContext } from '@/context/ConextEditor';
+import { formatDateToYMD } from '@/lib/fechas';
+import EditorView from '@/components/Views/EditorView';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 
+const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
+    ssr : false,
+    loading : ()=><>Cargando Tabla ...</>
+});
 
-const headerTableroCliente=[
-    {value : 'Nombre', head : ['firstName', 'lastName']},
-    {value : 'Usuario', head : 'userName'}
-]
-const formsInmueble = [
-    {
-        nombre : "Compra de Inmuebles", 
-        slug : 'compra',
-        descripcion : "Formulario para iniciar un proceso de compra de inmuebles", 
-        requisitos :[
-            "Copia literal del inmueble (Sunarp).",
-            "Minuta firmada por comprador y vendedor.",
-            "Pagos del proceso",
-        ]
-    },
-    {
-        nombre : "Venta de Inmuebles",
-        slug : 'venta',
-        descripcion : "Esto es una descripcion para los procesos de venta",
-        requisitos : [
-            "Copia literal del inmueble (Sunarp).",
-            "Minuta firmada por comprador y vendedor.",
-            "Pagos del proceso",
-        ]
-    }
-];
+const FormViewerPdfEscritura = dynamic(()=>import('@/components/Forms/FormViewerPdfEscritura'),{
+    ssr : false
+});
+
+const CardRequirements = dynamic(()=>import('@/components/Cards/CardRequirements'),{
+    ssr : false
+});
+
 
 function RenderCardsFormStepper() {
-    const URL_GET_DATA_CLIENTES = "http://localhost:8000/home/client";
-    const {activeStep, pushActiveStep, initializeClient} = useContextCard();
-    const {handleChangeDataPreMinuta} = useContratoContext();
+    const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
+    const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
+    const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
+
     const {
         data : dataClientes, 
-        loading : loadingDataClientes, 
-        error : errorDataClientes
     } = useFetch(URL_GET_DATA_CLIENTES);
+
+    const {
+        data : dataJuniors
+    } = useFetch(URL_GET_DATA_JUNIORS);
+
+    const {
+        data : dataSeniors 
+    } = useFetch(URL_GET_DATA_SENIORS);
+
+    const {
+        activeStep,
+        dataSelected,
+        fileLocation,
+        handleClickClient,
+        pushActiveStep,
+        handleChangeFileLocation
+    } = useContracts();
+
+    const {
+        agregarBloques,
+        parserData
+    } = useEditorContext();
+
+    const [loading, setLoading] = useState(false);
+    const [dataSendMinuta, setDataSendMinuta] = useState({
+        header : {
+            numeroDocumentoNotarial : "",
+            numeroRegistroEscritura : '',
+            year : '',
+            folio : '',
+            tomo : 'kardex'
+        },
+        fojasData : {
+            start : {
+                number : "1123",
+                serie : "C",
+            },
+            end : {
+                number : '1125V',
+                serie : "C"
+            }
+        }
+    });
+    const [notarioSelected, setNotarioSelected] = useState(null);
+    const [viewPdf, setViewPdf] = useState(null);
+    const [imagesMinuta, setImagesMinuta] = useState([]);
     
     const handleClickSelectClient=(client)=>{
+        handleClickClient(client);
         pushActiveStep();
-        handleChangeDataPreMinuta('clientId', client?.id);
-        initializeClient(client);
         toast('Cliente seleccionado',{
             type  : 'info',
             position : 'bottom-right'
         });
     }   
+    const handleClickSelectCard=(slug)=>{
+        setDataSendMinuta({
+            ...dataSendMinuta,
+            case : slug
+        });
+        pushActiveStep();
+    }
+
+    const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+        try {
+            if (!minuta) {
+                toast("Subir minuta",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                return;
+            }
+            setLoading(true);
+            const newFormData = new FormData();
+            newFormData.append('minutaFile', minuta);
+
+            const response = await sendDataMinuta(newFormData);
+            const jsonResponseUpload = await response.json();
+
+            const fileLocation = jsonResponseUpload?.fileLocation;
+
+            const responseProcessData = await processDataMinuta(newFormData);
+            const responseProcessDataJSon = await responseProcessData?.json();
+
+            const parserText = parseTextoToJSON(responseProcessDataJSon?.minuta_content);
+            handleChangeFileLocation(fileLocation);
+            agregarBloques(parserText?.data);
+
+            setDataSendMinuta({
+                ...dataSendMinuta,
+                minuta : {
+                    minutaNumber : detailsMinuta?.number,
+                    creationDay : {
+                        date : formatDateToYMD(new Date())
+                    },
+                    place : {
+                        name : detailsMinuta?.namePlace,
+                        district : detailsMinuta?.districtPlace
+                    }
+                }
+            });
+            pushActiveStep()
+        } catch (err) {
+            console.log(err);
+            toast("Error con la vista de minuta",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+        } finally{
+            setLoading(false);
+        }
+    }
+
+    const handleSubmitPreMinuta=async()=>{
+        try {
+            setLoading(true);
+            const dataParseada = parserData();
+            const JSONPreMinuta = {
+                client : dataSelected?.client?.id,
+                processPayment : "Pago a la mitad",
+                minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
+                datesDocument : {
+                    processInitiate : formatDateToYMD(new Date())
+                },
+                diretory : `DB_evidences/${fileLocation?.directory}`
+            }
+
+            const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
+            if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
+                toast("Error al subir la informacion",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                return;
+            }
+            const responsePreMinutaJSON = await responsePreMinuta?.json();
+            setDataSendMinuta((prev)=>({
+                ...dataSendMinuta,
+                minuta : {
+                    ...prev?.minuta,
+                    minutaContent : {
+                        data : dataParseada
+                    },
+                },
+                contractId : responsePreMinutaJSON?.contractId
+            }));
+            toast("Se creo el proceso",{
+                type : 'success',
+                position : 'bottom-right'
+            });
+            pushActiveStep();
+        } catch (err) {
+            toast("Hubo un error en iniciar el proceso",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+            return;
+        } finally { 
+            setLoading(false);
+        }
+    }
+    const handleClickSelectJunior=async(junior)=>{
+        try {
+            setLoading(true);
+            const responseJuniorAsigned = await asignJuniorToContracts(dataSendMinuta?.contractId, junior?.id);
+            if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+                toast("El junior excede la cantidad maxima que puede manipular",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                return;
+            }
+
+            toast("Se asigno el Junior correctamente",{
+                type : 'success',
+                position : 'bottom-right'
+            });
+
+            pushActiveStep();
+        } catch (err) {
+            toast("Sucedio un error al asignar el junior",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+        } finally {
+            setLoading(false)
+        }
+    };
+
+    const handleChangeHeader=(e)=>{
+        const target = e.target;
+        setDataSendMinuta((prev)=>({
+          ...dataSendMinuta,
+          header : {
+            ...prev.header,
+            [target?.name] : target.value
+          }
+        }))
+      }
+
+    const handleClickSelectSenior=()=>{
+        
+    }
+
+    const handleChangeImageMinuta=(files)=>{
+        setImagesMinuta([
+            ...imagesMinuta,
+            files
+        ]);
+    }
+    const handleChangeDeleteImageMinuta=(idx)=>{
+        const newDataImage = imagesMinuta?.filter((_, index)=>index!== idx);
+        setImagesMinuta(newDataImage);
+    }
+
     switch(activeStep) {
         // Primero seleccionamos el cliente que vamos a usar
         case 0:
             return (
                 <div >
-                    {
-                        loadingDataClientes ? 
-                        <TableroCarga
-                            headers={headerTableroCliente}
-                        /> :
-                        <TableSelectedUser
+                    <TableSelectedUser
                             title='Selecciona un cliente'
                             descripcion='Tabla de clientes, selecciona uno para continuar'
-                            headers={headerTableroCliente}
+                            headers={headersTableroCliente}
                             data={dataClientes?.data}
                             slugCrear={'/dashboard/clientes/form-add'}
                             handleClickSelect={handleClickSelectClient}
                         />
-                    }
                 </div>
             )
         // Luego seleccionamos el tipo de proceso que se va a realizar
@@ -94,7 +285,7 @@ function RenderCardsFormStepper() {
                     <Divider/>
                     <section className='flex flex-row items-start justify-center gap-4 mt-5'>
                         {
-                            formsInmueble?.map((item, idx)=><CardRequirements key={idx} {...item} />)
+                            cardDataInmuebles?.map((item, idx)=><CardRequirements key={idx} handleClick={handleClickSelectCard} {...item} />)
                         }
                     </section>
                 </div>
@@ -102,12 +293,180 @@ function RenderCardsFormStepper() {
 
         // Luegos se sube el formulario de la minuta
         case 2:
-            return (<FormUploadMinuta/>);
-        case 3 :
+            return (
+              <main className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
+                <FormUploadMinuta2
+                    loading={loading}
+                    handleUploadMinuta={handleUploadMinuta}
+                />
+                <section className='hidden col-span-1 bg-white p-4 h-fit shadow rounded-sm lg:flex flex-col gap-4'>
+                    <section>
+                        <Title1>Cliente Seleccionado : </Title1>
+                        <h1 className='text-sm'>Nombre : {dataSelected?.client?.firstName || '-'}</h1>
+                        <h1 className='text-sm'>Usuario : {dataSelected?.client?.userName || '-'}</h1>
+                    </section>
+                </section>
+              </main>  
+            );
+        
+        case 3:
+            return (
+            <section className='relative h-screen overflow-y-auto w-full flex-1'>
+                <EditorView/>
+                <div className='p-4 w-full'>
+                    <Button
+                        disabled={loading}
+                        onClick={handleSubmitPreMinuta}
+                        className={"w-full mt-4"}
+                    >   
+                        {loading ? <Loader2/> : <p>Continuar</p>}
+                    </Button>
+                </div>
+            </section>)
+        // Seleccionar que Junior se encargara de la tarea
+        case 4:
+            return(
+                <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
+                    <TableSelectedUser
+                        title='Selecciona un Junior'
+                        descripcion='Selecciona el junior que se va a encargar (5 tareas por Junior)'
+                        headers={headersTableroCliente}
+                        data={dataJuniors?.data}
+                        slugCrear={'/dashboard/juniors/form-add'}
+                        handleClickSelect={handleClickSelectJunior}
+                    />
+                </section>
+            )
+        case 5 :
             return (<FormStepper
                
             />);
-        case 4:
+        case 6:
+            return (
+                <section className='min-w-3xl p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
+                    <section className='my-2'>
+                        <Title1 className='text-center text-2xl'>Sube lo comprobantes de pago</Title1>
+                        <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
+                    </section>
+                    <ButtonUploadImageMinuta
+                        handleChangeImage={handleChangeImageMinuta}
+                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
+                    />
+                    {
+                        imagesMinuta?.length > 0 &&
+                        <div className='w-full mt-8'>
+                            <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required/>
+                        </div>
+                    }
+                </section>
+            )
+        case 7:
+            // Se pide la informacion restante
+            return(
+                  <section className='w-full flex justify-center items-center'>
+                          <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
+                            <section>
+                              <Title1 className='text-3xl'>Informacion Restante</Title1>
+                              <p>Ingresa la informócion restante para generar la escritura</p>
+                            </section>
+                            <section className='my-4'>
+                              <Title1>Información de la asociacion</Title1>
+                              <TextField label="Corporacion" onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required/>
+                            </section>
+                            <section className='my-4'>
+                              <Title1>Información de la cabecera</Title1>
+                              <p></p>
+                              <div className='grid grid-cols-2 gap-4'>
+                                <TextField 
+                                  label="Nro Documento Notarial" 
+                                  type='number'
+                                  onChange={handleChangeHeader} 
+                                  name='numeroDocumentoNotarial' 
+                                  value={dataSendMinuta?.header?.numeroDocumentoNotarial} 
+                                  fullWidth 
+                                  required />
+                                <TextField 
+                                  label="Nro Registro Escritura"
+                                  type='number'
+                                  onChange={handleChangeHeader}
+                                  name="numeroRegistroEscritura"
+                                  value={dataSendMinuta?.header?.numeroRegistroEscritura} 
+                                  fullWidth
+                                  required 
+                                />
+                                <TextField
+                                  label="Año"
+                                  onChange={handleChangeHeader}
+                                  name="year"
+                                  type='number'
+                                  value={dataSendMinuta.header.year}
+                                  fullWidth
+                                  required
+                                />
+                                <TextField
+                                  label="Folio"
+                                  onChange={handleChangeHeader}
+                                  name='folio'
+                                  type='number'
+                                  value={dataSendMinuta.header.folio}
+                                  fullWidth
+                                  required
+                                />
+                                <TextField
+                                  label="Tomo"
+                                  onChange={handleChangeHeader}
+                                  name='tomo'
+                                  value={dataSendMinuta.header.tomo}
+                                  fullWidth
+                                  required
+                                />
+                                <TextField
+                                  label="Kardex"
+                                  onChange={handleChangeHeader}
+                                  name='kardex'
+                                  type='number'
+                                  value={dataSendMinuta.header.kardex}
+                                  fullWidth
+                                  required
+                                />
+                              </div>
+                
+                            </section>
+                            <Button 
+                              onClick={()=>pushActiveStep()}
+                              className={'w-full mt-4'}>
+                              Continuar
+                            </Button>
+                          </div>
+                        </section>
+            )
+        case 8:
+            return(
+                <section className='flex flex-col gap-4'>
+                    <TableSelectedUser
+                        title='Selecciona un notario'
+                        descripcion='Selecciona un notario para el proceso'
+                        slugCrear={"/dashboard/seniors/form-add"}
+                        headers={headersTableroCliente}
+                        data={dataSeniors?.data}
+                        handleClickSelect={handleClickSelectSenior}
+                    />
+                    {
+                        notarioSelected && (
+                            <div>
+                                <Title1>Notario seleccionado : </Title1>
+                                <p>Informacón del notario seleccionado</p>
+
+                                <section className='bg-white rounded-sm shadow p-4'>
+                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
+                                    <h1>Usuario : {notarioSelected?.userName}</h1>
+                                </section>
+                            </div>
+                        )
+                    }
+                </section>
+            )
+        case 6:
             return (<FormViewerPdfEscritura/>);
     }
 }

@@ -79,7 +79,7 @@ export default function Page() {
     }
     getData();
   }, [])
-  const renderDivider = <Divider className='my-4' />
+  const renderDivider = <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
   const renderTable=(title, dataset, header, path, slugUrlItem)=>(
     <>
       {
@@ -110,13 +110,17 @@ export default function Page() {
         }
       </section>
       
-      {renderTable("Gestión de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add')}
+      {renderTable("Contratos de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add')}
       {renderDivider}
-      {renderTable("Gestión de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
-      {renderTable("Gestión de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
-      {renderTable("Gestión de constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/')}
-      {renderTable("Gestión de constitución de SAC", data.sac, headersSAC, 'contracts/sac/form-add', '/dashboard/contracts/sac/')}
-      {renderTable("Gestión de constitución de SCRL", data.scrl, headerSCRL, 'contracts/scrl/form-add','/dashboard/contracts/scrl/')}
+      {renderTable("Contratos de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
+      {renderDivider}
+      {renderTable("Constitución de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
+      {renderDivider}
+      {renderTable("Constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/')}
+      {renderDivider}
+      {renderTable("Constitución de SAC", data.sac, headersSAC, 'contracts/sac/form-add', '/dashboard/contracts/sac/')}
+      {renderDivider}
+      {renderTable("Constitución de SCRL", data.scrl, headerSCRL, 'contracts/scrl/form-add','/dashboard/contracts/scrl/')}
     </div>
   )
 }

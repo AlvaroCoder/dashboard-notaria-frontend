@@ -7,6 +7,7 @@ const URL_CONTRACTS = process.env.NEXT_PUBLIC_URL_HOME_CONTRACTS;
 const URL_SEND_MINUTA = process.env.NEXT_PUBLIC_URL_CONTRACTS+"/sendMinuta";
 const URL_ASSIGN_JUNIOR_TO_CONTRACT = process.env.NEXT_PUBLIC_URL_ASSIGN_JUNIOR
 const URL_CREATE_PROCESS = process.env.NEXT_PUBLIC_URL_CREATE_PROCESS;
+const URL_CREATE_PROCESS_2 = process.env.NEXT_PUBLIC_URL_CREATE_PROCESS_2;
 const URL_CREATE_SCRIPT=process.env.NEXT_PUBLIC_URL_GENERATE_SCRIPT
 
 export async function getDataClientByClientId(idClient) {
@@ -51,6 +52,16 @@ export async function submitDataPreMinuta(dataPreMinuta, typeProcess) {
     })
 }
 
+export async function submitDataPreMinuta2(dataPreMinuta, typeProcess) {
+    return fetch(`${URL_CREATE_PROCESS_2}/${typeProcess}`,{
+        method : 'POST',
+        headers :{
+            'Content-Type' : 'application/json'
+        },
+        mode : 'cors',
+        body : JSON.stringify(dataPreMinuta)
+    });
+}
 export async function getDataContractByTypeContract(typeContract) {
     return fetch(`${URL_CONTRACTS}/${typeContract}`,{
         method : 'GET',

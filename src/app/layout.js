@@ -17,7 +17,6 @@ export default function RootLayout({ children }) {
         className={`font-poppins text-[#0C1019]`}
       >
         <EditorContext>
-          <ContratoContext>
             <ContextCardComp>
           <TopBarNavigationMain/>
           {children}
@@ -26,7 +25,6 @@ export default function RootLayout({ children }) {
             position="bottom"
           />
           </ContextCardComp>
-          </ContratoContext>
         </EditorContext>
       </body>
     </html>

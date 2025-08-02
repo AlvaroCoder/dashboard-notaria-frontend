@@ -13,7 +13,6 @@ const TableroContratos = dynamic(()=>import('@/components/Tables/TableroContrato
 export default function Page() {
     const typeContract="RS";
     const {data : dataResponseRS} = useDataContracts(typeContract);
-    console.log(dataResponseRS);
     
     return (
     <section className='p-6 space-y-6 h-screen overflow-y-auto'>
@@ -24,6 +23,7 @@ export default function Page() {
         </div>
         <div>
             <TableroContratos
+                titulo='Constitucion de SAC'
                 dataContracts={typeof(dataResponseRS)==='string' ? [] : dataResponseRS}
                 baseSlugIdContract='/dashboard/contracts/rs'
                 slugCreateProcess='/dashboard/contracts/rs/form-add'

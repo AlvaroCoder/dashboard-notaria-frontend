@@ -20,6 +20,7 @@ import { toast } from 'react-toastify';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
   ssr : false,
+  loading : ()=><>Cargando Tabla ... </>
 });
 
 const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'),{
@@ -301,13 +302,7 @@ function RenderApp() {
       // Primer paso definir el cliente que va a realizar el proceso
       return(
         <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-          <Suspense fallback={<p>Cargando tabla ...</p>}>
-            {
-              loadingDataClientes ? (
-                <TableroCarga headers={headersTableroCliente} />
-              ) :
-              (
-                <TableSelectedUser
+          <TableSelectedUser
                   title='Selecciona un cliente'
                   descripcion='Tabla de clientes, selecciona uno para continuar'
                   headers={headersTableroCliente}
@@ -315,9 +310,6 @@ function RenderApp() {
                   slugCrear={'/dashboard/clientes/form-add'}
                   handleClickSelect={handleClickSelectClient}                
                 />
-              )
-            }
-          </Suspense>
         </section>
       )
     // Aun se esta viendo la opcion de que el junior pueda 

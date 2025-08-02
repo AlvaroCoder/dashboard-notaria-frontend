@@ -1,539 +1,204 @@
 'use client';
-import { useContextCard } from '@/context/ContextCard'
-import { Divider, Step, StepLabel, Stepper, TextField } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useState, useCallback, useMemo } from 'react';
 import FormPerson from './FormPerson';
 import { Button } from '../ui/button';
-import Title1 from '../elements/Title1';
-import ButtonUploadImageMinuta from '../elements/ButtonUploadImageMinuta';
-import { checkEmptyFieldsFormCompra, checkEvidenceEmpty } from '@/common/checkInputsFormInmueble';
-import { useContratoContext } from '@/context/ContratosContext';
-import { useFetch } from '@/hooks/useFetch';
-import TableSelectedUser from '../Tables/TableSelectedUser';
+import { checkEmptyFieldsFormCompra } from '@/common/checkInputsFormInmueble';
 import { toast } from 'react-toastify';
 import { RenderStepper } from './elements';
 
-const headers = [
-    {value : "Nombre", head : ["firstName", "lastName"]},
-    {value : "Usuario", head : "userName"},
-]
+// Estado inicial para una persona
+const initialPersonState = {
+  firstName: '',
+  lastName: '',
+  dni: '',
+  gender: '',
+  nationality: '',
+  age: '',
+  job: '',
+  maritalStatus: { civilStatus: '' },
+  address: {
+    district: '',
+    province: '',
+    department: '',
+    name: '',
+  },
+};
 
 export default function FormStepper({
-    handleSaveData=null
+  tipoProceso = 'compra',
+  handleSaveData = () => {},
 }) {
-    const {tipoProceso, pushActiveStep} = useContextCard();
-    const stepsCompra = ['Comprador(es)','Vendedor(es)',  'Comprobante de Pago', 'Notario' ];
-    const stepsVenta = ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago' , 'Minuta'];
-    const [activeStepCompra, setActiveStepCompra] = useState(0);
-    const [activeStepVenta, setActiveStepVenta] = useState(0);
-    const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
-    const [errorCompra, setErrorCompra] = useState([]);
-    const [errorVenta, setErrorVenta] = useState([]);
-    
-    const {
-        data : dataNotario, 
-        loading : loadingDataNotario, 
-        error : errorDataNotario
-    } = useFetch('http://localhost:8000/home/senior');
+  const stepsCompra = useMemo(() => ['Comprador(es)', 'Vendedor(es)', 'Comprobante de Pago', 'Notario'], []);
+  const stepsVenta = useMemo(() => ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago', 'Minuta'], []);
 
-    const {
-        dataPreMinuta, 
-        selectNotario,
-        notarioSelected,
-        subirInformacionMinuta,
-        subirEvidencias
-    } = useContratoContext();
+  const [activeStep, setActiveStep] = useState(0);
+  const [errores, setErrores] = useState([]);
 
-    
+  const [compradores, setCompradores] = useState([initialPersonState]);
+  const [vendedores, setVendedores] = useState([initialPersonState]);
 
-    const [dataSendCompra, setDataSendCompra] = useState({
-        minuta : '',
-        paymentMethod : ''
+  const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
+  const data = useMemo(() => ({ compradores, vendedores }), [compradores, vendedores]);
+  const setData = useCallback((personType, newData) => {
+    if (personType === 'compradores') {
+      setCompradores(newData);
+    } else {
+      setVendedores(newData);
+    }
+  }, []);
+
+  const handleChange = useCallback((index, field, value, personType) => {
+    setData(personType, (prevData) => {
+      const list = [...prevData];
+      if (field === 'maritalStatus') {
+        list[index].maritalStatus.civilStatus = value?.toLowerCase();
+      } else if (list[index].address.hasOwnProperty(field)) {
+        list[index].address[field] = value;
+      } else {
+        list[index][field] = value;
+      }
+      return list;
     });
+  }, [setData]);
 
-    const [dataSendVenta, setDataSendVenta] = useState({
-        minuta : '',
-        paymentMethod : ''
-    });
+  const addPerson = useCallback((personType) => {
+    setData(personType, (prevData) => [...prevData, initialPersonState]);
+  }, [setData]);
 
-    const [compradores, setCompradores] = useState([
-        {
-            firstName: '',
-            lastName: '',
-            dni: '',
-            gender: '',
-            nationality: '',
-            age: '',
-            job: '',
-            maritalStatus: {
-              civilStatus : ''
-            },
-            address: {
-              district : "",
-              province : "",
-              department : "",
-              name : ""
-            },
-            job :''
-        }
-    ]);
+  const deletePerson = useCallback((idx, personType) => {
+    setData(personType, (prevData) => prevData.filter((_, index) => idx !== index));
+  }, [setData]);
 
-    const [vendedores, setVendedores] = useState([
-        {
-            firstName: '',
-            lastName: '',
-            dni: '',
-            gender: '',
-            nationality: '',
-            age: '',
-            job: '',
-            maritalStatus: {
-              civilStatus : ''
-            },
-            address: {
-              district : "",
-              province : "",
-              department : "",
-              name : ""
-            },
-            job :''
-        }
-    ]);
-    const handleChange=(index, field, value, type='venta')=>{
-        const list = type === 'venta' ? [...vendedores] : [...compradores];
-        if (field === 'district' || field === 'province' || field === 'department' || field === 'address') {
-            field === 'address' ? list[index]['address']['name'] = value : list[index]['address'][field] = value;;
-        }
-        else if (field === 'maritalStatus') {
-            list[index]['maritalStatus']['civilStatus'] = value?.toLowerCase();
-          }
-          else{
-            list[index][field] = value;
-          }
-        type === 'venta' ? setVendedores(list) : setCompradores(list);
-    };
+  const handleNext = useCallback(async (e) => {
+    e.preventDefault();
 
-
-    const addPerson = (type = 'venta') => {
-        const newPerson = {
-          firstName: '',
-          lastName: '',
-          dni: '',
-          gender: '',
-          nationality: '',
-          age: '',
-          job: '',
-          maritalStatus: {
-            civilStatus : ""
-          },
-          address: {
-            name : "",
-            district : "",
-            province : "",
-            department : ""
-        }
-        };
-        type === 'venta' ? setVendedores([...vendedores, newPerson]) : setCompradores([...compradores, newPerson]);
-      };
-      
-    const deletePerson =(idx, type='vendedor')=>{
-        const currentData = type === 'vendedor' ? [...vendedores] : [...compradores];
-        const newData = currentData?.filter((_, index)=>idx !== index);        
-        type === 'vendedor' ? setVendedores(newData) : setCompradores(newData);
-    }
-    const handleChangeImageMinuta=(files)=>{
-        setDataImagesMinuta([
-            ...dataImagesMinuta,
-            files
-        ]);
-    }
-    const handleChangeDeleteImageMinuta=(idx)=>{
-        const newDataImage = dataImagesMinuta.filter((_,index)=>index!==idx);
-        setDataImagesMinuta(newDataImage)       
+    let dataToValidate = [];
+    if (tipoProceso === 'compra') {
+      if (activeStep === 0) dataToValidate = compradores;
+      if (activeStep === 1) dataToValidate = vendedores;
+    } else { // tipoProceso === 'venta'
+      if (activeStep === 0) dataToValidate = vendedores;
+      if (activeStep === 1) dataToValidate = compradores;
     }
 
-    switch (tipoProceso) {
-        case 'compra':
-            return (
-                <section>
-                    <RenderStepper
-                        steps={stepsCompra}
-                        active={activeStepCompra}
-                    />
-                    <section className='mt-8'>
-                        {
-                            activeStepCompra === 0 && (
-                                <>
-                                    <FormPerson
-                                        data={compradores}
-                                        handleChange={handleChange}
-                                        type='compra'
-                                        handleDelete={deletePerson}
-                                        errores={errorCompra}
-                                    />
-                                    <section className='flex flex-row gap-2 mt-6'>
-                                        <Button
-                                            onClick={()=>addPerson('compra')}
-                                            className={"flex-1 py-4 cursor-pointer"}
-                                        >
-                                        Agregar Comprador
-                                        </Button>
-                                    </section>
-                                </>
-                            )
-                        }
-                        
-                    </section>
-                    <section className='mt-8'>
-                        {
-                            activeStepCompra === 1 && (
-                                <section>
-                                    <FormPerson
-                                        data={vendedores}
-                                        handleChange={handleChange}
-                                        type='venta'
-                                        handleDelete={deletePerson}
-                                        errores={errorCompra}
-                                    />
-                                    <section className='flex flex-row gap-2'>
-                                        <Button
-                                            onClick={()=>addPerson('venta')}
-                                            className={"flex-1 py-4"}
-                                        >
-                                        Agregar Vendedor
-                                        </Button>
-                                    </section>
-                                </section>
-                            )
-                        }
-                    </section>
-                    <section className='mt-8'>
-                        {
-                            activeStepCompra === 2 && (
-                                <div className='min-w-3xl  p-4 bg-white rounded-xl shadow-sm  text-xl'>
-                                    
-                                    <section className='my-2'>
-                                        <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
-                                        <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
-                                    </section>
-                                    <ButtonUploadImageMinuta
-                                        handleChangeImage={handleChangeImageMinuta}
-                                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
-                                    />
-                                    {
-                                        dataImagesMinuta.length > 0 &&
-                                        <div className='w-full mt-8'>
-                                            <TextField className='w-full' onChange={(e)=>setDataSendCompra({...dataSendCompra, paymentMethod : e.target.value})}  label="Indique el medio de pago" required />
-                                        </div> 
-                                    }
-                                </div>
-                            )
-                        }
-                    </section>
-                    <section>
-                        {
-                            activeStepCompra === 3 && (
-                                <div className='flex flex-col gap-4'>
-                                    <TableSelectedUser
-                                        title='Selecciona un notario'
-                                        descripcion='Selecciona la informacion del notario'
-                                        slugCrear={'/dashboard/seniors/form-add'}
-                                        headers={headers}
-                                        data={dataNotario?.data}
-                                        handleClickSelect={selectNotario}
-                                    />
-                                    <Divider/>
-                                    {
-                                        notarioSelected && (
-                                            <div >
-                                                <Title1>Notario seleccionado : </Title1>
-                                                <p>Informacion del notario seleccionado</p>
-
-                                                <section className='bg-white rounded-sm shadow p-4 '>
-                                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
-                                                    <h1>Usuario : {notarioSelected?.userName}</h1>
-                                                </section>
-                                            </div>     
-                                        )
-                                       }
-
-                                </div>
-                            )
-                        }
-                    </section>
-                    <div className="flex justify-between mt-6">
-                        <Button disabled={activeStepCompra === 0} onClick={() => setActiveStepCompra((prev) => prev - 1)}>
-                            Atrás
-                        </Button>
-                        <Button
-                            onClick={async(e)=>{
-                                e.preventDefault();
-                                if (activeStepCompra === 0) {
-                                    const errores = checkEmptyFieldsFormCompra(compradores);
-                                    if (errores.length > 0) {
-                                        setErrorCompra(errores);
-                                        toast("Formulario incompleto",{
-                                            type : 'error'
-                                        })
-                                        return;
-                                    }
-                                }
-                                if (activeStepCompra === 1) {
-                                    const errores = checkEmptyFieldsFormCompra(vendedores);
-                                    if (errores.length > 0) {
-                                        setErrorCompra(errores);
-                                        toast("Formulario incompleto",{
-                                            type :'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                if (activeStepCompra === 2) {
-                                    const errores = checkEvidenceEmpty(dataImagesMinuta);
-                                    if (errores.error) {
-                                        setErrorCompra([errores]);
-                                        toast("Evidencias incompletas",{
-                                            type : 'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                
-                                if (activeStepCompra === 3) {
-                                    if (handleSaveData) {
-                                        await handleSaveData(dataImagesMinuta, vendedores, compradores, dataSendCompra)
-                                    }
-                                    else{
-                                        try {
-                                            const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
-                                                method : 'POST',
-                                                headers : {
-                                                    'Content-type':'application/json'
-                                                },
-                                                body : JSON.stringify(dataPreMinuta)
-                                            });
-        
-                                            const jsonDataPreMinuta = await responseDataPreMinuta.json();                                        
-                                            const contractId = jsonDataPreMinuta?.contractId;
-                                            const imagenesEvidencias = await subirEvidencias(dataImagesMinuta);
-                                            
-                                            await subirInformacionMinuta(contractId, vendedores, compradores, {
-                                                caption : dataSendCompra?.paymentMethod,
-                                                evidences : imagenesEvidencias
-                                            });
-                                            
-                                        } catch (err) {
-                                            console.log(err);
-                                            
-                                        } finally {
-    
-                                        }
-                                    }
-                                }
-                                   
-                                setActiveStepCompra((prev) => (prev < stepsCompra.length - 1 ? prev + 1 : prev));
-                            }}
-                        >
-                            {activeStepCompra === stepsCompra.length - 1 ? 'Finalizar' : 'Siguiente'}
-                        </Button>
-                    </div>
-                </section>
-            )
-        case 'venta':
-            return (
-                <div>
-                    <RenderStepper
-                        steps={stepsVenta}
-                        active={activeStepVenta}
-                    />
-                    <section className='mt-8'>
-                        {
-                            activeStepVenta === 0 && (
-                                <>
-                                    <FormPerson
-                                        data={vendedores}
-                                        handleChange={handleChange}
-                                        type='venta'
-                                        handleDelete={deletePerson}
-                                        errores={errorVenta}
-                                    />
-                                    <section className='flex flex-row gap-2'>
-                                        <Button
-                                            onClick={()=>addPerson('venta')}
-                                            className={"flex-1 py-4"}
-                                        >
-                                        Agregar Vendedor
-                                        </Button>
-                                    </section>
-                                </>
-                            )
-                        }
-                    </section>
-                    <section className='mt-8'>
-                        {
-                            activeStepVenta === 1 && (
-                                <section>
-                                    <FormPerson
-                                        data={compradores}
-                                        handleChange={handleChange}
-                                        type='compra'
-                                        handleDelete={deletePerson}
-                                        errores={errorVenta}
-                                    />
-                                    <div className='flex flex-row gap-2'>
-                                        <Button
-                                            onClick={()=>addPerson('compra')}
-                                            className={'flex-1 py-4'}
-                                        >
-                                            Agregar Comprador
-                                        </Button>
-                                    </div>
-                                </section>
-                            )
-                        }
-                    </section>
-                    <section>
-                        {
-                            activeStepVenta === 2 &&(
-                                <div className='min-w-3xl p-4 bg-white rounded-xl shadow-sm text-xl'>
-                                    <section className='my-2'>
-                                        <Title1 
-                                            className='text-center text-2xl'>Subr los comprobantes de pago</Title1>
-                                        <p
-                                            className='text-center text-gray-600 text-sm'
-                                        >Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
-                                    </section>
-                                    <ButtonUploadImageMinuta
-                                        handleChangeImage={handleChangeImageMinuta}
-                                        handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
-                                    />
-                                    {
-                                        dataImagesMinuta?.length > 0 &&
-                                        <section className='w-full mt-8'>
-                                            <TextField 
-                                                className='w-full' 
-                                                onChange={(e)=>setDataSendVenta({...dataSendVenta, paymentMethod : e.target.value})} 
-                                                label="Indique el medio de pago" 
-                                                required 
-                                            />
-                                        </section>
-                                    }
-                                </div>
-                            )
-                        }
-                    </section>
-                    <section>
-                        {
-                            activeStepVenta === 3 && (
-                                <div className='flex flex-col gap-4'>
-                                    <TableSelectedUser
-                                        title='Selecciona un notario'
-                                        descripcion='Selecciona la informacion del notario'
-                                        slugCrear={'/dashboard/seniors/form-add'}
-                                        headers={headers}
-                                        data={dataNotario?.data}
-                                        handleClickSelect={selectNotario}
-                                    />
-                                    <Divider/>
-                                    {
-                                        notarioSelected && (
-                                            <div >
-                                                <Title1>Notario seleccionado : </Title1>
-                                                <p>Informacion del notario seleccionado</p>
-
-                                                <section className='bg-white rounded-sm shadow p-4 '>
-                                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
-                                                    <h1>Usuario : {notarioSelected?.userName}</h1>
-                                                </section>
-                                            </div>  
-                                        )
-                                    }
-                                </div>
-                            )
-                        }
-                    </section>
-                    <div className="flex justify-between mt-6">
-                        <Button disabled={activeStepVenta === 0} onClick={() => setActiveStepVenta((prev) => prev - 1)}>
-                            Atrás
-                        </Button>
-                        <Button
-                            onClick={async(e)=>{
-                                e.preventDefault();
-                                if (activeStepVenta === 0) {
-                                    const errores = checkEmptyFieldsFormCompra(vendedores);
-                                    if (errores.length > 0) {
-                                        setErrorVenta(errores);
-                                        toast('Formulario incompleto', {
-                                            type : 'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                if (activeStepVenta === 1) {
-                                    const errores = checkEmptyFieldsFormCompra(compradores);
-                                    
-                                    console.log(errores);
-                                    console.log(compradores);
-                                    
-                                    if (errores.length > 0) {
-                                        setErrorVenta(errores);
-                                        toast('Formulario incompleto',{
-                                            type : 'error',
-                                            position:'bottom-center'
-                                        });
-                                        return;
-                                    }
-                                }
-                                if (activeStepVenta === 2) {
-                                    const errores = checkEvidenceEmpty(dataImagesMinuta);
-                                   
-                                    
-                                    if (errores.error) {
-                                        setErrorVenta([errores]);
-                                        toast('Evidencias incompletas',{
-                                            type : 'error'
-                                        });
-                                        return;
-                                    }
-                                }
-                                if (activeStepVenta === 3) {
-                                    if (handleSaveData) {
-                                        await handleSaveData(dataImagesMinuta, vendedores, compradores, dataSendVenta)
-                                    }
-                                    else{
-                                        try {
-                                            const responseDataPreMinuta = await fetch('http://localhost:8000/create/propertyCompraVenta',{
-                                                method : 'POST',
-                                                headers : {
-                                                    'Content-type' : 'application/json'
-                                                },
-                                                body : JSON.stringify(dataPreMinuta)
-                                            });
-                                            const jsonDataPreMinuta = await responseDataPreMinuta.json();
-                                            const contractId = jsonDataPreMinuta?.contractId;
-    
-                                            const imagesEvidencias = await subirEvidencias(dataImagesMinuta);
-                                            await subirInformacionMinuta(contractId, vendedores, compradores, {
-                                                caption : dataSendVenta?.paymentMethod,
-                                                evidences : imagesEvidencias
-                                            });
-    
-                                            pushActiveStep();
-                                        } catch (err) {
-                                            console.log(err);
-                                            
-                                        } finally {
-    
-                                        }
-                                    }
-                                }
-                                setActiveStepVenta((prev)=>(prev<stepsVenta.length - 1 ? prev + 1 : prev))
-                            }}
-                        >
-                        {activeStepVenta === stepsVenta.length - 1 ? 'Finalizar' : 'Siguiente'}
-                        </Button>
-                    </div>
-                </div>
-            )
+    // Lógica de validación
+    const validationErrors = checkEmptyFieldsFormCompra(dataToValidate);
+    if (validationErrors.length > 0) {
+      setErrores(validationErrors);
+      toast('Formulario incompleto', { type: 'error' });
+      return;
     }
+    setErrores([]); // Limpiar errores si la validación es exitosa
+
+    if (activeStep === steps.length - 1) {
+      handleSaveData(compradores, vendedores);
+    }
+
+    setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+  }, [activeStep, compradores, vendedores, handleSaveData, steps.length, tipoProceso]);
+
+  const handleBack = useCallback(() => {
+    setActiveStep((prev) => prev - 1);
+  }, []);
+
+  const renderCurrentStepForm = () => {
+    if (tipoProceso === 'compra') {
+      if (activeStep === 0) {
+        return (
+          <>
+            <FormPerson
+              data={compradores}
+              handleChange={(index, field, value) => handleChange(index, field, value, 'compradores')}
+              type='compra'
+              handleDelete={(idx) => deletePerson(idx, 'compradores')}
+              errores={errores}
+            />
+            <div className='flex flex-row gap-2 mt-6'>
+              <Button onClick={() => addPerson('compradores')} className='flex-1 py-4'>
+                Agregar Comprador
+              </Button>
+            </div>
+          </>
+        );
+      }
+      if (activeStep === 1) {
+        return (
+          <>
+            <FormPerson
+              data={vendedores}
+              handleChange={(index, field, value) => handleChange(index, field, value, 'vendedores')}
+              type='venta'
+              handleDelete={(idx) => deletePerson(idx, 'vendedores')}
+              errores={errores}
+            />
+            <div className='flex flex-row gap-2'>
+              <Button onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+                Agregar Vendedor
+              </Button>
+            </div>
+          </>
+        );
+      }
+      // Los casos 2 y 3 no tienen un FormPerson, por lo que no se muestran aquí.
+    } else { // tipoProceso === 'venta'
+      if (activeStep === 0) {
+        return (
+          <>
+            <FormPerson
+              data={vendedores}
+              handleChange={(index, field, value) => handleChange(index, field, value, 'vendedores')}
+              type='venta'
+              handleDelete={(idx) => deletePerson(idx, 'vendedores')}
+              errores={errores}
+            />
+            <div className='flex flex-row gap-2'>
+              <Button onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+                Agregar Vendedor
+              </Button>
+            </div>
+          </>
+        );
+      }
+      if (activeStep === 1) {
+        return (
+          <>
+            <FormPerson
+              data={compradores}
+              handleChange={(index, field, value) => handleChange(index, field, value, 'compradores')}
+              type='compra'
+              handleDelete={(idx) => deletePerson(idx, 'compradores')}
+              errores={errores}
+            />
+            <div className='flex flex-row gap-2'>
+              <Button onClick={() => addPerson('compradores')} className='flex-1 py-4'>
+                Agregar Comprador
+              </Button>
+            </div>
+          </>
+        );
+      }
+    }
+    return null;
+  };
+
+  return (
+    <section>
+      <RenderStepper steps={steps} active={activeStep} />
+      <section className='mt-8'>{renderCurrentStepForm()}</section>
+
+      <div className={`mt-6 ${tipoProceso === 'compra' ? 'flex justify-between' : 'w-full'}`}>
+        {tipoProceso === 'compra' && (
+          <Button disabled={activeStep === 0} onClick={handleBack}>
+            Atrás
+          </Button>
+        )}
+        <Button
+          onClick={handleNext}
+          className={tipoProceso === 'venta' ? 'w-full' : ''}
+        >
+          {activeStep === steps.length - 1 ? 'Finalizar' : 'Siguiente'}
+        </Button>
+      </div>
+    </section>
+  );
 }

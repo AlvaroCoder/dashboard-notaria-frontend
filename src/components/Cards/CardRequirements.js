@@ -1,18 +1,16 @@
 'use client';
-import { useContextCard } from '@/context/ContextCard'
 import React from 'react'
 import Title1 from '../elements/Title1';
 import { Button } from '../ui/button';
-import { useContratoContext } from '@/context/ContratosContext';
 
 export default function CardRequirements({
     nombre, 
     descripcion,
     requisitos=[],
-    slug
+    slug,
+    handleClick=()=>{}
 }) {
-    const {establecerTipoProceso, pushActiveStep} = useContextCard();
-    const {handleChangeDataPreMinuta} = useContratoContext();
+    
   return (
     <section className='p-2 w-full max-w-[450px] bg-[#102945] rounded-sm shadow-sm'>
     <div
@@ -26,11 +24,7 @@ export default function CardRequirements({
         </section>
         <Button
             className={"bg-[#102945] w-full hover:bg-[#0C1019]"}
-            onClick={()=>{                    
-                handleChangeDataPreMinuta('case', slug);
-                establecerTipoProceso(slug);
-                pushActiveStep();
-            }}
+            onClick={()=>handleClick(slug)}
         >
             Iniciar Proceso
         </Button>
