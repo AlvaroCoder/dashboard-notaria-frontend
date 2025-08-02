@@ -9,6 +9,8 @@ const URL_ASSIGN_JUNIOR_TO_CONTRACT = process.env.NEXT_PUBLIC_URL_ASSIGN_JUNIOR
 const URL_CREATE_PROCESS = process.env.NEXT_PUBLIC_URL_CREATE_PROCESS;
 const URL_CREATE_PROCESS_2 = process.env.NEXT_PUBLIC_URL_CREATE_PROCESS_2;
 const URL_CREATE_SCRIPT=process.env.NEXT_PUBLIC_URL_GENERATE_SCRIPT
+const URL_CREATE_EVIDENCE=process.env.NEXT_PUBLIC_URL_SEND_EVIDENCE;
+const URL_GENERATE_SCRIPT_COMPRA_VENTA= process.env.NEXT_PUBLIC_URL_CREATE_COMPRA_VENTA;
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -41,6 +43,17 @@ export async function generateScriptContract(type, bodyScript) {
     })
 }
 
+export async function generateScriptCompraVenta(type, bodyScript) {
+    return fetch(`${URL_GENERATE_SCRIPT_COMPRA_VENTA}/${type}/escritura`,{
+        method : 'POST',
+        mode : 'cors',
+        headers : {
+            'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify(bodyScript)
+    })
+}
+
 export async function submitDataPreMinuta(dataPreMinuta, typeProcess) {
     return fetch(`${URL_CREATE_PROCESS}${typeProcess}`,{
         method : 'POST',
@@ -62,6 +75,27 @@ export async function submitDataPreMinuta2(dataPreMinuta, typeProcess) {
         body : JSON.stringify(dataPreMinuta)
     });
 }
+
+export async function subirEvidencias(evidencias=[], directory='') {
+    const responsesEvidences = evidencias?.map(async(evidencia)=>{
+        const formDataEvidence = new FormData();
+        formDataEvidence.append('evidence', evidencia[0])
+
+        const response = await fetch(`${URL_CREATE_EVIDENCE}${directory}`,{
+            method : 'POST',
+            body : formDataEvidence
+        });
+
+        const responseJSON = await response.json();
+        const file = responseJSON?.fileLocation;
+
+        return `DB_evidences/${file?.directory}/${file?.fileNames[0]}`
+    });
+    return Promise.all(responsesEvidences);
+}
+
+
+
 export async function getDataContractByTypeContract(typeContract) {
     return fetch(`${URL_CONTRACTS}/${typeContract}`,{
         method : 'GET',

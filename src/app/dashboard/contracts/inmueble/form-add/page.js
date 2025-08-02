@@ -13,7 +13,7 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, processDataMinuta, sendDataMinuta, submitDataPreMinuta, submitDataPreMinuta2 } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, generateScriptContract, processDataMinuta, sendDataMinuta, subirEvidencias, submitDataPreMinuta, submitDataPreMinuta2 } from '@/lib/apiConnections';
 import { parseTextoToJSON } from '@/common/parserText';
 import { useEditorContext } from '@/context/ConextEditor';
 import { formatDateToYMD } from '@/lib/fechas';
@@ -74,9 +74,10 @@ function RenderCardsFormStepper() {
             numeroRegistroEscritura : '',
             year : '',
             folio : '',
-            tomo : 'kardex'
+            tomo : '',
+            kardex : ''
         },
-        fojasData : {
+        fojaData : {
             start : {
                 number : "1123",
                 serie : "C",
@@ -162,21 +163,25 @@ function RenderCardsFormStepper() {
             setLoading(true);
             const dataParseada = parserData();
             const JSONPreMinuta = {
-                client : dataSelected?.client?.id,
+                clientId : dataSelected?.client?.id,
                 processPayment : "Pago a la mitad",
                 minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
                 datesDocument : {
                     processInitiate : formatDateToYMD(new Date())
                 },
-                diretory : `DB_evidences/${fileLocation?.directory}`
+                directory : `DB_evidences/${fileLocation?.directory}`,
+                case : dataSendMinuta?.case
             }
-
+            console.log(JSONPreMinuta);
+            
             const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
             if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
                 toast("Error al subir la informacion",{
                     type : 'error',
                     position : 'bottom-center'
                 });
+                console.log(await responsePreMinuta.json());
+                
                 return;
             }
             const responsePreMinutaJSON = await responsePreMinuta?.json();
@@ -244,8 +249,97 @@ function RenderCardsFormStepper() {
         }))
       }
 
-    const handleClickSelectSenior=()=>{
+    const handleClickFormStepper=(compradores, vendedores)=>{
+        setDataSendMinuta({
+            ...dataSendMinuta,
+            sellers : {
+                people : vendedores
+            },
+            buyers : {
+                people : compradores
+            }
+        });
+        pushActiveStep()
+        toast("Cliente guardado",{
+            type : 'info',
+            position : 'bottom-right'
+        })
+    }
+    const handleClickEvidences=async(e)=>{
+        e.preventDefault();
+        try {
+            setLoading(true);
+
+            const response = await subirEvidencias(imagesMinuta, fileLocation?.directory);
         
+
+            setDataSendMinuta((prev)=>({
+                ...dataSendMinuta,
+                paymentMethod : {
+                    ...prev?.paymentMethod,
+                    evidences : response                    
+                }
+            }));
+
+            toast("Imagenes subidas correctamente",{
+                type : 'success',
+                position: 'bottom-right'
+            });
+            pushActiveStep();
+        } catch (err) {
+            console.log(err);
+            
+        } finally{
+            setLoading(false);
+        }
+    }
+
+    const handleClickSelectSenior=(senior)=>{
+        setNotarioSelected(senior);
+        setDataSendMinuta({
+            ...dataSendMinuta,
+            notario : {
+                firstName : senior?.firstName,
+                lastName : senior?.lastName,
+                dni : senior?.dni,
+                ruc : senior?.ruc
+            },
+            creationDay :{
+                date : formatDateToYMD(new Date())
+            }
+        });
+    }
+
+    const handleSubmitData=async()=>{
+        try {
+            setLoading(true);
+            const response = await generateScriptCompraVenta('inmueble', dataSendMinuta);
+            console.log(dataSendMinuta);
+            
+            if (!response.ok || response.status === 406) {
+                toast("Sucedio un error",{
+                    type :'error',
+                    position : 'bottom-center'
+                });
+                console.log(await response.json());
+                
+                return;
+            }
+            const blobResponse = await response.blob();
+            const url = URL.createObjectURL(blobResponse);
+
+            setViewPdf(url);
+            pushActiveStep();
+
+        } catch (err) {
+            toast("Surgio un error en la api",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+            
+        } finally{
+            setLoading(false);
+        }
     }
 
     const handleChangeImageMinuta=(files)=>{
@@ -339,11 +433,11 @@ function RenderCardsFormStepper() {
             )
         case 5 :
             return (<FormStepper
-               
+               handleSaveData={handleClickFormStepper}
             />);
         case 6:
             return (
-                <section className='min-w-3xl p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
+                <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
                         <Title1 className='text-center text-2xl'>Sube lo comprobantes de pago</Title1>
                         <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
@@ -358,6 +452,13 @@ function RenderCardsFormStepper() {
                             <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required/>
                         </div>
                     }
+                    <Button
+                        onClick={handleClickEvidences}
+                        disabled={imagesMinuta.length === 0 || loading}
+                        className={"mt-4 w-full"}
+                    >
+                    {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
+                    </Button>
                 </section>
             )
         case 7:
@@ -368,10 +469,6 @@ function RenderCardsFormStepper() {
                             <section>
                               <Title1 className='text-3xl'>Informacion Restante</Title1>
                               <p>Ingresa la informócion restante para generar la escritura</p>
-                            </section>
-                            <section className='my-4'>
-                              <Title1>Información de la asociacion</Title1>
-                              <TextField label="Corporacion" onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required/>
                             </section>
                             <section className='my-4'>
                               <Title1>Información de la cabecera</Title1>
@@ -464,10 +561,19 @@ function RenderCardsFormStepper() {
                             </div>
                         )
                     }
+                    <Button 
+                        disabled={!notarioSelected}
+                        onClick={handleSubmitData}
+                        className={"w-full mt-4"}
+                    >   
+                        {loading ? <Loader2 className='animate-spin' /> : <p>Generar Escritura</p>}
+                    </Button>
                 </section>
             )
-        case 6:
-            return (<FormViewerPdfEscritura/>);
+        case 9:
+            return (<FormViewerPdfEscritura
+                viewerPdf={viewPdf}
+            />);
     }
 }
 

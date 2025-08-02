@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import { checkEmptyFieldsFormCompra } from '@/common/checkInputsFormInmueble';
 import { toast } from 'react-toastify';
 import { RenderStepper } from './elements';
+import { cn } from '@/lib/utils';
 
 // Estado inicial para una persona
 const initialPersonState = {
@@ -28,14 +29,14 @@ export default function FormStepper({
   tipoProceso = 'compra',
   handleSaveData = () => {},
 }) {
-  const stepsCompra = useMemo(() => ['Comprador(es)', 'Vendedor(es)', 'Comprobante de Pago', 'Notario'], []);
-  const stepsVenta = useMemo(() => ['Vendedor(es)', 'Comprador(es)', 'Comprobante de Pago', 'Minuta'], []);
+  const stepsCompra = useMemo(() => ['Comprador(es)', 'Vendedor(es)'], []);
+  const stepsVenta = useMemo(() => ['Vendedor(es)', 'Comprador(es)'], []);
 
   const [activeStep, setActiveStep] = useState(0);
   const [errores, setErrores] = useState([]);
 
-  const [compradores, setCompradores] = useState([initialPersonState]);
-  const [vendedores, setVendedores] = useState([initialPersonState]);
+  const [compradores, setCompradores] = useState([{...initialPersonState}]);
+  const [vendedores, setVendedores] = useState([{...initialPersonState}]);
 
   const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
   const data = useMemo(() => ({ compradores, vendedores }), [compradores, vendedores]);
@@ -52,9 +53,13 @@ export default function FormStepper({
       const list = [...prevData];
       if (field === 'maritalStatus') {
         list[index].maritalStatus.civilStatus = value?.toLowerCase();
-      } else if (list[index].address.hasOwnProperty(field)) {
-        list[index].address[field] = value;
-      } else {
+      } else if (field === 'district' || field === 'province' || field === 'department') {
+        list[index]['address'][field] = value
+      } 
+      else if (field === 'address') {
+        list[index]['address']['name'] = value;
+      } 
+      else {
         list[index][field] = value;
       }
       return list;
@@ -114,7 +119,9 @@ export default function FormStepper({
               errores={errores}
             />
             <div className='flex flex-row gap-2 mt-6'>
-              <Button onClick={() => addPerson('compradores')} className='flex-1 py-4'>
+              <Button 
+              variant={"outline"}
+              onClick={() => addPerson('compradores')} className='flex-1 py-4'>
                 Agregar Comprador
               </Button>
             </div>
@@ -132,7 +139,9 @@ export default function FormStepper({
               errores={errores}
             />
             <div className='flex flex-row gap-2'>
-              <Button onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+              <Button 
+              variant={"outline"}
+              onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
                 Agregar Vendedor
               </Button>
             </div>
@@ -152,7 +161,9 @@ export default function FormStepper({
               errores={errores}
             />
             <div className='flex flex-row gap-2'>
-              <Button onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+              <Button 
+              variant={"outlined"}
+              onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
                 Agregar Vendedor
               </Button>
             </div>
@@ -186,15 +197,17 @@ export default function FormStepper({
       <RenderStepper steps={steps} active={activeStep} />
       <section className='mt-8'>{renderCurrentStepForm()}</section>
 
-      <div className={`mt-6 ${tipoProceso === 'compra' ? 'flex justify-between' : 'w-full'}`}>
+      <div className={`mt-6 ${tipoProceso === 'compra' ? 'flex flex-row gap-4' : 'w-full'}`}>
         {tipoProceso === 'compra' && (
-          <Button disabled={activeStep === 0} onClick={handleBack}>
+          <Button 
+          className={"flex-1"}
+          disabled={activeStep === 0} onClick={handleBack}>
             Atrás
           </Button>
         )}
         <Button
           onClick={handleNext}
-          className={tipoProceso === 'venta' ? 'w-full' : ''}
+          className={cn(tipoProceso === 'venta' ? 'w-full' : '','flex-1')}
         >
           {activeStep === steps.length - 1 ? 'Finalizar' : 'Siguiente'}
         </Button>
