@@ -4,7 +4,9 @@ import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinu
 import Loading from '@/components/elements/Loading';
 import Title1 from '@/components/elements/Title1';
 import TableroCarga from '@/components/Loading/TableroCarga';
+import { useEditorContext } from '@/context/ConextEditor';
 import { useContextCard } from '@/context/ContextCard';
+import { useContracts } from '@/context/ContextContract';
 import { useContratoContext } from '@/context/ContratosContext';
 import { cardDataVehiculos } from '@/data/CardData';
 import { useFetch } from '@/hooks/useFetch';
@@ -26,27 +28,71 @@ const headerTableroCliente=[
 
 function RenderCardsFormStepper() {
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
-
-  const {activeStep, pushActiveStep, initializeClient} = useContextCard();
-  const {handleChangeDataPreMinuta} = useContratoContext();
-  const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
-  const [metodoPago, setMetodoPago] = useState('');
+  const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
+  const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
 
   const {
-    data : dataClientes,
-    loading : loadingDataClientes,
-    error : errorDataClientes
+    data : dataClientes
   } = useFetch(URL_GET_DATA_CLIENTES);
 
+  const {
+    data : dataJuniors
+  } = useFetch(URL_GET_DATA_JUNIORS);
+
+  const { 
+    data : dataSeniors
+  } = useFetch(URL_GET_DATA_SENIORS);
+
+
+  const {
+    activeStep,
+    dataSelected,
+    fileLocation,
+    handleClickClient,
+    pushActiveStep,
+    handleChangeFileLocation
+  } = useContracts();
+
+  const {
+    agregarBloques,
+    parserData
+  } = useEditorContext();
+
+  const [dataImagesMinuta, setDataImagesMinuta] = useState([]);
+  const [dataSendMinuta, setDataSendMinuta] = useState({
+    header : {
+      numeroDocumentoNotarial : "",
+      numeroRegistroEscritura : '',
+      year : '',
+      folio : '',
+      tomo : '',
+      kardex : ''
+  },
+  fojaData : {
+      start : {
+          number : "1123",
+          serie : "C",
+      },
+      end : {
+          number : '1125V',
+          serie : "C"
+      }
+  }
+  });
+
+  const [metodoPago, setMetodoPago] = useState('');
+
   const handleClickSelectClient=(client)=>{
-        pushActiveStep();
-        handleChangeDataPreMinuta('clientId', client?.id);
-        initializeClient(client);
-        toast('Cliente seleccionado',{
-            type  : 'info',
-            position : 'bottom-right'
-        });
-    }   ;
+      handleClickClient(client);
+      pushActiveStep();
+      toast("Cliente seleccionado",{
+        type : 'info',
+        position : 'bottom-right'
+      });
+  };
+  const handleClickSelectCard=()=>{
+    
+  }
   const handleChangeImageMinuta=(files)=>{
     setDataImagesMinuta([
       ...dataImagesMinuta,
@@ -61,12 +107,7 @@ function RenderCardsFormStepper() {
     case 0:
       return(
         <div>
-          {
-            loadingDataClientes ?
-            <TableroCarga
-              headers={headerTableroCliente}
-            /> : 
-            <TableSelectedUser
+          <TableSelectedUser
               title='Selecciona un cliente'
               descripcion='Tabla de clientes, selecciona uno para continuar'
               headers={headerTableroCliente}
@@ -74,7 +115,6 @@ function RenderCardsFormStepper() {
               slugCrear={'/dashboard/clientes/form-add'}
               handleClickSelect={handleClickSelectClient}
             />
-          } 
         </div>
       )
     case 1:
@@ -87,7 +127,7 @@ function RenderCardsFormStepper() {
           <Divider/>
           <section className='flex flex-row items-center justify-center gap-4 mt-5'>
             {
-              cardDataVehiculos?.map((item, idx)=><CardRequirements key={idx} {...item} />)
+              cardDataVehiculos?.map((item, idx)=><CardRequirements key={idx} handleClick={handleClickSelectCard} {...item} />)
             }
           </section>
         </div>
