@@ -21,6 +21,7 @@ import EditorView from '@/components/Views/EditorView';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
+import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -172,7 +173,6 @@ function RenderCardsFormStepper() {
                 directory : `DB_evidences/${fileLocation?.directory}`,
                 case : dataSendMinuta?.case
             }
-            console.log(JSONPreMinuta);
             
             const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
             if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
@@ -373,7 +373,7 @@ function RenderCardsFormStepper() {
             return(
                 <div className='w-full'>
                     <section className='flex flex-col items-center mb-4'>
-                        <Title1 className='text-4xl font-bold'>Formularios de inmuebles</Title1>
+                        <Title1 className='text-4xl font-bold'>Formularios de Inmuebles</Title1>
                         <p className='text-sm text-gray-400'>Selecciona un proceso a realizar para el contrato de inmuebles</p>
                     </section>
                     <Divider/>
@@ -468,67 +468,12 @@ function RenderCardsFormStepper() {
                           <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
                             <section>
                               <Title1 className='text-3xl'>Informacion Restante</Title1>
-                              <p>Ingresa la informócion restante para generar la escritura</p>
+                              <p>Ingresa la información restante para generar la escritura</p>
                             </section>
-                            <section className='my-4'>
-                              <Title1>Información de la cabecera</Title1>
-                              <p></p>
-                              <div className='grid grid-cols-2 gap-4'>
-                                <TextField 
-                                  label="Nro Documento Notarial" 
-                                  type='number'
-                                  onChange={handleChangeHeader} 
-                                  name='numeroDocumentoNotarial' 
-                                  value={dataSendMinuta?.header?.numeroDocumentoNotarial} 
-                                  fullWidth 
-                                  required />
-                                <TextField 
-                                  label="Nro Registro Escritura"
-                                  type='number'
-                                  onChange={handleChangeHeader}
-                                  name="numeroRegistroEscritura"
-                                  value={dataSendMinuta?.header?.numeroRegistroEscritura} 
-                                  fullWidth
-                                  required 
-                                />
-                                <TextField
-                                  label="Año"
-                                  onChange={handleChangeHeader}
-                                  name="year"
-                                  type='number'
-                                  value={dataSendMinuta.header.year}
-                                  fullWidth
-                                  required
-                                />
-                                <TextField
-                                  label="Folio"
-                                  onChange={handleChangeHeader}
-                                  name='folio'
-                                  type='number'
-                                  value={dataSendMinuta.header.folio}
-                                  fullWidth
-                                  required
-                                />
-                                <TextField
-                                  label="Tomo"
-                                  onChange={handleChangeHeader}
-                                  name='tomo'
-                                  value={dataSendMinuta.header.tomo}
-                                  fullWidth
-                                  required
-                                />
-                                <TextField
-                                  label="Kardex"
-                                  onChange={handleChangeHeader}
-                                  name='kardex'
-                                  type='number'
-                                  value={dataSendMinuta.header.kardex}
-                                  fullWidth
-                                  required
-                                />
-                              </div>
-                
-                            </section>
+                            <FormHeaderInformation
+                                handleChangeHeader={handleChangeHeader}
+                                data={dataSendMinuta}
+                            />
                             <Button 
                               onClick={()=>pushActiveStep()}
                               className={'w-full mt-4'}>
