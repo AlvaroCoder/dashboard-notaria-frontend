@@ -2,6 +2,7 @@
 import { parseTextoToJSON } from '@/common/parserText';
 import Title1 from '@/components/elements/Title1';
 import FormFounders from '@/components/Forms/FormFounders';
+import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
@@ -59,7 +60,6 @@ function RenderApp() {
     fileLocation,
     handleClickClient,
     pushActiveStep,
-    changeLoading,
     handleChangeFileLocation
   } = useContracts();
 
@@ -75,19 +75,16 @@ function RenderApp() {
   const {
     data : dataClientes,
     loading: loadingDataClientes,
-    error : errorDataClientes
   } = useFetch(URL_GET_DATA_CLIENTES);
 
   const {
     data : dataJuniors,
     loading : loadingDataJuniors,
-    error : errorDataJuniors,
   } = useFetch(URL_GET_DATA_JUNIORS);
 
   const {
     data : dataSeniors,
     loading : loadingDataSeniors,
-    error : errroDataSeniors
   } = useFetch(URL_GET_DATA_SENIORS);
 
   const handleClickSelectClient=(client)=>{
@@ -407,65 +404,10 @@ function RenderApp() {
               <Title1>Información de la asociacion</Title1>
               <TextField label="Corporacion" onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required/>
             </section>
-            <section className='my-4'>
-              <Title1>Información de la cabecera</Title1>
-              <p></p>
-              <div className='grid grid-cols-2 gap-4'>
-                <TextField 
-                  label="Nro Documento Notarial" 
-                  type='number'
-                  onChange={handleChangeHeader} 
-                  name='numeroDocumentoNotarial' 
-                  value={dataSendMinuta?.header?.numeroDocumentoNotarial} 
-                  fullWidth 
-                  required />
-                <TextField 
-                  label="Nro Registro Escritura"
-                  type='number'
-                  onChange={handleChangeHeader}
-                  name="numeroRegistroEscritura"
-                  value={dataSendMinuta?.header?.numeroRegistroEscritura} 
-                  fullWidth
-                  required 
-                />
-                <TextField
-                  label="Año"
-                  onChange={handleChangeHeader}
-                  name="year"
-                  type='number'
-                  value={dataSendMinuta.header.year}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Folio"
-                  onChange={handleChangeHeader}
-                  name='folio'
-                  type='number'
-                  value={dataSendMinuta.header.folio}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Tomo"
-                  onChange={handleChangeHeader}
-                  name='tomo'
-                  value={dataSendMinuta.header.tomo}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Kardex"
-                  onChange={handleChangeHeader}
-                  name='kardex'
-                  type='number'
-                  value={dataSendMinuta.header.kardex}
-                  fullWidth
-                  required
-                />
-              </div>
-
-            </section>
+            <FormHeaderInformation
+              data={dataSendMinuta}
+              handleChangeHeader={handleChangeHeader}
+            />
             <Button 
               onClick={()=>pushActiveStep()}
               className={'w-full mt-4'}>

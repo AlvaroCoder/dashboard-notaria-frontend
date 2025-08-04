@@ -69,7 +69,7 @@ function RenderPageContracts() {
           className={"rounded-sm p-6"}
           variant={"ghost"}
         >
-          Continuar Revision
+         Enviar escritura con marca de agua
         </Button>
       )
     }

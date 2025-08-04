@@ -28,6 +28,7 @@ function RenderPageContracts() {
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
 
+	console.log(dataResponseContract);
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
 
   const dataContract = dataResponseContract?.data || null;
@@ -66,7 +67,7 @@ function RenderPageContracts() {
     if (idStatus === 2) {
       return(
         <Button
-          className={"rounded-sm p-6"}
+          className={"rounded-sm p-6 bg-blue-800 text-white"}
           variant={"ghost"}
         >
           Continuar Revision
@@ -91,13 +92,8 @@ function RenderPageContracts() {
         <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
         <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
       </section>
-      <section className='w-full grid grid-cols-1 lg:grid-cols-2 gap-4'>
-        <CompradoresList
-          dataCompradores={dataContract?.buyers?.people || []}
-        />
-        <VendedoresList
-          dataVendedores={dataContract?.sellers?.people || []}
-        />
+      <section className='w-full grid grid-cols-1 gap-4'>
+	  {dataContract?.length > 0 && dataContracts?.founders?.map((item)=>(<div className="bg-white shadow p-4 rounded-sm ">{item?.firstName}</div>))}
       </section>
 
       <section>

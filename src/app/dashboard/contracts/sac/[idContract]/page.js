@@ -31,9 +31,11 @@ function RenderPageContracts() {
     if (loadingDataContract || loadingDataClient) {
         return <div className='p-6'>
           <h1>Cargando contrato ...</h1>
-        </div>
+
+		    </div>
       }
-      if (errorDataContract) {
+  
+	if (errorDataContract) {
         return (
           <div className='p-6 space-y-6'>
             <h1 className='text-3xl font-bold text-red-600'>Error al cargar el contrato</h1>
@@ -62,10 +64,10 @@ function RenderPageContracts() {
     if (idStatus === 2) {
       return(
         <Button
-          className={"rounded-sm p-6"}
+          className={"rounded-sm p-6 bg-blue-600"}
           variant={"ghost"}
         >
-          Continuar Revision
+          Enviar Escritura
         </Button>
       )
     }
@@ -103,6 +105,10 @@ function RenderPageContracts() {
             directory={dataContract?.minutaDirectory}
           />
         </section>
+	<section className="w-full min-h-screen p-8">
+
+	    <Title1>Escritura generada</Title1>
+	</section>
         
       </div>
     )

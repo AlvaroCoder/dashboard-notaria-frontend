@@ -13,7 +13,7 @@ export default function Page() {
   const typeContract = "SAC";
   const {data : dataReponseSAC} =useDataContracts(typeContract);
   return (
-    <section className='p-6 space-y-6 h-screen overflow-y-auto'>
+<section className='p-6 space-y-6 h-screen overflow-y-auto'>
     <div className=''>
       <Title1 className='text-4xl'>Contrato de Constitucion de Asociacion</Title1>
       <p className='text-gray-600'>Gestion de los contratos de constitución de asociacion</p>
