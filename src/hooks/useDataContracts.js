@@ -1,4 +1,5 @@
-import { getDataContractByTypeContract } from "@/lib/apiConnections";
+import { parseTextoToJSON } from "@/common/parserText";
+import { getDataContractByIdContract, getDataContractByTypeContract, getMinutaFile, processDataMinuta } from "@/lib/apiConnections";
 import { useEffect, useState } from "react";
 
 export const useDataContracts=(type="SAC")=>{
