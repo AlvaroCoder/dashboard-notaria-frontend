@@ -1,11 +1,12 @@
 'use client'
-import { Button } from '@/components/ui/button';
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
+import { submitEscrituraCliente } from '@/lib/apiConnections';
 import { useParams, useRouter } from 'next/navigation';
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
+import { toast } from 'react-toastify';
 
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
@@ -20,7 +21,39 @@ function RenderPageContracts() {
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
 
   const dataContract = dataResponseContract?.data || null;
-  
+  const [loading, setLoading] = useState(false);
+  const [viewPdf, setViewPdf] = useState(null);
+
+    const handleSubmitEscritura=async()=>{
+      try {
+        setLoading(true);    
+        const prevData = dataResponseContract?.data;
+        const newDataToSend={
+          contractId : idContract,
+          ...prevData,
+        }
+        const response = await submitEscrituraCliente(newDataToSend, 'razonSocial');
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setViewPdf(url);
+        
+        toast("Se genero la escritura",{
+          type : 'info',
+          position :'bottom-right'
+        });
+
+      } catch (error) {
+        console.log(error);
+        toast("Surgio un error al enviar la marca de agua",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+      } finally{
+        setLoading(false);
+      }
+    }
+
+
   if (loadingDataContract || loadingDataClient) {
     return <div className='p-6'>
       <h1>Cargando contrato ...</h1>
@@ -53,8 +86,18 @@ function RenderPageContracts() {
     case 2:
       return (
         <View2ContractEscritura
-
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          handleClickSubmit={handleSubmitEscritura}
+          loading={loading}
+          viewPdfEscrituraMarcaAgua={viewPdf}
         />
+      )
+    case 3:
+      return(
+        <p>View 3</p>
       )
   }
 }

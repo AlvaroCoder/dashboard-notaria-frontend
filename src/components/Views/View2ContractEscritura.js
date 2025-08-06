@@ -4,13 +4,26 @@ import dynamic from 'next/dynamic';
 import {Button} from '../ui/button';
 import {camelCaseToTitle, cn} from '@/lib/utils';
 import {Loader2, User2} from 'lucide-react';
+import { TextField } from '@mui/material';
+import CardPersonFounder from '../Cards/CardPersonFounder';
+
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
-const Separator2 = dynamic(() => import('@/components/elements/Separator2'));
 const Title1 = dynamic(() => import('@/components/elements/Title1'));
 
-export default function View2ContractEscritura() {
+export default function View2ContractEscritura({
+	idContract,
+	dataContract,
+	loadingDataClient,
+	client,
+	viewPdfEscrituraMarcaAgua=null,
+	loading=false,
+	handleClickSubmit=()=>{}
+}) {
+
+
+
   return (
     <div className="h-screen pb-24 p-8 space-y-6 overflow-y-auto">
 	<section className="flex flex-row justify-between">
@@ -21,10 +34,64 @@ export default function View2ContractEscritura() {
 	</section>
 	<section>
 	    <p><b>ID : </b>{idContract}</p>
-	    <p className="my-1"><b>Estado : </b>{statusContracts?.filter((est)=>est?.id === dataContracts?.status).map((item)=><span>{item?.title}</span>)}</p>
-	    <p><b>Tipo de Contrato : </b><span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
+	    <p className="my-1"><b>Estado : </b>{statusContracts?.filter((est)=>est?.id === dataContract?.status).map((item)=><span key={item.title} className={cn('px-2 py-1 rounded-sm text-sm space-y-4', item.bgColor)}>{item.title}</span>)}</p>
+	    <p><b>Tipo de Contrato : </b><span>{camelCaseToTitle(dataContract ? dataContract?.contractType : '')}</span></p>
         <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient ?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
     </section>
+
+	<section className='shadow bg-white p-4 rounded-lg '>
+		<Title1 className='text-2xl' >Información de la minuta</Title1>
+		<div className='grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4'>
+			<TextField label="Nro Documento Notarial" value={dataContract?.minuta?.minutaNumber}  type='number' disabled fullWidth  />
+			<TextField label="Lugar" value={dataContract?.minuta?.place?.name} disabled fullWidth />
+			<TextField label="Distrito" value={dataContract?.minuta?.place?.district} disabled fullWidth />
+			<TextField label="Fecha creacion" value={dataContract?.minuta?.creationDay?.date} disabled fullWidth />
+			
+		</div>
+		<div className='mt-4'>
+			<FramePdf
+				directory={dataContract?.minutaDirectory}
+				
+			/>
+		</div>
+	</section>
+	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
+		<Title1 className='text-2xl'>Información de los fundadores</Title1>
+		<div className='w-full grid grid-cols-1 mt-4 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+			{
+				dataContract?.founders?.people?.map((found, idx)=>(
+					<CardPersonFounder
+						key={idx}
+						person={found}
+					/>
+				))
+			}
+		</div>
+	</section>
+
+	<section>
+		{
+			viewPdfEscrituraMarcaAgua ?
+			(
+				<embed
+					src={viewPdfEscrituraMarcaAgua}
+					className='w-full h-96 border rounded'
+					type='application/json'
+					title='Vista previa de PDF'
+				/>
+			) :
+			<section className='w-full border border-red-300 rounded-sm h-32 flex justify-center items-center'>
+                <p className='text-red-400 font-bold'>No se pudo cargar el PDF :/</p>
+            </section>
+		}
+		<Button
+			disabled={loading}
+			onClick={handleClickSubmit}
+			className={'w-full my-4'}
+		>
+			{loading ? <Loader2 className='animate-spin' /> : <p>Ver Escritura con marca de agua</p>}
+		</Button>
+	</section>
    </div>
   )
 };

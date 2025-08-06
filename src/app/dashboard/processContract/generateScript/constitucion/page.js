@@ -201,11 +201,11 @@ function RenderPageScript() {
         try {
             setLoading(true);
 
-            const response = await generateScriptContract(contractType === 'RS'?'razonSocial':contractType, dataSendMinuta);
+            const response = await generateScriptContract(contractType === 'RS'?'razonSocial':contractType?.toLowerCase(), dataSendMinuta);
             if (!response.ok) {
                 console.log(await response.json());
                 console.log(dataSendMinuta);
-                
+                return
             }
             
             const blobResponse = await response.blob();
@@ -339,11 +339,14 @@ function RenderPageScript() {
                     <FormViewerPdfEscritura
                         viewerPdf={viewPdf}
                     />
+                    <div className='w-full p-6 '>
                     <Button
+                        className={"w-full"}
                         onClick={()=>router.push("/dashboard/contracts/")}
                     >
                         Regresar al inicio
                     </Button>
+                    </div>
                 </main>
             )
     }

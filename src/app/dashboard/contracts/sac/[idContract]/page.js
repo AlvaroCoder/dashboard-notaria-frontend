@@ -3,9 +3,11 @@ import View1ContractConstitucion from '@/components/Views/View1ContractConstituc
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
+import { submitEscrituraCliente } from '@/lib/apiConnections';
 
 import { useParams, useRouter } from 'next/navigation';
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
+import { toast } from 'react-toastify';
 
 
 function RenderPageContracts() {
@@ -19,6 +21,43 @@ function RenderPageContracts() {
 
     const {loadingDataClient, client}  = useContractDetails(dataResponseContract);
     const dataContract = dataResponseContract?.data || null;
+    
+    const [loading, setLoading] = useState(false);
+    const [viewerPdf, setViewerPdf] = useState(null);
+
+    const handleSubmitEscritura=async()=>{
+      try {
+        
+        setLoading(true); 
+        const prevData = dataResponseContract?.data;
+        const newDataToSend={
+          contractId : idContract,
+          ...prevData
+        }   
+        
+        const response = await submitEscrituraCliente(newDataToSend, 'sac');
+        const blob = await response.blob();
+
+        const url = URL.createObjectURL(blob);
+        setViewerPdf(url);
+
+        toast("Se genero la escritura",{
+          type : 'info',
+          position :'bottom-right'
+        });
+
+      } catch (error) {
+        console.log(error);
+        toast("Surgio un error al enviar la marca de agua",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+
+      } finally{
+        setLoading(false);
+      }
+    }
+
     if (loadingDataContract || loadingDataClient) {
         return <div className='p-6'>
           <h1>Cargando contrato ...</h1>
@@ -55,6 +94,13 @@ function RenderPageContracts() {
     case 2:
       return(
         <View2ContractEscritura
+        loading={loading}
+        idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          viewPdfEscrituraMarcaAgua={viewerPdf}
+          handleClickSubmit={handleSubmitEscritura}
         />
       )
   }

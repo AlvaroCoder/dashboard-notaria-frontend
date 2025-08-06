@@ -11,6 +11,8 @@ const URL_CREATE_PROCESS_2 = process.env.NEXT_PUBLIC_URL_CREATE_PROCESS_2;
 const URL_CREATE_SCRIPT=process.env.NEXT_PUBLIC_URL_GENERATE_SCRIPT
 const URL_CREATE_EVIDENCE=process.env.NEXT_PUBLIC_URL_SEND_EVIDENCE;
 const URL_GENERATE_SCRIPT_COMPRA_VENTA= process.env.NEXT_PUBLIC_URL_CREATE_COMPRA_VENTA;
+const URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION = process.env.NEXT_PUBLIC_URL_CREATE_ESCRITURA_MARCA_AGUA;
+
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -140,4 +142,15 @@ export async function registerClient(data) {
         },
         body : JSON.stringify(data)
     });
+};
+
+export async function submitEscrituraCliente(data, type) {
+    return fetch(`${URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION}${type}/escritura/?waterMark=true`,{
+        method : 'POST',
+        headers : {
+            'Content-type':'application/json'
+        },
+        mode : 'cors',
+        body : JSON.stringify(data)
+    })
 }
