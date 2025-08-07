@@ -2,6 +2,7 @@
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
+import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
@@ -133,6 +134,15 @@ const handleClickSetFirma=async()=>{
           client={client}
           handleClickSetFirma={handleClickSetFirma}
           title='Contrato de Razon Social'
+        />
+      )
+    case 5:
+      return(
+        <View4ContractParteNotarial
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
         />
       )
   }

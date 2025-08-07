@@ -2,6 +2,7 @@
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
+import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
@@ -21,8 +22,6 @@ function RenderPageContracts() {
   } = useFetch(URL_CONTRACT_ID+idContract);
   
   console.log(dataResponseContract);
-  
-
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
 
   const dataContract = dataResponseContract?.data || null;
@@ -70,7 +69,7 @@ function RenderPageContracts() {
         type:'success',
         position : 'bottom-right'
       });
-      
+
       router.push("/dashboard")
     } catch (err) {
       toast("Surgio un error al generar la escritura",{
@@ -135,6 +134,15 @@ function RenderPageContracts() {
           loadingDataClient={loadingDataClient}
           client={client}
           handleClickSetFirma={handleClickSetFirma}
+        />
+      )
+    case 5:
+      return(
+        <View4ContractParteNotarial
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
         />
       )
   }
