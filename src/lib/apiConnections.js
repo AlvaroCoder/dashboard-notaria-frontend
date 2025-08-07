@@ -12,7 +12,8 @@ const URL_CREATE_SCRIPT=process.env.NEXT_PUBLIC_URL_GENERATE_SCRIPT
 const URL_CREATE_EVIDENCE=process.env.NEXT_PUBLIC_URL_SEND_EVIDENCE;
 const URL_GENERATE_SCRIPT_COMPRA_VENTA= process.env.NEXT_PUBLIC_URL_CREATE_COMPRA_VENTA;
 const URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION = process.env.NEXT_PUBLIC_URL_CREATE_ESCRITURA_MARCA_AGUA;
-
+const URL_GET_DOCUMENT_BY_PATH=process.env.NEXT_PUBLIC_URL_GET_DOCUMENT_BY_PATH;
+const URL_ESTABLECER_FIRMA=process.env.NEXT_PUBLIC_URL_FIRMAR_DOCUMENTO;
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -152,5 +153,23 @@ export async function submitEscrituraCliente(data, type) {
         },
         mode : 'cors',
         body : JSON.stringify(data)
+    })
+}
+
+export async function getDocumentByPath(path) {
+    return fetch(`${URL_GET_DOCUMENT_BY_PATH}`,{
+        method : 'POST',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        mode : 'cors',
+        body : JSON.stringify({path})
+    });
+}
+
+export async function submitFirmarDocumento(contractId, fecha) {
+    return fetch(`${URL_ESTABLECER_FIRMA}${contractId}&signedDocumentDate=${fecha}`,{
+        method : 'PUT',
+        mode : 'cors'
     })
 }

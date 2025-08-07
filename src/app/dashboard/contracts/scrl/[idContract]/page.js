@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
+import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { submitEscrituraCliente } from '@/lib/apiConnections';
@@ -19,10 +20,7 @@ function RenderPageContracts() {
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
 
-	console.log(dataResponseContract);
-  const {loadingDataClient, client} = useContractDetails(dataResponseContract);
-
-  
+  const {loadingDataClient, client} = useContractDetails(dataResponseContract);  
   const dataContract = dataResponseContract?.data || null;
   const [loading, setLoading] = useState(false);
   const [viewPdfEscritura, setViewPdfEscritura] = useState(null);
@@ -58,6 +56,29 @@ function RenderPageContracts() {
           setLoading(false);
         }
       }
+
+    const handleClickSetFirma=async()=>{
+      try {
+        setLoading(true);
+        const dateToday = formatDateToYMD(new Date());
+        await submitFirmarDocumento(idContract, dateToday);
+
+        toast("Se firmo el documento",{
+          type : 'success',
+          position : 'bottom-right'
+        });
+        
+        router.push("/dashboard");
+
+      } catch (err) {
+        toast("Surgio un error al firmar la escritura",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+      } finally{
+        setLoading(false);
+      }
+    }
 
   if (loadingDataContract || loadingDataClient) {
     return <div className='p-6'>
@@ -104,7 +125,18 @@ function RenderPageContracts() {
       )
     case 3:
       return (
-        <p>Estado 3</p>
+        <p>Estado 3 con observacion</p>
+      )
+    case 4:
+      return(
+        <View3ContractsConstitucionFirma
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loading}
+          client={client}
+          handleClickSetFirma={handleClickSetFirma}
+          title='Contrato de SCRL'
+        />
       )
   }
 }

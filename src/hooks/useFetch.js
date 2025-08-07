@@ -17,7 +17,7 @@ export function useFetch(URL="", cache='no-store') {
                     },
                     method : 'GET',
                     mode : 'cors',
-                    cache
+                    
                 }) :  await fetch(URL);
                 
                 if (!response.ok) {

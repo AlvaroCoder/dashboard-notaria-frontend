@@ -1,9 +1,11 @@
 'use client'
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
+import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
-import { submitEscrituraCliente } from '@/lib/apiConnections';
+import { submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
+import { formatDateToYMD } from '@/lib/fechas';
 import { useParams, useRouter } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
 import { toast } from 'react-toastify';
@@ -19,6 +21,8 @@ function RenderPageContracts() {
   } = useFetch(URL_CONTRACT_ID+idContract);
 
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
+  
+  const router = useRouter();
 
   const dataContract = dataResponseContract?.data || null;
   const [loading, setLoading] = useState(false);
@@ -53,6 +57,27 @@ function RenderPageContracts() {
       }
     }
 
+const handleClickSetFirma=async()=>{
+    try {
+      setLoading(true);
+      const dataToday = formatDateToYMD(new Date());
+      await submitFirmarDocumento(idContract, dataToday);
+      
+      toast("Se firmo el documento",{
+        type:'success',
+        position : 'bottom-right'
+      });
+      
+      router.push("/dashboard")
+    } catch (err) {
+      toast("Surgio un error al generar la escritura",{
+        type : 'error',
+        position : 'bottom-center'
+      });
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (loadingDataContract || loadingDataClient) {
     return <div className='p-6'>
@@ -98,6 +123,17 @@ function RenderPageContracts() {
     case 3:
       return(
         <p>View 3</p>
+      )
+    case 4:
+      return (
+        <View3ContractsConstitucionFirma
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          handleClickSetFirma={handleClickSetFirma}
+          title='Contrato de Razon Social'
+        />
       )
   }
 }

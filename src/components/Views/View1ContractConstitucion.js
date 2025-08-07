@@ -15,7 +15,9 @@ export default function View1ContractConstitucion({
     idContract='',
     dataContract={},
     loadingDataClient,
-    client=null
+    client=null,
+    title="Detalles del Contrato",
+    description="Información del contrato"
 }) {
   const router = useRouter();
 
@@ -23,8 +25,8 @@ export default function View1ContractConstitucion({
         <div className='h-screen pb-24 p-8 space-y-6  overflow-y-auto'>
           <section className='flex flex-row justify-between'>
             <div>
-              <Title1 className='text-3xl'>Detalles del Contrato SAC</Title1>
-              <p>Información detallada del contrato de Sociedad Anónima Cerrada (SAC)</p> 
+              <Title1 className='text-3xl'>{title}</Title1>
+              <p>{description}</p> 
             </div>
           </section>
           <section className=''>

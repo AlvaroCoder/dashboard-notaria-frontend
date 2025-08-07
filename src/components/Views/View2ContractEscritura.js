@@ -7,7 +7,6 @@ import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
 import CardPersonFounder from '../Cards/CardPersonFounder';
 
-
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
 const Title1 = dynamic(() => import('@/components/elements/Title1'));
@@ -17,12 +16,11 @@ export default function View2ContractEscritura({
 	dataContract,
 	loadingDataClient,
 	client,
+	junior,
 	viewPdfEscrituraMarcaAgua=null,
 	loading=false,
 	handleClickSubmit=()=>{}
 }) {
-
-
 
   return (
     <div className="h-screen pb-24 p-8 space-y-6 overflow-y-auto">
@@ -69,7 +67,8 @@ export default function View2ContractEscritura({
 		</div>
 	</section>
 
-	<section>
+	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
+		<Title1 className='text-xl'>Escritura del cliente</Title1>
 		{
 			viewPdfEscrituraMarcaAgua ?
 			(
@@ -80,8 +79,8 @@ export default function View2ContractEscritura({
 					title='Vista previa de PDF'
 				/>
 			) :
-			<section className='w-full border border-red-300 rounded-sm h-32 flex justify-center items-center'>
-                <p className='text-red-400 font-bold'>No se pudo cargar el PDF :/</p>
+			<section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
+                <p className=' font-bold'>No se pudo cargar el PDF :/</p>
             </section>
 		}
 		<Button

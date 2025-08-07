@@ -1,9 +1,11 @@
 'use client'
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
+import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
-import { submitEscrituraCliente } from '@/lib/apiConnections';
+import { submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
+import { formatDateToYMD } from '@/lib/fechas';
 import { useParams, useRouter } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
 import { toast } from 'react-toastify';
@@ -18,12 +20,16 @@ function RenderPageContracts() {
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
   
+  console.log(dataResponseContract);
+  
 
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
 
   const dataContract = dataResponseContract?.data || null;
   const [loading, setLoading] = useState(false);
-  const [viewPdf, setViewPdf] = useState(null);
+  const [viewPdf, setViewPdf] = useState(null);  
+
+  const router = useRouter();
 
   const handleSubmitEscritura=async()=>{
     try {
@@ -51,6 +57,28 @@ function RenderPageContracts() {
       });
     } finally {
       setLoading(false);
+    }
+  }
+
+  const handleClickSetFirma=async()=>{
+    try {
+      setLoading(true);
+      const dataToday = formatDateToYMD(new Date());
+      await submitFirmarDocumento(idContract, dataToday);
+      
+      toast("Se firmo el documento",{
+        type:'success',
+        position : 'bottom-right'
+      });
+      
+      router.push("/dashboard")
+    } catch (err) {
+      toast("Surgio un error al generar la escritura",{
+        type : 'error',
+        position : 'bottom-center'
+      });
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -97,7 +125,17 @@ function RenderPageContracts() {
       )
     case 3:
       return(
-        <p>View 3</p>
+        <p>Vista 3 de Comentarios</p>
+      )
+    case 4:
+      return(
+        <View3ContractsConstitucionFirma
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          handleClickSetFirma={handleClickSetFirma}
+        />
       )
   }
 
