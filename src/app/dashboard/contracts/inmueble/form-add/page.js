@@ -78,7 +78,7 @@ function RenderCardsFormStepper() {
             tomo : '',
             kardex : ''
         },
-        fojaData : {
+        fojasData : {
             start : {
                 number : "1123",
                 serie : "C",

@@ -14,6 +14,7 @@ const URL_GENERATE_SCRIPT_COMPRA_VENTA= process.env.NEXT_PUBLIC_URL_CREATE_COMPR
 const URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION = process.env.NEXT_PUBLIC_URL_CREATE_ESCRITURA_MARCA_AGUA;
 const URL_GET_DOCUMENT_BY_PATH=process.env.NEXT_PUBLIC_URL_GET_DOCUMENT_BY_PATH;
 const URL_ESTABLECER_FIRMA=process.env.NEXT_PUBLIC_URL_FIRMAR_DOCUMENTO;
+const URL_ACEPTAR_ESCRITURA =process.env.NEXT_PUBLIC_ACEPTAR_ESCRITURA;
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -51,7 +52,25 @@ export async function generateScriptCompraVenta(type, bodyScript) {
         method : 'POST',
         mode : 'cors',
         headers : {
-            'Content-Type' : 'application/json'
+            'Content-type' : 'application/json'
+        },
+        body : JSON.stringify(bodyScript)
+    })
+}
+
+export async function aceptarEscritura(contractId) {
+    return fetch(`http://localhost:8000/update/contract/confirmation/?contractId=${contractId}`,{
+        method : 'PUT',
+        mode : 'cors',
+    })
+}
+
+export async function generateScriptMarcaAguaCompraVenta(type, bodyScript) {
+    return fetch(`${URL_GENERATE_SCRIPT_COMPRA_VENTA}/${type}/escritura/?waterMark=true`,{
+        method : 'POST',
+        mode : 'cors',
+        headers : {
+            'Content-type' : 'application/json'
         },
         body : JSON.stringify(bodyScript)
     })
@@ -147,6 +166,17 @@ export async function registerClient(data) {
 
 export async function submitEscrituraCliente(data, type) {
     return fetch(`${URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION}${type}/escritura/?waterMark=true`,{
+        method : 'POST',
+        headers : {
+            'Content-type':'application/json'
+        },
+        mode : 'cors',
+        body : JSON.stringify(data)
+    })
+}
+
+export async function submitEscrituraClienteCompraVenta(data, type) {
+    return fetch(`${ URL_GENERATE_SCRIPT_COMPRA_VENTA}/${type}/escritura/`,{
         method : 'POST',
         headers : {
             'Content-type':'application/json'

@@ -15,7 +15,7 @@ export async function middleware(request = NextRequest) {
     if (url.pathname === '/dashboard/processContract/generateScript') {
         const contractType = url.searchParams.get('contractType');
 
-        if (contractType === 'compraVentaPropiedades') {
+        if (contractType === 'compraVentaPropiedad') {
             url.pathname = '/dashboard/processContract/generateScript/inmuebles';
             return NextResponse.redirect(url);
         }

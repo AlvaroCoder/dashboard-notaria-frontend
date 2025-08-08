@@ -6,7 +6,7 @@ import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsCo
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
-import { submitEscrituraCliente } from '@/lib/apiConnections';
+import { aceptarEscritura, submitEscrituraCliente } from '@/lib/apiConnections';
 import { useParams, useRouter } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
 
@@ -81,6 +81,30 @@ function RenderPageContracts() {
       }
     }
 
+     const handleCheckViewEscritura=async()=>{
+        try {
+          setLoading(true);
+          const response = await aceptarEscritura(idContract);
+          const responseJSON = await response.json();
+          console.log(responseJSON);
+          toast("La escritura fue aceptada",{
+            type : 'success',
+            position : 'bottom-right'
+          });
+          router.push("/dashboard/contracts");
+    
+    
+        } catch (err) {
+          console.log(err);
+          
+          toast("Surgio un error al aceptar la escritura",{
+            type : 'error',
+            position : 'bottom-center'
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
   if (loadingDataContract || loadingDataClient) {
     return <div className='p-6'>
       <h1>Cargando contrato ...</h1>
@@ -120,6 +144,7 @@ function RenderPageContracts() {
         loadingDataClient={loadingDataClient}
         client={client}
         handleClickSubmit={handleSubmitEscritura}
+        checkViewEscritura={handleCheckViewEscritura}
         loading={loading}
         viewPdfEscrituraMarcaAgua={viewPdfEscritura}
         />

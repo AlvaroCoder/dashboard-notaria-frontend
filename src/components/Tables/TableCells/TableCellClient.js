@@ -6,11 +6,10 @@ import React from 'react'
 export default function TableCellClient({
     clientId    
 }) {
-    const URL_DATA_CLIENT = `http://localhost:8000/home/client/id/?idUser=${clientId}`;
+    const URL_DATA_CLIENT = `${process.env.NEXT_PUBLIC_URL_HOME}/client/id/?idUser=${clientId}`;
     const {
         data : dataCliente,
         loading : loadingDataCliente,
-        error : errorDataCliente
     } = useFetch(URL_DATA_CLIENT, 'force-cache');
 
     return (

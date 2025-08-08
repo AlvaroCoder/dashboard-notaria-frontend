@@ -1,24 +1,19 @@
 'use client'
-import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
-import { Loader2, User2 } from 'lucide-react'
+import { Suspense, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useFetch } from '@/hooks/useFetch'
-import { statusContracts } from '@/lib/commonJSON'
-import { camelCaseToTitle, cn } from '@/lib/utils'
 import { useContractDetails } from '@/hooks/useContractsDetails'
-
-// ✅ Dynamic imports
-const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
-const Separator2 = dynamic(() => import('@/components/elements/Separator2'));
-const Title1 = dynamic(() => import('@/components/elements/Title1'));
-const CompradoresList = dynamic(() => import('@/components/Tables').then(m => m.CompradoresList));
-const VendedoresList = dynamic(() => import('@/components/Tables').then(m => m.VendedoresList));
+import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion'
+import View2ContractEscritura from '@/components/Views/View2ContractEscritura'
+import { toast } from 'react-toastify'
+import { aceptarEscritura, generateScriptCompraVenta, generateScriptMarcaAguaCompraVenta, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections'
+import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVenta'
+import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma'
+import { formatDateToYMD } from '@/lib/fechas'
+import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial'
 
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
-  const router = useRouter();
   const {idContract} = useParams();
   
   const {
@@ -26,8 +21,89 @@ function RenderPageContracts() {
     loading : loadingDataContract, 
     error : errorDataContract} 
   = useFetch(URL_CONTRACT_ID + idContract);  
-  const {loadingDataClient, client } = useContractDetails(dataResponseContract)
+  const {loadingDataClient, client } = useContractDetails(dataResponseContract);
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const [viewPdf, setViewPdf] = useState(null);
+
   const dataContract = dataResponseContract?.data || null;
+  
+  const handleSubmitEscritura=async()=>{
+    try {
+      setLoading(true);
+      const prevData = dataResponseContract?.data;
+      const newDataToSend = {
+        contractId : idContract,
+        ...prevData
+      };
+
+      const response = await generateScriptMarcaAguaCompraVenta('inmueble', newDataToSend);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      setViewPdf(url);
+      toast("Se genero la escritura",{
+        type :'success',
+        position : 'bottom-right'
+      });
+    } catch (err) {
+      console.error("Error al enviar escritura:", err);
+      toast("Surgio un error al generar la escritura", {
+        type: 'error',
+        position: 'bottom-center'
+      });
+      
+    }finally {
+      setLoading(false);
+    }
+  }
+
+  const handleCheckViewEscritura=async()=>{
+    try {
+      setLoading(true);
+      const response = await aceptarEscritura(idContract);
+      const responseJSON = await response.json();
+      console.log(responseJSON);
+      toast("La escritura fue aceptada",{
+        type : 'success',
+        position : 'bottom-right'
+      });
+      router.push("/dashboard");
+
+      
+    } catch (err) {
+      console.log(err);
+      
+      toast("Surgio un error al aceptar la escritura",{
+        type : 'error',
+        position : 'bottom-center'
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+   const handleClickSetFirma=async()=>{
+     try {
+       setLoading(true);
+       const dataToday = formatDateToYMD(new Date());
+       await submitFirmarDocumento(idContract, dataToday);
+       
+       toast("Se firmo el documento",{
+         type:'success',
+         position : 'bottom-right'
+       });
+ 
+       router.push("/dashboard")
+     } catch (err) {
+       toast("Surgio un error al generar la escritura",{
+         type : 'error',
+         position : 'bottom-center'
+       });
+     } finally {
+       setLoading(false)
+     }
+   }
   if (loadingDataContract) {
     return(
       <div
@@ -51,65 +127,54 @@ function RenderPageContracts() {
       </div>
     )
   }
-  const handleButtonContract=(idStatus)=>{
-    if (idStatus === 1) {
-      return(
-        <Button
-          className={"bg-amber-100 rounded-sm p-5 hover:bg-amber-50 cursor-pointer"}
-          variant={"outline"}
-          onClick={()=>router.push("/dashboard/processContract/generateScript/?idContract="+idContract)}
-        >
-          Generar Escritura
-        </Button>
-      )
-    } 
-    if (idStatus === 2) {
-      return(
-        <Button
-          className={"rounded-sm p-6"}
-          variant={"ghost"}
-        >
-          Continuar Revision
-        </Button>
-      )
-    }
-  }
-  return (
-    <div className='p-8 pb-12 space-y-6 h-screen overflow-y-auto'>
-      <section className='flex flex-row justify-between'>
-        <div>
-          <Title1 className='text-3xl'>Detalles del Contrato de Inmueble</Title1>
-          <p>Información detallada del contrato de Inmueble</p> 
-        </div>
-        <div>
-          {handleButtonContract(dataContract?.status)}
-        </div>
-      </section>
-      <section className=''>
-        <p><b>ID: </b>{idContract}</p>
-        <p className='my-1'><b>Estado : </b>{statusContracts?.filter((est)=>est.id === dataContract?.status).map((item)=><span key={item.title} className={cn('px-2 py-1 rounded-sm text-sm space-y-4', item.bgColor)}>{item.title}</span>)}</p>
-        <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.case)}</span></p>
-        <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
-      </section>
-      <section className='w-full grid grid-cols-1 lg:grid-cols-2 gap-4'>
-        <CompradoresList
-          dataCompradores={dataContract?.buyers?.people || []}
-        />
-        <VendedoresList
-          dataVendedores={dataContract?.sellers?.people || []}
-        />
-      </section>
 
-      <section>
-        <Title1 className='text-xl'>Minuta del Contrato</Title1>
-        <Separator2/>
-        <FramePdf
-          directory={dataContract?.minutaDirectory}
+  switch (dataContract?.status) {
+    case 1:
+      return (
+        <View1ContractConstitucion
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
         />
-      </section>
-      
-    </div>
-  )
+      )
+    case 2:
+      return (
+        <View2ContractCompraVenta
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          loading={loading}
+          viewPdfEscrituraMarcaAgua={viewPdf}
+          handleClickSubmit={handleSubmitEscritura}
+          checkViewEscritura={handleCheckViewEscritura}
+        />
+      )
+    case 3:
+      return(
+        <p>Vista 3</p>
+      )
+    case 4:
+      return(
+        <View3ContractsConstitucionFirma
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          handleClickSetFirma={handleClickSetFirma}
+        />
+      )
+    case 5:
+      return(
+        <View4ContractParteNotarial
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+        />
+      )
+  }
 }
 
 

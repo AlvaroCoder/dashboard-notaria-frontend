@@ -12,7 +12,7 @@ export default function ButtonDownloadPdf({
     const handleClick=async()=>{
         try {
             setLoading(true);
-            const response = await fetch('http://127.0.0.1:8000/home/minuta/',{
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_HOME}/minuta/`,{
                 method : 'POST',
                 headers : {
                     "Content-Type": "application/json",

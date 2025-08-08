@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import EditorView from '@/components/Views/EditorView';
 import { useEditorContext } from '@/context/ConextEditor';
 import { headersTableroCliente } from '@/data/Headers';
-import { useDataContractByIdContract } from '@/hooks/useDataContracts';
 import { useFetch } from '@/hooks/useFetch';
 import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract, getMinutaFile, processDataMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
@@ -239,7 +238,7 @@ function RenderPageScript() {
                             onClick={handleClickEditor}
                             className={"w-full mt-4"}
                         >
-                            {loading ? <Loader2/> : <p>Continuar</p>}
+                            {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
                         </Button>
                     </div>
                 </main>

@@ -5,7 +5,7 @@ import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsCo
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
-import { submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
+import { aceptarEscritura, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { useParams, useRouter } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
@@ -21,7 +21,6 @@ function RenderPageContracts() {
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
   
-  console.log(dataResponseContract);
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
 
   const dataContract = dataResponseContract?.data || null;
@@ -58,6 +57,31 @@ function RenderPageContracts() {
       setLoading(false);
     }
   }
+
+   const handleCheckViewEscritura=async()=>{
+      try {
+        setLoading(true);
+        const response = await aceptarEscritura(idContract);
+        const responseJSON = await response.json();
+        console.log(responseJSON);
+        toast("La escritura fue aceptada",{
+          type : 'success',
+          position : 'bottom-right'
+        });
+        router.push("/dashboard/contracts");
+  
+  
+      } catch (err) {
+        console.log(err);
+        
+        toast("Surgio un error al aceptar la escritura",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
 
   const handleClickSetFirma=async()=>{
     try {
@@ -118,6 +142,7 @@ function RenderPageContracts() {
         loadingDataClient={loadingDataClient}
         client={client}
         handleClickSubmit={handleSubmitEscritura}
+        checkViewEscritura={handleCheckViewEscritura}
         viewPdfEscrituraMarcaAgua={viewPdf}
         loading={loading}
         />
@@ -134,6 +159,7 @@ function RenderPageContracts() {
           loadingDataClient={loadingDataClient}
           client={client}
           handleClickSetFirma={handleClickSetFirma}
+          
         />
       )
     case 5:
@@ -145,6 +171,7 @@ function RenderPageContracts() {
           client={client}
         />
       )
+  
   }
 
 }

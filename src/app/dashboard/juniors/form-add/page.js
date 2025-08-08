@@ -29,6 +29,7 @@ export default function Page() {
     password :"",
     birthYear : ""
   });
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -52,13 +53,14 @@ export default function Page() {
         },
         photo : ""
       }
-      const response = await fetch('http://localhost:8000/login/register',{
+      const response = await fetch(process.env.NEXT_PUBLIC_URL_SIGNUP,{
         method : 'POST',
         headers :{
           'Content-type':'application/json'
         },
         body : JSON.stringify(newDataJunior)
       });
+      
       const jsonResponseJunior = await response.json();
       console.log(jsonResponseJunior);
       

@@ -100,8 +100,7 @@ export default function TableManageDocuments({
                                                         return (
                                                             <TableCell key={idxHeader}>
                                                                 <ButtonDownloadPdf
-                                                                
-                                                                minutaDirectory={documento[header?.head]}
+                                                                    minutaDirectory={documento[header?.head]}
                                                                 />
                                                             </TableCell>
                                                         )
