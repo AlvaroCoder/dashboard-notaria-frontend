@@ -69,9 +69,9 @@ function RenderPageContracts() {
         type : 'success',
         position : 'bottom-right'
       });
-      router.push("/dashboard");
+      router.push("/dashboard/contracts");
 
-      
+
     } catch (err) {
       console.log(err);
       
