@@ -65,6 +65,28 @@ export async function aceptarEscritura(contractId) {
     })
 }
 
+export async function generarParteNotarial(data, type) {
+    return fetch(`http://localhost:8000/contracts/compra_venta/${type}/parteNotarial/`,{
+        method : 'POST',
+        mode : 'cors',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        body : JSON.stringify(data)
+    });
+}
+
+export async function generarParteNotarialConstitucion(data, type) {
+    return fetch(`http://localhost:8000/contracts/constitucion/${type}/parteNotarial/`,{
+        method : 'POST',
+        mode : 'cors',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        body : JSON.stringify(data)
+    });
+}
+
 export async function generateScriptMarcaAguaCompraVenta(type, bodyScript) {
     return fetch(`${URL_GENERATE_SCRIPT_COMPRA_VENTA}/${type}/escritura/?waterMark=true`,{
         method : 'POST',
