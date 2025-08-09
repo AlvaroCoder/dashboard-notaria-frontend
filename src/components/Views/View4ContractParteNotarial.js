@@ -24,7 +24,6 @@ export default function View4ContractParteNotarial({
 
     const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
     const [viewParteNotarial, setViewParteNotarial] = useState(null);
-    console.log(dataContract);
     
     const handleClickGenerateNotarialPart =async () => {
         // Logic to generate notarial part

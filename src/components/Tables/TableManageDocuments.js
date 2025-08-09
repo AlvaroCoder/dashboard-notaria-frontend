@@ -29,7 +29,8 @@ export default function TableManageDocuments({
     handleAddDocument=()=>{},
     data=[],
     headers=[],
-    slugUrlItem="/dashboard/contracts/inmueble/"
+    slugUrlItem="/dashboard/contracts/inmueble/",
+    id=""
 }) {    
     const [vista, setVista] = useState("tabla");
   return (
@@ -68,9 +69,9 @@ export default function TableManageDocuments({
             vista === "tabla" && (
                 <Suspense fallback={<Loader2 className='animate-spin' />}>
                 <div className='overflow-auto mt-8'>
-                    <Table>
+                    <Table id={id}>
                         <TableHeader>
-                            <TableRow>
+                            <TableRow >
                                 {
                                     headers?.map((header, idx) => (
                                         <TableHead key={idx}>

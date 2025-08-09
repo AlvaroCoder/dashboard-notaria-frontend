@@ -7,8 +7,16 @@ export default function CardIndicator({
     indicator={}
 }) {
     const Icon = indicator?.icon;
+    const handleClick=()=>{
+        const target = document.getElementById(indicator?.targetId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
   return (
-    <div className="flex items-center justify-between bg-[#0C1019] text-white rounded-sm px-4 py-3 shadow-md w-full max-w-sm">
+    <div 
+    onClick={handleClick}
+    className="flex items-center justify-between bg-[#0C1019] text-white rounded-sm px-4 py-3 shadow-md w-full max-w-sm hover:bg-slate-800">
         <div className='flex items-center gap-4'>
             <div className='rounded-full p-3 bg-[#F6DF9B] text-[#0C1019]'>
                 {Icon ? <Icon /> : <Users/> }

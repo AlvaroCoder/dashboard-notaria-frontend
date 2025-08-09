@@ -56,12 +56,12 @@ export default function Page() {
         setData({inmuebles, vehiculos, asociacion, rs, sac, scrl});
 
         setIndicators([
-          {id : 1, title : 'Inmuebles', value : inmuebles?.length || 0, icon : Building2},
-          {id : 2, title : 'Vehiculos', value : vehiculos?.length || 0, icon : Car},
-          {id : 3, title : 'Asociacion', value : asociacion?.length || 0, icon : User},
-          {id : 4, title : 'RS', value : rs?.length || 0, icon : User},
-          {id : 5, title : 'SAC', value : sac?.length || 0, icon  : User},
-          {id : 6, title : 'SCRL', value : scrl?.length || 0, icon : User}
+          {id : 1, title : 'Inmuebles', value : inmuebles?.length || 0, icon : Building2, targetId : "contracts-inmuebles"},
+          {id : 2, title : 'Vehiculos', value : vehiculos?.length || 0, icon : Car, targetId : "contracts-vehiculos"},
+          {id : 3, title : 'Asociacion', value : asociacion?.length || 0, icon : User, targetId : "contracts-asociacion"},
+          {id : 4, title : 'RS', value : rs?.length || 0, icon : User, targetId : "contracts-rs"},
+          {id : 5, title : 'SAC', value : sac?.length || 0, icon  : User, targetId : "contracts-sac"},
+          {id : 6, title : 'SCRL', value : scrl?.length || 0, icon : User, targetId : "contracts-scrl"}
         ]);
 
         toast("Datos cargados correctamente",{
@@ -80,12 +80,13 @@ export default function Page() {
     getData();
   }, [])
   const renderDivider = <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
-  const renderTable=(title, dataset, header, path, slugUrlItem)=>(
+  const renderTable=(title, dataset, header, path, slugUrlItem, id)=>(
     <>
       {
         loading ? 
         <TableLoading headers={header} rows={6}/> :
         <TableManageDocuments
+          id={id}
           headers={header}
           data={dataset}
           title={title}
@@ -110,17 +111,17 @@ export default function Page() {
         }
       </section>
       
-      {renderTable("Contratos de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add')}
+      {renderTable("Contratos de Inmuebles", data.inmuebles, headersInmuebles, 'contracts/inmueble/form-add', '/dashboard/contracts/inmueble/', 'contracts-inmuebles')}
       {renderDivider}
-      {renderTable("Contratos de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/')}
+      {renderTable("Contratos de Vehículos", data.vehiculos, headersVehiculos, 'contracts/vehiculo/form-add', '/dashboard/contracts/vehiculo/','contracts-vehiculos')}
       {renderDivider}
-      {renderTable("Constitución de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/')}
+      {renderTable("Constitución de Asociación", data.asociacion, headersAsociacion, 'contracts/asociacion/form-add','/dashboard/contracts/asociacion/','contracts-asociacion')}
       {renderDivider}
-      {renderTable("Constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/')}
+      {renderTable("Constitución de RS", data.rs, headerRS, 'contracts/rs/form-add', '/dashboard/contracts/rs/', 'contracts-rs')}
       {renderDivider}
-      {renderTable("Constitución de SAC", data.sac, headersSAC, 'contracts/sac/form-add', '/dashboard/contracts/sac/')}
+      {renderTable("Constitución de SAC", data.sac, headersSAC, 'contracts/sac/form-add', '/dashboard/contracts/sac/', 'contracts-sac')}
       {renderDivider}
-      {renderTable("Constitución de SCRL", data.scrl, headerSCRL, 'contracts/scrl/form-add','/dashboard/contracts/scrl/')}
+      {renderTable("Constitución de SCRL", data.scrl, headerSCRL, 'contracts/scrl/form-add','/dashboard/contracts/scrl/', 'contracts-scrl')}
     </div>
   )
 }
