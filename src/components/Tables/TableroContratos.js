@@ -17,7 +17,8 @@ export default function TableroContratos({
   titulo="Contratos",
   dataContracts=[],
   baseSlugIdContract='/dashboard/contracts/inmueble/',
-  slugCreateProcess='/dashboard/contracts/inmueble/form-add'
+  slugCreateProcess='/dashboard/contracts/inmueble/form-add',
+  showAddButton=true,
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
   const router = useRouter();
@@ -32,12 +33,15 @@ export default function TableroContratos({
           <p className="text-sm text-gray-500">Tablero para visualizar la información</p>
         </div>
         <div className="flex justify-end gap-2">
-          <Button
-            className={"bg-[#0C1019]"}
-            onClick={()=>router.push(slugCreateProcess)}
-          >
-            Agregar Contrato
-          </Button>
+          {
+            showAddButton && 
+            <Button
+              className={"bg-[#0C1019]"}
+              onClick={()=>router.push(slugCreateProcess)}
+            >
+              Agregar Contrato
+            </Button>
+          }
           <Button
             className='text-[#0C1019] text-center'
             variant={vista === "tabla" ? "outline" : 'ghost'}

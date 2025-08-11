@@ -14,7 +14,7 @@ import { formatDateToYMD } from '@/lib/fechas';
 import { Divider, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
@@ -161,7 +161,7 @@ function RenderCardsFormStepper() {
 
       setViewPdf(url);
       pushActiveStep();
-      
+
     } catch (err) {
       toast("Surgio un error en la api",{
         type : 'error',

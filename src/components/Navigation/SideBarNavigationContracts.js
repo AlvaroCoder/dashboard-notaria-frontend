@@ -13,7 +13,7 @@ export default function SideBarNavigationContracts() {
     }
 
   return (
-    <aside className={cn('h-full shadow w-20 xl:min-w-[180px] ')}>
+    <aside className={cn('h-screen shadow w-20 xl:min-w-[180px] ')}>
         <ul className='flex flex-col px-2 gap-2 mt-4'>
             {
                 dataRoutes.map((item, idx)=>{

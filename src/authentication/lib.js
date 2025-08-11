@@ -1,6 +1,7 @@
 "use server"
 
 import { SignJWT, jwtVerify } from "jose";
+import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -26,41 +27,63 @@ export async function decrypt(input){
     return payload;
 }
 
-export async function login(dataUser, userType="client") {
-    
+export async function login(dataUser, userType = "client") {
     const formData = {
-        userName : dataUser.username,
-        password : dataUser.password,
-        user_type : userType
-    }
-    
-    const response= await fetch(URL_LOGIN_USER,{
-        method : 'POST',
-        headers: {
-            'Content-Type' : 'application/json',
-        },
-        body : JSON.stringify(formData)
+      userName: dataUser.username,
+      password: dataUser.password,
+    };
+  
+    const response = await fetch(URL_LOGIN_USER, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
-    
+  
     if (!response.ok) {
-       const rpta = await response.json();       
-        return {
-            error : true,
-            message : rpta?.detail
-        }
+      const rpta = await response.json();
+      return {
+        error: true,
+        message: rpta?.detail,
+      };
     }
-    const responseJson = await response.json();    
-    const expires = new Date(Date.now() + timeExpiration); 
-    const user = {username : formData.userName, access_token : responseJson?.access_token, refresh_token : responseJson?.refresh_token, token_type : responseJson?.token_type};    
-    const session = await encrypt({user, expires});
-    
-    (await cookies()).set("dashboard-session",session, {expires, httpOnly : true});
-    
+  
+    const responseJson = await response.json();
+    const { access_token, refresh_token, token_type } = responseJson;
+  
+    // ⬇️ Decodificar el JWT
+    let decodedToken;
+    try {
+      decodedToken = jwtDecode(access_token);
+      console.log("Token decodificado:", decodedToken);
+    } catch (error) {
+      console.error("Error decodificando el token:", error);
+      return { error: true, message: "Token inválido" };
+    }
+  
+    // Guardar en cookie encriptada
+    const expires = new Date(Date.now() + timeExpiration);
+    const user = {
+      username: formData.userName,
+      access_token,
+      refresh_token,
+      token_type,
+      payload: decodedToken, // ✅ Guardamos también los datos decodificados
+    };
+    const session = await encrypt({ user, expires });
+  
+    (await cookies()).set("dashboard-session", session, {
+      expires,
+      httpOnly: true,
+    });
+  
     return {
-        error : false,
-        message : "Ingreso exitoso"
-    }
-}
+      error: false,
+      message: "Ingreso exitoso",
+      tokenData: decodedToken, // ✅ Retornamos datos decodificados
+    };
+  }
 
 export async function logout() {
     cookies().set("dashboard-session", "", {expires:new Date(0)})

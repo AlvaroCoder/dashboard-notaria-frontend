@@ -4,9 +4,10 @@ import React, { useState } from 'react'
 import Title1 from '../elements/Title1';
 import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
-import UploadMinuta from '../elements/ButtonUploadMinuta';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
+import ButtonUploadWord from '../elements/ButtonUploadWord';
+import CardAviso from '../Cards/CardAviso';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
@@ -14,7 +15,7 @@ export default function FormUploadMinuta2({
 }) {
     const [detailsMinuta, setDetailsMinuta] = useState({
         number : '',
-        namePlace : '',
+        namePlace : 'Notaria Rojas',
         districtPlace : ''
     });
     const [minuta, setMinuta] = useState(null);
@@ -45,20 +46,6 @@ export default function FormUploadMinuta2({
                 />
                 <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
                 <div className='mb-4'>
-                    <Title1>Nombre del lugar</Title1>
-                    <p>Ingresa el nombre del lugar</p>
-                </div>
-                <TextField
-                    label="Nombre del lugar"
-                    type='text'
-                    name="namePlace"
-                    value={detailsMinuta.namePlace}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                />
-                <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
-                <div className='mb-4'>
                     <Title1>Distrito</Title1>
                     <p>Ingresa el distrito del lugar</p>
                 </div>
@@ -74,8 +61,14 @@ export default function FormUploadMinuta2({
             </section>
             <section className='bg-white p-8 shadow rounded-sm'>
                 <Title1>Sube la minuta</Title1>
-                <p>Sube la minuta en formato PDF</p>
-                <UploadMinuta
+                <p>Sube la minuta en formato Word</p>
+                <div className='my-2'>
+                <CardAviso
+                    advise='ANTES DE SUBIR LA MINUTA DEFINA EL TAMAÑO DE LA FUENTE Y EL COLOR DEL TEXTO EN EL WORD'
+                />
+                </div>
+                
+                <ButtonUploadWord
                     handleSetFile={(data)=>setMinuta(data)}
                 />
                 <Button

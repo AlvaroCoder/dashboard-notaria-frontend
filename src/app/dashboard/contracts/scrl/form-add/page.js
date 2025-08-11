@@ -151,14 +151,26 @@ function RenderApp() {
       
       const fileLocation = jsonResponseUpload?.fileLocation;
 
-      const responseProcessData = await processDataMinuta(newFormData);
-      const responseProcessDataJSon = await responseProcessData.json();
+      const JSONPreMinuta = {
+        clientId : dataSelected?.client?.id,
+        processPayment : "Pago a la mitad",
+        minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
+        datesDocument : {
+          processInitiate : formatDateToYMD(new Date())
+        },
+        directory : `DB_evidences/${fileLocation?.directory}`
+      }
       
-      const parserText = parseTextoToJSON(responseProcessDataJSon?.minuta_content);
+      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'scrl');
+      if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
+        toast("Error al momento de subir la informacion",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+        return;
+      }
+      const responsePreMinutaJSON = await responsePreMinuta?.json();
       
-      handleChangeFileLocation(fileLocation);
-      
-      agregarBloques(parserText?.data);
       setDataSendMinuta({
         ...dataSendMinuta,
         minuta : {
@@ -170,10 +182,19 @@ function RenderApp() {
             name : detailsMinuta?.namePlace,
             district : detailsMinuta?.districtPlace
           } 
-        }
+        },
+        contractId : responsePreMinutaJSON?.contractId
       });
-      pushActiveStep();
       
+      toast("Se creo el proceso",{
+        type : 'success',
+        position : 'bottom-right'
+      });
+
+      pushActiveStep();
+      if (dataSession?.payload?.role === 'junior') {
+        pushActiveStep();
+      }
     } catch (err) {
       console.log(err);
       toast("Error con la vista de minuta",{
@@ -185,57 +206,6 @@ function RenderApp() {
       setLoading(false);
     }
 
-  }
-
-  const handleSubmitPreMinuta=async()=>{
-    try {
-      setLoading(true);
-      const dataParseada = parserData();
-
-      const JSONPreMinuta = {
-        clientId : dataSelected?.client?.id,
-        processPayment : "Pago a la mitad",
-        minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-        datesDocument : {
-          processInitiate : formatDateToYMD(new Date())
-        },
-        directory : `DB_evidences/${fileLocation?.directory}`
-      }
-
-      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'scrl');
-      if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
-        toast("Error al momento de subir la informacion",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return;
-      }
-      const responsePreMinutaJSON = await responsePreMinuta?.json();
-      
-      setDataSendMinuta((prev)=>({
-        ...dataSendMinuta,
-        minuta : {
-          ...prev?.minuta,
-          minutaContent : {
-            data : dataParseada
-          }
-        },
-        contractId : responsePreMinutaJSON?.contractId
-      }));
-
-      toast("Se creo el proceso",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      pushActiveStep();
-    } catch (err) {      
-      toast("Hubo un error en iniciar el proceso",{
-        type : 'error',
-        position : 'bottom-center'
-      });
-    } finally {
-      setLoading(false);
-    }
   }
 
   const handleSubmitFormStepperPerson=(dataFounder)=>{
@@ -350,21 +320,6 @@ function RenderApp() {
         </section>
       )
     case 2:
-      // Se cambia al modo editor
-      return(
-        <section className='relative h-screen overflow-y-auto w-full flex-1'> 
-          <EditorView/>
-          <div className='p-4 w-full'>
-          <Button
-            onClick={handleSubmitPreMinuta}
-            className={"w-full mt-4"}
-          >
-            {loading ? <Loader2/> : <p>Continuar</p>}
-          </Button>
-          </div>
-        </section>
-      )
-    case 3:
       // Seleccionar que Junior se encargara de la tarea
       return(
         <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'> 
@@ -384,7 +339,7 @@ function RenderApp() {
           </Suspense>
         </section>
       )
-    case 4:
+    case 3:
       // Se generan los formularios de los fundadores
       return(
         <section className='w-full flex justify-center items-center'>
@@ -395,7 +350,7 @@ function RenderApp() {
           </div>
         </section>
       )
-    case 5:
+    case 4:
       // Se pide la información restante
       return(
         <section className='w-full flex justify-center items-center'>
@@ -420,7 +375,7 @@ function RenderApp() {
           </div>
         </section>
       )
-    case 6:
+    case 5:
       // Se pide la informacion del senior
       return(
         <section className='w-full h-screen overflow-y-auto p-8 pb-24 flex flex-col gap-4'> 
@@ -465,7 +420,7 @@ function RenderApp() {
             </Button>
         </section>
       )
-      case 7:
+      case 6:
         return(
           <section className='p-4 w-full'>
             <FormViewerPdfEscritura

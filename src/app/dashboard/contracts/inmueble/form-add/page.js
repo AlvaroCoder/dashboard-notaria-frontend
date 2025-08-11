@@ -3,7 +3,7 @@
 import Title1 from '@/components/elements/Title1';
 import { useFetch } from '@/hooks/useFetch';
 import { Divider, TextField } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FormStepper from '@/components/Forms/FormStepper';
 import { useContratoContext } from '@/context/ContratosContext';
 import { toast } from 'react-toastify';
@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
+import { useSession } from '@/hooks/useSesion';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -37,7 +38,9 @@ const CardRequirements = dynamic(()=>import('@/components/Cards/CardRequirements
 });
 
 
-function RenderCardsFormStepper() {
+function RenderCardsFormStepper({
+    dataSession
+}) {
     const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
     const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
     const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
@@ -59,14 +62,8 @@ function RenderCardsFormStepper() {
         dataSelected,
         fileLocation,
         handleClickClient,
-        pushActiveStep,
-        handleChangeFileLocation
+        pushActiveStep
     } = useContracts();
-
-    const {
-        agregarBloques,
-        parserData
-    } = useEditorContext();
 
     const [loading, setLoading] = useState(false);
     const [dataSendMinuta, setDataSendMinuta] = useState({
@@ -127,12 +124,28 @@ function RenderCardsFormStepper() {
 
             const fileLocation = jsonResponseUpload?.fileLocation;
 
-            const responseProcessData = await processDataMinuta(newFormData);
-            const responseProcessDataJSon = await responseProcessData?.json();
-
-            const parserText = parseTextoToJSON(responseProcessDataJSon?.minuta_content);
-            handleChangeFileLocation(fileLocation);
-            agregarBloques(parserText?.data);
+            const JSONPreMinuta = {
+                clientId : dataSelected?.client?.id,
+                processPayment : "Pago a la mitad",
+                minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
+                datesDocument : {
+                    processInitiate : formatDateToYMD(new Date())
+                },
+                directory : `DB_evidences/${fileLocation?.directory}`,
+                case : dataSendMinuta?.case
+            }
+   
+            const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
+            if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
+                toast("Error al subir la informacion",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                console.log(await responsePreMinuta.json());
+                
+                return;
+            }
+            const responsePreMinutaJSON = await responsePreMinuta?.json();
 
             setDataSendMinuta({
                 ...dataSendMinuta,
@@ -145,9 +158,20 @@ function RenderCardsFormStepper() {
                         name : detailsMinuta?.namePlace,
                         district : detailsMinuta?.districtPlace
                     }
-                }
+                },
+                contractId : responsePreMinutaJSON?.contractId
             });
-            pushActiveStep()
+
+            toast("Se creo el proceso",{
+                type : 'success',
+                position : 'bottom-right'
+            });
+
+            pushActiveStep();
+            if (dataSession?.payload?.role === 'junior') {
+                pushActiveStep();
+            }
+            
         } catch (err) {
             console.log(err);
             toast("Error con la vista de minuta",{
@@ -159,57 +183,6 @@ function RenderCardsFormStepper() {
         }
     }
 
-    const handleSubmitPreMinuta=async()=>{
-        try {
-            setLoading(true);
-            const dataParseada = parserData();
-            const JSONPreMinuta = {
-                clientId : dataSelected?.client?.id,
-                processPayment : "Pago a la mitad",
-                minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-                datesDocument : {
-                    processInitiate : formatDateToYMD(new Date())
-                },
-                directory : `DB_evidences/${fileLocation?.directory}`,
-                case : dataSendMinuta?.case
-            }
-            
-            const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
-            if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
-                toast("Error al subir la informacion",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                console.log(await responsePreMinuta.json());
-                
-                return;
-            }
-            const responsePreMinutaJSON = await responsePreMinuta?.json();
-            setDataSendMinuta((prev)=>({
-                ...dataSendMinuta,
-                minuta : {
-                    ...prev?.minuta,
-                    minutaContent : {
-                        data : dataParseada
-                    },
-                },
-                contractId : responsePreMinutaJSON?.contractId
-            }));
-            toast("Se creo el proceso",{
-                type : 'success',
-                position : 'bottom-right'
-            });
-            pushActiveStep();
-        } catch (err) {
-            toast("Hubo un error en iniciar el proceso",{
-                type : 'error',
-                position : 'bottom-center'
-            });
-            return;
-        } finally { 
-            setLoading(false);
-        }
-    }
     const handleClickSelectJunior=async(junior)=>{
         try {
             setLoading(true);
@@ -403,22 +376,8 @@ function RenderCardsFormStepper() {
               </main>  
             );
         
-        case 3:
-            return (
-            <section className='relative h-screen overflow-y-auto w-full flex-1'>
-                <EditorView/>
-                <div className='p-4 w-full'>
-                    <Button
-                        disabled={loading}
-                        onClick={handleSubmitPreMinuta}
-                        className={"w-full mt-4"}
-                    >   
-                        {loading ? <Loader2/> : <p>Continuar</p>}
-                    </Button>
-                </div>
-            </section>)
         // Seleccionar que Junior se encargara de la tarea
-        case 4:
+        case 3:
             return(
                 <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
                     <TableSelectedUser
@@ -431,11 +390,11 @@ function RenderCardsFormStepper() {
                     />
                 </section>
             )
-        case 5 :
+        case 4:
             return (<FormStepper
                handleSaveData={handleClickFormStepper}
             />);
-        case 6:
+        case 5:
             return (
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
@@ -461,7 +420,7 @@ function RenderCardsFormStepper() {
                     </Button>
                 </section>
             )
-        case 7:
+        case 6:
             // Se pide la informacion restante
             return(
                   <section className='w-full flex justify-center items-center'>
@@ -482,7 +441,7 @@ function RenderCardsFormStepper() {
                           </div>
                         </section>
             )
-        case 8:
+        case 7:
             return(
                 <section className='flex flex-col gap-4'>
                     <TableSelectedUser
@@ -515,7 +474,7 @@ function RenderCardsFormStepper() {
                     </Button>
                 </section>
             )
-        case 9:
+        case 8:
             return (<FormViewerPdfEscritura
                 viewerPdf={viewPdf}
             />);
@@ -527,10 +486,13 @@ export default function Page() {
         loadingProcess
     } = useContratoContext();
 
+    const {dataSession} = useSession();
     return (
         <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
             {loadingProcess && <Loading isOpen={loadingProcess}/>}
-            <RenderCardsFormStepper/>
+            <RenderCardsFormStepper
+                dataSession={dataSession}
+            />
         </section>
   )
 };

@@ -11,6 +11,7 @@ import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
+import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
@@ -27,7 +28,11 @@ const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'),{
   ssr : false
 });
 
-function RenderApp() {
+function RenderApp({
+  dataSession=null
+}) {
+  console.log(dataSession);
+  
   const [loading, setLoading] = useState(false);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({
@@ -147,55 +152,15 @@ function RenderApp() {
       
       const fileLocation = jsonResponseUpload?.fileLocation;
 
-      const responseProcessData = await processDataMinuta(newFormData);
-      const responseProcessDataJSon = await responseProcessData.json();
-      
-      const parserText = parseTextoToJSON(responseProcessDataJSon?.minuta_content);
-      
-      handleChangeFileLocation(fileLocation);
-      
-      agregarBloques(parserText?.data);
-      setDataSendMinuta({
-        ...dataSendMinuta,
-        minuta : {
-          minutaNumber : detailsMinuta?.number,
-          creationDay : {
-            date : formatDateToYMD(new Date())
-          },
-          place : {
-            name : detailsMinuta?.namePlace,
-            district : detailsMinuta?.districtPlace
-          } 
-        }
-      });
-      pushActiveStep();
-      
-    } catch (err) {
-      console.log(err);
-      toast("Error con la vista de minuta",{
-        type : 'error',
-        position : 'bottom-center'
-      });
-      
-    } finally{
-      setLoading(false);
-    }
-
-  }
-
-  const handleSubmitPreMinuta=async()=>{
-    try {
-      setLoading(true);
-      const dataParseada = parserData();
-
       const JSONPreMinuta = {
-        clientId : dataSelected?.client?.id,
-        processPayment : "Pago a la mitad",
-        minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-        datesDocument : {
-          processInitiate : formatDateToYMD(new Date())
-        },
-        directory : `DB_evidences/${fileLocation?.directory}`
+          clientId : dataSelected?.client?.id,
+          processPayment : "Pago a la mitad",
+          minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
+          datesDocument : {
+              processInitiate : formatDateToYMD(new Date())
+          },
+          directory : `DB_evidences/${fileLocation?.directory}`,
+          case : dataSendMinuta?.case
       }
 
       const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'asociacion');
@@ -207,29 +172,38 @@ function RenderApp() {
         return;
       }
       const responsePreMinutaJSON = await responsePreMinuta?.json();
-      
-      setDataSendMinuta((prev)=>({
+
+      setDataSendMinuta({
         ...dataSendMinuta,
         minuta : {
-          ...prev?.minuta,
-          minutaContent : {
-            data : dataParseada
-          }
+          minutaNumber : detailsMinuta?.number,
+          creationDay : {
+            date : formatDateToYMD(new Date())
+          },
+          place : {
+            name : detailsMinuta?.namePlace,
+            district : detailsMinuta?.districtPlace
+          } 
         },
         contractId : responsePreMinutaJSON?.contractId
-      }));
-
+      });
       toast("Se creo el proceso",{
         type : 'success',
         position : 'bottom-right'
       });
+      
       pushActiveStep();
-    } catch (err) {      
-      toast("Hubo un error en iniciar el proceso",{
+      if (dataSession?.payload?.role) {
+        pushActiveStep();
+      }
+    } catch (err) {
+      console.log(err);
+      toast("Error con la vista de minuta",{
         type : 'error',
         position : 'bottom-center'
       });
-    } finally {
+      
+    } finally{
       setLoading(false);
     }
   }
@@ -345,22 +319,8 @@ function RenderApp() {
           </section>
         </section>
       )
+
     case 2:
-      // Se cambia al modo editor
-      return(
-        <section className='relative h-screen overflow-y-auto w-full flex-1'> 
-          <EditorView/>
-          <div className='p-4 w-full'>
-          <Button
-            onClick={handleSubmitPreMinuta}
-            className={"w-full mt-4"}
-          >
-            {loading ? <Loader2/> : <p>Continuar</p>}
-          </Button>
-          </div>
-        </section>
-      )
-    case 3:
       // Seleccionar que Junior se encargara de la tarea
       return(
         <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'> 
@@ -380,7 +340,7 @@ function RenderApp() {
           </Suspense>
         </section>
       )
-    case 4:
+    case 3:
       // Se generan los formularios de los fundadores
       return(
         <section className='w-full flex justify-center items-center'>
@@ -391,7 +351,7 @@ function RenderApp() {
           </div>
         </section>
       )
-    case 5:
+    case 4:
       // Se pide la información restante
       return(
         <section className='w-full flex justify-center items-center'>
@@ -416,7 +376,7 @@ function RenderApp() {
           </div>
         </section>
       )
-    case 6:
+    case 5:
       // Se pide la informacion del senior
       return(
         <section className='w-full h-screen overflow-y-auto p-8 pb-24 flex flex-col gap-4'> 
@@ -461,7 +421,7 @@ function RenderApp() {
             </Button>
         </section>
       )
-      case 7:
+      case 6:
         return(
           <section className='p-4 w-full'>
             <FormViewerPdfEscritura
@@ -475,8 +435,9 @@ function RenderApp() {
 
 export default function Page() {
   const {loading} = useContracts();
+  const {dataSession} = useSession();
   if (loading) {
-    return (<p>Cargando ...</p>)
+    return (<p>Cargando ...</p>);
   }
   else{
     return (
@@ -485,7 +446,9 @@ export default function Page() {
             <Title1 className='text-3xl'>Nuevo Contrato de constitucion de Asociacón de empresa </Title1>
             <p className='text-gray-600 text-sm'>Genera la escritura de la Asociacion</p>
         </section>
-        <RenderApp/>
+        <RenderApp
+          dataSession={dataSession}
+        />
       </main>
     )
   }
