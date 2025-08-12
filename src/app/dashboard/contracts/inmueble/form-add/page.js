@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import { useSession } from '@/hooks/useSesion';
+import FojasDataForm from '@/components/Forms/FojasDataForm';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -358,6 +359,21 @@ function RenderCardsFormStepper({
         setImagesMinuta(newDataImage);
     }
 
+    const handleChangeFojasDatas = (path, value) => {
+        setDataSendMinuta(prev => {
+          const updated = { ...prev };
+          const keys = path.split(".");
+          let current = updated;
+      
+          for (let i = 0; i < keys.length - 1; i++) {
+            current = current[keys[i]];
+          }
+      
+          current[keys[keys.length - 1]] = value;
+          return updated;
+        });
+      };
+
     switch(activeStep) {
         // Primero seleccionamos el cliente que vamos a usar
         case 0:
@@ -460,6 +476,13 @@ function RenderCardsFormStepper({
                       <section>
                         <Title1 className='text-3xl'>Informacion Restante</Title1>
                         <p>Ingresa la información restante para generar la escritura</p>
+                      </section>
+                      <section>
+                        <Title1 className='text-2xl'>Información de Fojas</Title1>
+                        <FojasDataForm
+                            fojasData={dataSendMinuta?.fojasData}
+                            handleChangeFojasDatas={handleChangeFojasDatas}
+                        />
                       </section>
                       <FormHeaderInformation
                           handleChangeHeader={handleChangeHeader}

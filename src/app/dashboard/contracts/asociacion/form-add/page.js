@@ -1,5 +1,6 @@
 'use client';
 import Title1 from '@/components/elements/Title1';
+import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
@@ -288,7 +289,20 @@ function RenderApp({
       setLoading(false);
     }
   }
-
+  const handleChangeFojasDatas = (path, value) => {
+    setDataSendMinuta(prev => {
+      const updated = { ...prev };
+      const keys = path.split(".");
+      let current = updated;
+  
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+  
+      current[keys[keys.length - 1]] = value;
+      return updated;
+    });
+  };
   switch (activeStep) {
     case 0:
       // Primer paso definir el cliente que va a realizar el proceso
@@ -381,6 +395,13 @@ function RenderApp({
             <section>
               <Title1 className='text-3xl'>Informacion Restante</Title1>
               <p>Ingresa la informócion restante para generar la escritura</p>
+            </section>
+            <section>
+              <Title1 className='text-2xl'>Información de Fojas</Title1>
+              <FojasDataForm
+                fojasData={dataSendMinuta.fojasData}
+                handleChangeFojasDatas={handleChangeFojasDatas}
+              />
             </section>
             <section className='my-4'>
               <Title1>Información de la asociacion</Title1>
