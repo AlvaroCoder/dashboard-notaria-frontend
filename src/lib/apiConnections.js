@@ -1,3 +1,4 @@
+const URL_BASE = process.env.NEXT_PUBLIC_BASE_URL;
 const URL_GET_DATA_CLIENT = process.env.NEXT_PUBLIC_URL_HOME_CLIENT + "/id/?idUser=";
 const URL_GET_CONTRACT_BY_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
 const URL_PROCESS_MINUTA=process.env.NEXT_PUBLIC_URL_CONTRACTS+"/processMinuta";
@@ -61,14 +62,14 @@ export async function generateScriptCompraVenta(type, bodyScript) {
 }
 
 export async function aceptarEscritura(contractId) {
-    return fetch(`http://localhost:8000/update/contract/confirmation/?contractId=${contractId}`,{
+    return fetch(`${URL_BASE}/update/contract/confirmation/?contractId=${contractId}`,{
         method : 'PUT',
         mode : 'cors',
     })
 }
 
 export async function generarParteNotarial(data, type) {
-    return fetch(`http://localhost:8000/contracts/compra_venta/${type}/parteNotarial/`,{
+    return fetch(`${URL_BASE}/contracts/compra_venta/${type}/parteNotarial/`,{
         method : 'POST',
         mode : 'cors',
         headers : {
@@ -79,7 +80,7 @@ export async function generarParteNotarial(data, type) {
 }
 
 export async function generarParteNotarialConstitucion(data, type) {
-    return fetch(`http://localhost:8000/contracts/constitucion/${type}/parteNotarial/`,{
+    return fetch(`${URL_BASE}/contracts/constitucion/${type}/parteNotarial/`,{
         method : 'POST',
         mode : 'cors',
         headers : {
