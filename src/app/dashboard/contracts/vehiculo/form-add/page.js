@@ -3,6 +3,7 @@ import CardAviso from '@/components/Cards/CardAviso';
 import CardNotarioSelected from '@/components/Cards/CardNotarioSelected';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import Title1 from '@/components/elements/Title1';
+import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
@@ -252,6 +253,22 @@ function RenderCardsFormStepper({
       }
     }))
   };
+
+  const handleChangeFojasDatas = (path, value) => {
+    setDataSendMinuta(prev => {
+      const updated = { ...prev };
+      const keys = path.split(".");
+      let current = updated;
+  
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+  
+      current[keys[keys.length - 1]] = value;
+      return updated;
+    });
+  };
+
   switch (activeStep) {
     case 0:
       return(
@@ -326,6 +343,13 @@ function RenderCardsFormStepper({
             <section>
               <Title1 className='text-3xl'>Información Restante</Title1>
               <p>Ingresa la información restantes para generar la escritura</p>
+            </section>
+            <section>
+              <Title1 className='text-2xl'>Información de las fojas</Title1>
+              <FojasDataForm
+                fojasData={dataSendMinuta.fojasData}
+                handleChangeFojasDatas={handleChangeFojasDatas}
+              />
             </section>
             <section className='my-2'>
               <Title1>Información del pago</Title1>
