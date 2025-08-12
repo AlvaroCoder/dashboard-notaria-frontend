@@ -6,8 +6,8 @@ import Title1 from "../elements/Title1";
 import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 
 const getMaritalOptions = (gender) => {
-    if (gender === 'Femenino') return ['soltera', 'casada', 'viuda', 'divorciada'];
-    if (gender === 'Masculino') return ['soltero', 'casado', 'viudo', 'divorciado'];
+    if (gender === 'F') return ['soltera', 'casada', 'viuda', 'divorciada'];
+    if (gender === 'M') return ['soltero', 'casado', 'viudo', 'divorciado'];
     return [];
 };
 
@@ -18,7 +18,7 @@ export default function FormFounders({
         firstName:"",
         lastName:"",
         dni:"",
-        gender:"Masculino",
+        gender:"M",
         nationality:"Peruano",
         age:'',
         job:"",
@@ -99,8 +99,8 @@ export default function FormFounders({
                                         label="Genero"
                                         onChange={(e)=>handleChangeFounder(idx, 'gender', e.target.value)}
                                     >
-                                        <MenuItem value="Masculino">Masculino</MenuItem>
-                                        <MenuItem value="Femenino">Femenino</MenuItem>
+                                        <MenuItem value="M">Masculino</MenuItem>
+                                        <MenuItem value="F">Femenino</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <TextField label="Nacionalidad" value={person?.nationality} onChange={(e)=>handleChangeFounder(idx, 'nationality', e.target.value)} fullWidth required/>

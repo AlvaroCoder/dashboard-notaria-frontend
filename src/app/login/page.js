@@ -48,7 +48,7 @@ export default function Page() {
     }
     try {
       setLoading(true);
-      const response = await login(dataSend, 'admin');
+      const response = await login(dataSend);
       if (response.error) {
         setError({
           title : 'Error ',

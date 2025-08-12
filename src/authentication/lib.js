@@ -10,7 +10,7 @@ const URL_REGISTER_USER = process.env.NEXT_PUBLIC_URL_SIGNUP;
 const URL_LOGIN_USER = process.env.NEXT_PUBLIC_URL_LOGIN;
 
 const key=new TextEncoder().encode(secretKey);
-const timeExpiration =  30 * 60 * 1000;
+const timeExpiration =  60 * 60 * 1000;
 
 export async function encrypt(payload) {
     return new SignJWT(payload)
@@ -27,7 +27,7 @@ export async function decrypt(input){
     return payload;
 }
 
-export async function login(dataUser, userType = "client") {
+export async function login(dataUser) {
     const formData = {
       userName: dataUser.username,
       password: dataUser.password,

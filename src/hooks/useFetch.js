@@ -3,7 +3,7 @@
 import { getSession } from "@/authentication/lib";
 import { useEffect, useState } from "react";
 
-export function useFetch(URL="", cache='no-store') {
+export function useFetch(URL="") {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
@@ -27,7 +27,8 @@ export function useFetch(URL="", cache='no-store') {
                 }
 
                 const jsonResponse = await response.json();          
-                      
+                console.log(jsonResponse);
+                
                 setData(jsonResponse);
 
             } catch (err) {

@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
 import CardAviso from '../Cards/CardAviso';
+import UploadMinuta from '../elements/ButtonUploadMinuta';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
@@ -19,14 +20,15 @@ export default function FormUploadMinuta2({
         districtPlace : ''
     });
     const [minuta, setMinuta] = useState(null);
-
+    const [minutaPdf, setMinutaPdf] = useState(null);
+    
     const handleChange=(e)=>{
         const target = e.target;
         setDetailsMinuta({
             ...detailsMinuta,
             [target.name] : target.value
         });
-    }
+    };
   return (
     <div className='col-span-2'>
         <section className={cn('flex flex-col gap-4')}>
@@ -60,12 +62,27 @@ export default function FormUploadMinuta2({
                 />
             </section>
             <section className='bg-white p-8 shadow rounded-sm'>
-                <Title1>Sube la minuta</Title1>
-                <p>Sube la minuta en formato Word</p>
-                <div className='my-2'>
-                <CardAviso
-                    advise='ANTES DE SUBIR LA MINUTA DEFINA EL TAMAÑO DE LA FUENTE Y EL COLOR DEL TEXTO EN EL WORD'
+                <Title1>Sube la Minuta en PDF</Title1>
+                <p>Sube la minuta en formato .pdf</p>
+                <div className='my-2 space-y-6'>
+                    <CardAviso
+                        advise='LA MINUTA ES DEL CLIENTE, SE GUARDARÁ TAL CUAL EN LA BASE DE DATOS'
+                    />
+                </div>
+                <UploadMinuta
+                    handleSetFile={(data)=>setMinutaPdf(data)}
                 />
+            </section>
+            <section className='bg-white p-8 shadow rounded-sm'>
+                <Title1>Sube la minuta en WORD</Title1>
+                <p>Sube la minuta en formato .doc o .docx</p>
+                <div className='my-2 space-y-6'>
+                    <CardAviso
+                        advise='ANTES DE SUBIR LA MINUTA DEFINA EL TAMAÑO DE LA FUENTE Y EL COLOR DEL TEXTO EN EL WORD'
+                    />
+                    <CardAviso
+                        advise='EL WORD NO DEBE CONTENER LAS FIRMAS Y DEBE EMPEZAR POR SR NOTARIO'
+                    />
                 </div>
                 
                 <ButtonUploadWord
@@ -74,11 +91,12 @@ export default function FormUploadMinuta2({
                 <Button
                     disabled={!minuta}
                     className='mt-4 w-full'
-                    onClick={()=>handleUploadMinuta(minuta, detailsMinuta)}
+                    onClick={()=>handleUploadMinuta(minuta, detailsMinuta, minutaPdf)}
                 >
                     {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
                 </Button>
             </section>
+
         </section>
     </div>
   )

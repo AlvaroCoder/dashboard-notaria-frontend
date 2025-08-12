@@ -27,7 +27,9 @@ const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'),{
   ssr : false
 });
 
-function RenderApp() {
+function RenderApp({
+  dataSession
+}) {
   const [loading, setLoading] = useState(false);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({

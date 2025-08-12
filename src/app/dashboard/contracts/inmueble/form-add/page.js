@@ -13,11 +13,8 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, generateScriptCompraVenta, generateScriptContract, processDataMinuta, sendDataMinuta, subirEvidencias, submitDataPreMinuta, submitDataPreMinuta2 } from '@/lib/apiConnections';
-import { parseTextoToJSON } from '@/common/parserText';
-import { useEditorContext } from '@/context/ConextEditor';
+import { asignJuniorToContracts, generateScriptCompraVenta, sendDataMinuta, sendMinutaWord, subirEvidencias, submitDataPreMinuta2 } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
-import EditorView from '@/components/Views/EditorView';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
@@ -62,7 +59,8 @@ function RenderCardsFormStepper({
         dataSelected,
         fileLocation,
         handleClickClient,
-        pushActiveStep
+        pushActiveStep,
+        pushActive2Step
     } = useContracts();
 
     const [loading, setLoading] = useState(false);
@@ -89,7 +87,7 @@ function RenderCardsFormStepper({
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [viewPdf, setViewPdf] = useState(null);
     const [imagesMinuta, setImagesMinuta] = useState([]);
-    
+
     const handleClickSelectClient=(client)=>{
         handleClickClient(client);
         pushActiveStep();
@@ -106,9 +104,9 @@ function RenderCardsFormStepper({
         pushActiveStep();
     }
 
-    const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+    const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
         try {
-            if (!minuta) {
+            if (!minutaPdf) {
                 toast("Subir minuta",{
                     type : 'error',
                     position : 'bottom-center'
@@ -116,8 +114,9 @@ function RenderCardsFormStepper({
                 return;
             }
             setLoading(true);
+        
             const newFormData = new FormData();
-            newFormData.append('minutaFile', minuta);
+            newFormData.append('minutaFile', minutaPdf);
 
             const response = await sendDataMinuta(newFormData);
             const jsonResponseUpload = await response.json();
@@ -133,7 +132,7 @@ function RenderCardsFormStepper({
                 },
                 directory : `DB_evidences/${fileLocation?.directory}`,
                 case : dataSendMinuta?.case
-            }
+            };
    
             const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
             if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
@@ -146,7 +145,14 @@ function RenderCardsFormStepper({
                 return;
             }
             const responsePreMinutaJSON = await responsePreMinuta?.json();
+            const idContract = responsePreMinutaJSON?.contractId;
 
+            const newFormDataWord = new FormData();
+            newFormDataWord.append("minutaFile", minutaWord);
+
+            const responseSendMinutaWord = await sendMinutaWord(newFormDataWord, idContract)
+            console.log(await responseSendMinutaWord?.json());
+            
             setDataSendMinuta({
                 ...dataSendMinuta,
                 minuta : {
@@ -159,7 +165,7 @@ function RenderCardsFormStepper({
                         district : detailsMinuta?.districtPlace
                     }
                 },
-                contractId : responsePreMinutaJSON?.contractId
+                contractId : idContract
             });
 
             toast("Se creo el proceso",{
@@ -167,8 +173,25 @@ function RenderCardsFormStepper({
                 position : 'bottom-right'
             });
 
-            pushActiveStep();
+            
             if (dataSession?.payload?.role === 'junior') {
+                
+                const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+                console.log(await responseJuniorAsigned.json());
+                
+                if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 404) {
+                    toast("No se puede agregar mas carga",{
+                        type : 'error',
+                        position : 'bottom-right'
+                    });
+                    return;
+                }
+                toast("Se asigno el junior",{
+                    type : 'info',
+                    position : 'bottom-right'
+                })
+                pushActive2Step();
+            } else {
                 pushActiveStep();
             }
             
@@ -232,7 +255,7 @@ function RenderCardsFormStepper({
                 people : compradores
             }
         });
-        pushActiveStep()
+        pushActiveStep();
         toast("Cliente guardado",{
             type : 'info',
             position : 'bottom-right'
@@ -241,11 +264,18 @@ function RenderCardsFormStepper({
     const handleClickEvidences=async(e)=>{
         e.preventDefault();
         try {
+            if (imagesMinuta.length === 0) {
+                setDataSendMinuta({
+                    ...dataSendMinuta,
+                    paymentMethod : null
+                })
+                pushActiveStep();
+                return
+            }
             setLoading(true);
-
+            
             const response = await subirEvidencias(imagesMinuta, fileLocation?.directory);
         
-
             setDataSendMinuta((prev)=>({
                 ...dataSendMinuta,
                 paymentMethod : {
@@ -286,6 +316,8 @@ function RenderCardsFormStepper({
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
+            console.log(dataSendMinuta);
+            
             const response = await generateScriptCompraVenta('inmueble', dataSendMinuta);
             console.log(dataSendMinuta);
             
@@ -332,13 +364,13 @@ function RenderCardsFormStepper({
             return (
                 <div >
                     <TableSelectedUser
-                            title='Selecciona un cliente'
-                            descripcion='Tabla de clientes, selecciona uno para continuar'
-                            headers={headersTableroCliente}
-                            data={dataClientes?.data}
-                            slugCrear={'/dashboard/clientes/form-add'}
-                            handleClickSelect={handleClickSelectClient}
-                        />
+                        title='Selecciona un cliente'
+                        descripcion='Tabla de clientes, selecciona uno para continuar'
+                        headers={headersTableroCliente}
+                        data={dataClientes?.data}
+                        slugCrear={'/dashboard/clientes/form-add'}
+                        handleClickSelect={handleClickSelectClient}
+                    />
                 </div>
             )
         // Luego seleccionamos el tipo de proceso que se va a realizar
@@ -398,8 +430,8 @@ function RenderCardsFormStepper({
             return (
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
-                        <Title1 className='text-center text-2xl'>Sube lo comprobantes de pago</Title1>
-                        <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG</p>
+                        <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
+                        <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG (No obligatorio)</p>
                     </section>
                     <ButtonUploadImageMinuta
                         handleChangeImage={handleChangeImageMinuta}
@@ -413,7 +445,7 @@ function RenderCardsFormStepper({
                     }
                     <Button
                         onClick={handleClickEvidences}
-                        disabled={imagesMinuta.length === 0 || loading}
+                        
                         className={"mt-4 w-full"}
                     >
                     {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
@@ -423,23 +455,23 @@ function RenderCardsFormStepper({
         case 6:
             // Se pide la informacion restante
             return(
-                  <section className='w-full flex justify-center items-center'>
-                          <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
-                            <section>
-                              <Title1 className='text-3xl'>Informacion Restante</Title1>
-                              <p>Ingresa la información restante para generar la escritura</p>
-                            </section>
-                            <FormHeaderInformation
-                                handleChangeHeader={handleChangeHeader}
-                                data={dataSendMinuta}
-                            />
-                            <Button 
-                              onClick={()=>pushActiveStep()}
-                              className={'w-full mt-4'}>
-                              Continuar
-                            </Button>
-                          </div>
-                        </section>
+                <section className='w-full flex justify-center items-center'>
+                    <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
+                      <section>
+                        <Title1 className='text-3xl'>Informacion Restante</Title1>
+                        <p>Ingresa la información restante para generar la escritura</p>
+                      </section>
+                      <FormHeaderInformation
+                          handleChangeHeader={handleChangeHeader}
+                          data={dataSendMinuta}
+                      />
+                      <Button 
+                        onClick={()=>pushActiveStep()}
+                        className={'w-full mt-4'}>
+                        Continuar
+                      </Button>
+                    </div>
+                </section>
             )
         case 7:
             return(

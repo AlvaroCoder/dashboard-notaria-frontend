@@ -113,7 +113,7 @@ export default function TableroContratosJunior({
                                     <TableRow key={idx}>
                                         <TableCell>
                                             <Link 
-                                                href={`/dashboard/contracts/${contrato?.contractType?.toLowerCase()}/${contrato?.id}`}
+                                                href={`/dashboard/contracts/${contrato?.contractType?.toLowerCase() === 'compraventapropiedad' ? 'inmueble' : contrato?.contractType?.toLowerCase()}/${contrato?.id}`}
                                                 className="text-blue-600 underline"
                                             >
                                                 {camelCaseToTitle(contrato?.contractType)}

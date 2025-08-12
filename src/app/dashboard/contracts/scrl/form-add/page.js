@@ -27,7 +27,9 @@ const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'),{
   ssr : false
 });
 
-function RenderApp() {
+function RenderApp({
+  dataSession
+}) {
   const [loading, setLoading] = useState(false);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({
@@ -57,17 +59,10 @@ function RenderApp() {
   const {
     activeStep, 
     dataSelected,
-    fileLocation,
     handleClickClient,
     pushActiveStep,
-    changeLoading,
-    handleChangeFileLocation
   } = useContracts();
 
-  const {
-    agregarBloques,
-    parserData
-  } = useEditorContext();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
   const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";

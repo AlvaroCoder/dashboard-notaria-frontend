@@ -2,9 +2,9 @@
 import { useFetch } from '@/hooks/useFetch';
 import React from 'react'
 import Title1 from '../elements/Title1'
-import { Button } from '../ui/button'
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import RedirectButton from '../elements/RedirectButton';
+import { Building, Building2, Car, FileText, Handshake, User2 } from 'lucide-react';
 
 const TableroContratosJunior=dynamic(()=>import('@/components/Tables/TableroContratosJunior'),{
   ssr : false,
@@ -15,38 +15,50 @@ export default function ViewJuniorDashboard({
   idJunior=""
 }) {
     const {
-      data : dataContractsJunior,
+      data : dataContractsJunior
     } = useFetch(process.env.NEXT_PUBLIC_URL_ID_CONTRATOS_JUNIOR+idJunior)
-    console.log(dataContractsJunior);
-    
+      
     const dataButtons =[
       {
-        title : "Contrato Constitucion de Asociacion",
-        slug : "/dashboard/contracts/asociacion/form-add"
-      },
-      {
-        title : "Contrato de Inmueble",
-        slug : "/dashboard/contracts/inmueble/form-add"
-      },
-      {
-        title : "Contrato de Constitucion de RS",
-        slug : "/dashboard/contracts/rs/form-add"
-      },
-      {
-        title : "Contrato de constitucion de SAC",
-        slug : "/dashboard/contracts/sac/form-add"
-      },
-      {
-        title : "Contrato de constitucion de SCRL",
-        slug :"/dashboard/contracts/scrl/form-add"
+        title : "Agregar Inmueble",
+        description : "Crea un nuevo contrato de compra/venta de inmueble",
+        slug : "inmueble",
+        icon : Building2
       },
       {
         title : "Contrato de Vehiculos",
-        slug : "/dashboard/contracts/vehiculo/form-add"
-      }
+        description : "Crea un nuevo contrat de compra/venta Vehiculos",
+        slug : "vehiculo",
+        icon : Car
+      },
+      {
+        title : "Agregar Asociacion",
+        description : "Crea un nuevo contrato de asociacion de empresa",
+        slug : "asociacion",
+        icon : User2
+      },
+
+      {
+        title : "Agregar Razon Social",
+        description : "Crea un nuevo contrato de Razon Social",
+        slug : "rs",
+        icon : FileText
+      },
+      {
+        title : "Agregar SAC",
+        description : "Crea un nuevo contrato de Sociedad Anonima Cerrada",
+        slug : "sac",
+        icon : Building
+      },
+      {
+        title : "Agregar SCRL",
+        description : "Crea un nuevo contrato de Sociedad Constitucion de Responsabilidad Limitada",
+        slug :"scrl",
+        icon : Handshake
+      },
+
     ];
-    const router = useRouter();
-  // const {data : dataContractsJunior, loading : loadingDataContractJunior} = useFetch(`${process.env.NEXT_PUBLIC_URL_ID_CONTRATOS_JUNIOR}`)
+
   return (
     <div className='p-6 space-y-6 h-full overflow-y-auto'>
       <div>
@@ -55,9 +67,11 @@ export default function ViewJuniorDashboard({
       </div>
       <section className='w-full grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 '>
         {
-          dataButtons?.map((butt)=><Button
-          onClick={()=>router.push(butt.slug)}
-          >{butt.title}</Button>)
+          dataButtons?.map((butt)=>
+            <RedirectButton
+              indicator={butt}
+            />
+          )
         }
       </section>
       <TableroContratosJunior

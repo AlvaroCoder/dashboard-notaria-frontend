@@ -14,7 +14,9 @@ const URL_GENERATE_SCRIPT_COMPRA_VENTA= process.env.NEXT_PUBLIC_URL_CREATE_COMPR
 const URL_GENERATE_SCRIPT_WATER_MAKER_CONSTITUTION = process.env.NEXT_PUBLIC_URL_CREATE_ESCRITURA_MARCA_AGUA;
 const URL_GET_DOCUMENT_BY_PATH=process.env.NEXT_PUBLIC_URL_GET_DOCUMENT_BY_PATH;
 const URL_ESTABLECER_FIRMA=process.env.NEXT_PUBLIC_URL_FIRMAR_DOCUMENTO;
-const URL_ACEPTAR_ESCRITURA =process.env.NEXT_PUBLIC_ACEPTAR_ESCRITURA;
+// const URL_ACEPTAR_ESCRITURA =process.env.NEXT_PUBLIC_ACEPTAR_ESCRITURA;
+const URL_SEND_MINUTA_WORD= process.env.NEXT_PUBLIC_URL_SEND_MINUTA_WORD;
+
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -163,6 +165,14 @@ export async function sendDataMinuta(dataMinuta) {
         redirect : 'follow'
     });
 }
+
+export async function sendMinutaWord(dataMinuta, idContract) {
+    return fetch(URL_SEND_MINUTA_WORD+idContract,{
+        method : 'POST',
+        body : dataMinuta,
+        redirect : 'follow'
+    })
+};
 
 export async function getMinutaFile(minutaDirectory) {
     return fetch(URL_GET_MINUTA,{

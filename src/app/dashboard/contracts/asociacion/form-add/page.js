@@ -1,18 +1,15 @@
 'use client';
-import { parseTextoToJSON } from '@/common/parserText';
 import Title1 from '@/components/elements/Title1';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
-import EditorView from '@/components/Views/EditorView';
-import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -62,16 +59,10 @@ function RenderApp({
   const {
     activeStep, 
     dataSelected,
-    fileLocation,
     handleClickClient,
     pushActiveStep,
-    handleChangeFileLocation
+    pushActive2Step
   } = useContracts();
-
-  const {
-    agregarBloques,
-    parserData
-  } = useEditorContext();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
   const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
@@ -134,10 +125,10 @@ function RenderApp({
   }
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minuta) {
+      if (!minutaWord || !minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -146,7 +137,7 @@ function RenderApp({
       };
       setLoading(true);
       const newFormData = new FormData();
-      newFormData.append('minutaFile', minuta);
+      newFormData.append('minutaFile', minutaPdf);
       const response = await sendDataMinuta(newFormData);
       const jsonResponseUpload =  await response.json();
       
@@ -172,7 +163,14 @@ function RenderApp({
         return;
       }
       const responsePreMinutaJSON = await responsePreMinuta?.json();
+      const idContract = responsePreMinutaJSON?.contractId;
 
+      const newFormDataWord = new FormData();
+      newFormDataWord.append('minutaFile', minutaWord);
+
+      const responseSendMinutaWord = await sendMinutaWord(newFormDataWord, idContract);
+      console.log(await responseSendMinutaWord.json());
+      
       setDataSendMinuta({
         ...dataSendMinuta,
         minuta : {
@@ -192,10 +190,27 @@ function RenderApp({
         position : 'bottom-right'
       });
       
-      pushActiveStep();
-      if (dataSession?.payload?.role) {
+      if (dataSession?.payload?.role === 'junior') {
+        const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+
+        if (!responseJuniorAsigned.ok || responseJuniorAsigned?.status === 404) {
+          toast("No se puede agregar mas carga",{
+            type : 'error',
+            position : 'bottom-right'
+          });
+          return;
+        }
+        toast("Se asigno el junior",{
+          type : 'info',
+          position : 'bottom-right'
+        });
+        pushActive2Step();
+
+      } else{
         pushActiveStep();
       }
+      
+      
     } catch (err) {
       console.log(err);
       toast("Error con la vista de minuta",{
@@ -226,7 +241,7 @@ function RenderApp({
         ...prev.header,
         [target?.name] : target.value
       }
-    }))
+    }));
   }
 
   const handleClickSenior=(senior)=>{
@@ -250,6 +265,13 @@ function RenderApp({
       setLoading(true);
       const response = await generateScriptContract('asociacion',dataSendMinuta);
       
+      if (!response.ok || response.status == 406) {
+        toast("Sucedio un error",{
+          type : 'error',
+          position : 'bottom-center'
+        });
+      }
+
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
@@ -323,7 +345,7 @@ function RenderApp({
     case 2:
       // Seleccionar que Junior se encargara de la tarea
       return(
-        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'> 
+        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 px-8 gap-2'> 
           <Suspense>
             {
               (loadingDataJuniors || loading) ?
@@ -379,7 +401,7 @@ function RenderApp({
     case 5:
       // Se pide la informacion del senior
       return(
-        <section className='w-full h-screen overflow-y-auto p-8 pb-24 flex flex-col gap-4'> 
+        <section className='w-full h-screen overflow-y-auto px-8 pb-24 flex flex-col gap-4'> 
           <Suspense fallback={<p>Cargando tabla ...</p>}>
             {
               loadingDataSeniors ?

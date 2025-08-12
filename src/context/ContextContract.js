@@ -11,7 +11,8 @@ const Contracts = React.createContext({
     handleTypeProces :()=>{},
     handleClickClient : ()=>{},
     handleClickJunior : ()=>{},
-    handleChangeFileLocation : ()=>{}
+    handleChangeFileLocation : ()=>{},
+    pushActive2Step : ()=>{}
 });
 
 
@@ -46,6 +47,9 @@ export default function ContractContext({
     const pushActiveStep=()=>{
         setActiveStep(activeStep+1);
     };
+    const pushActive2Step=()=>{
+        setActiveStep(activeStep+2);
+    }
 
     const changeLoading=()=>{
         setLoading(!loading);
@@ -71,7 +75,8 @@ export default function ContractContext({
                 handleTypeProces,
                 handleClickClient,
                 handleClickJunior,
-                handleChangeFileLocation
+                handleChangeFileLocation,
+                pushActive2Step
             }}
         >
             {children}

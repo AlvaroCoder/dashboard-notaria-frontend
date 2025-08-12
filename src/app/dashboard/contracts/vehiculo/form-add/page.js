@@ -26,7 +26,9 @@ const CardRequirements = dynamic(()=>import('@/components/Cards/CardRequirements
   ssr : false
 });
 
-function RenderCardsFormStepper() {
+function RenderCardsFormStepper({
+  dataSession
+}) {
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
   const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
 

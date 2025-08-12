@@ -7,24 +7,6 @@ import { toast } from 'react-toastify';
 import { RenderStepper } from './elements';
 import { cn } from '@/lib/utils';
 
-// Estado inicial para una persona
-const initialPersonState = {
-  firstName: '',
-  lastName: '',
-  dni: '',
-  gender: '',
-  nationality: '',
-  age: '',
-  job: '',
-  maritalStatus: { civilStatus: '' },
-  address: {
-    district: '',
-    province: '',
-    department: '',
-    name: '',
-  },
-};
-
 export default function FormStepper({
   tipoProceso = 'compra',
   handleSaveData = () => {},
@@ -35,8 +17,40 @@ export default function FormStepper({
   const [activeStep, setActiveStep] = useState(0);
   const [errores, setErrores] = useState([]);
 
-  const [compradores, setCompradores] = useState([{...initialPersonState}]);
-  const [vendedores, setVendedores] = useState([{...initialPersonState}]);
+  const [compradores, setCompradores] = useState([
+    {
+      firstName: '',
+      lastName: '',
+      dni: '',
+      gender: '',
+      nationality: '',
+      age: '19',
+      job: '',
+      maritalStatus: { civilStatus: '' },
+      address: {
+        district: '',
+        province: '',
+        department: '',
+        name: '',
+      },
+    }
+  ]);
+  const [vendedores, setVendedores] = useState([{
+    firstName: '',
+    lastName: '',
+    dni: '',
+    gender: '',
+    nationality: '',
+    age: '19',
+    job: '',
+    maritalStatus: { civilStatus: '' },
+    address: {
+      district: '',
+      province: '',
+      department: '',
+      name: '',
+    },
+  }]);
 
   const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
   const data = useMemo(() => ({ compradores, vendedores }), [compradores, vendedores]);
@@ -48,26 +62,70 @@ export default function FormStepper({
     }
   }, []);
 
-  const handleChange = useCallback((index, field, value, personType) => {
+  const handleChange = useCallback((index, field, value, personType, bienesMancomunados = false) => {
     setData(personType, (prevData) => {
       const list = [...prevData];
+  
+      // Asegurar que el objeto existe
+      if (!list[index]) list[index] = {};
+      if (!list[index].address) list[index].address = {};
+      if (!list[index].maritalStatus) list[index].maritalStatus = {};
+  
+      // Estado Civil
       if (field === 'maritalStatus') {
         list[index].maritalStatus.civilStatus = value?.toLowerCase();
-      } else if (field === 'district' || field === 'province' || field === 'department') {
-        list[index]['address'][field] = value
+        const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
+        if (isCasado) {
+          list[index].maritalStatus.marriageType = { type: bienesMancomunados ? 1 : 2 };
+        }
       } 
+      
+      // Campos del cónyuge
+      else if (field?.startsWith("spouse-")) {
+        const fieldForm = field.split("-")[1];
+        if (!list[index].maritalStatus.spouse) {
+          list[index].maritalStatus.spouse = {};
+        }
+        list[index].maritalStatus.spouse[fieldForm] = value;
+      } 
+      
+      // Campos de dirección
+      else if (['district', 'province', 'department'].includes(field)) {
+        list[index].address[field] = value;
+      } 
+      
       else if (field === 'address') {
-        list[index]['address']['name'] = value;
+        list[index].address.name = value;
       } 
+      
+      // Resto de campos
       else {
         list[index][field] = value;
       }
+  
       return list;
     });
   }, [setData]);
 
   const addPerson = useCallback((personType) => {
-    setData(personType, (prevData) => [...prevData, initialPersonState]);
+    setData(personType, (prevData) => [...prevData, 
+      {
+        firstName: '',
+        lastName: '',
+        dni: '',
+        gender: '',
+        nationality: '',
+        age: '19',
+        job: '',
+        maritalStatus: { civilStatus: '' },
+        address: {
+          district: '',
+          province: '',
+          department: '',
+          name: '',
+        },
+      }
+    ]);
   }, [setData]);
 
   const deletePerson = useCallback((idx, personType) => {
@@ -88,6 +146,7 @@ export default function FormStepper({
 
     // Lógica de validación
     const validationErrors = checkEmptyFieldsFormCompra(dataToValidate);
+    
     if (validationErrors.length > 0) {
       setErrores(validationErrors);
       toast('Formulario incompleto', { type: 'error' });

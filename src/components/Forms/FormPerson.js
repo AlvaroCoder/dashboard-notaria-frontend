@@ -8,8 +8,8 @@ import Title1 from '../elements/Title1';
 import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const getMaritalOptions = (gender) => {
-    if (gender === 'Femenino') return ['soltera', 'casada', 'viuda', 'divorciada'];
-    if (gender === 'Masculino') return ['soltero', 'casado', 'viudo', 'divorciado'];
+    if (gender === 'F') return ['soltera', 'casada', 'viuda', 'divorciada'];
+    if (gender === 'M') return ['soltero', 'casado', 'viudo', 'divorciado'];
     return [];
 };
 
@@ -19,12 +19,13 @@ export default function FormPerson({
     type='venta',
     handleDelete=()=>{},
     errores=[],
+
 }) {
     const nombreProceso = type === 'venta' ? 'Vendedor' : 'Comprador';
     const [bienesMancomunados, setBienesMancomunados] = useState(true);
 
   return data?.map((person, idx)=>
-        <section key={idx} className={cn('min-w-3xl relative h-fit', 'bg-white shadow rounded-lg ', person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada' ? 'flex flex-row' : '')}>
+        <section key={idx} className={cn('min-w-3xl relative h-fit mt-6', 'bg-white shadow rounded-lg ')}>
             {
                 idx > 0 &&
                 <Button 
@@ -44,6 +45,7 @@ export default function FormPerson({
                     />
                 </div>
             }
+            <section className={cn(person?.maritalStatus?.civilStatus === 'casado' || person?.maritalStatus?.civilStatus === 'casada' ? 'flex flex-row' : '', 'flex-1 ')}>
             <div className='flex-1 p-8 mb-6'>
                 <div className='mb-4'>
                     <Title1 className='text-2xl'>{nombreProceso} {idx+1}</Title1>
@@ -60,12 +62,11 @@ export default function FormPerson({
                             label="Genero"
                             onChange={(e)=>handleChange(idx, 'gender', e.target.value, type)}
                         >
-                            <MenuItem value="Masculino">Masculino</MenuItem>
-                            <MenuItem value="Femenino">Femenino</MenuItem>
+                            <MenuItem value="M">Masculino</MenuItem>
+                            <MenuItem value="F">Femenino</MenuItem>
                         </Select>
                     </FormControl>
                     <TextField label="Nacionalidad" value={person.nationality} onChange={(e) => handleChange(idx, 'nationality', e.target.value, type)}  fullWidth required />
-                    <TextField label="Edad" name="age" type="number" value={person.age} onChange={(e) => handleChange(idx, 'age', e.target.value, type)} fullWidth required/>
                     <TextField label="Trabajo" value={person.job} onChange={(e) => handleChange(idx, 'job', e.target.value, type)} fullWidth  required/>
                     <section className='w-full flex flex-row gap-2'>
                         <FormControl fullWidth>
@@ -99,15 +100,17 @@ export default function FormPerson({
                 
             </div>
             {
-                (person?.maritalStatus?.value === 'Casado' || person?.maritalStatus?.value === 'Casada') && (
+                (person?.maritalStatus?.civilStatus === 'casado' || person?.maritalStatus?.civilStatus === 'casada') && (
                     <section className='flex-1 p-8 mb-6 border-l border-gray-200'>
                         <Title1 className='text-2xl'>Información del Conyuge</Title1>
                         <p className='text-sm'>Información del conyuge del {nombreProceso}</p>
                         <div className='grid grid-cols-2 gap-4 mt-2'>
                             <Button
                                 variant={bienesMancomunados ? "" : "outline"}
-                                onClick={()=>setBienesMancomunados(true)}
-
+                                onClick={()=>{
+                                    //addSpouseData(type);
+                                    setBienesMancomunados(true)
+                                }}
                             >
                                 Con bienes mancomunados
                             </Button>
@@ -118,25 +121,36 @@ export default function FormPerson({
                                 Con bienes separados
                             </Button>
                         </div>
-                        <div className='grid grid-cols-2 gap-4 mt-8'>
-                            <TextField disabled={!bienesMancomunados} label="Primer Nombre" />
-                            <TextField disabled={!bienesMancomunados} label="Apellido" />
-                            <TextField disabled={!bienesMancomunados} label="DNI" type='number' />
-                            <FormControl disabled={true}>
+                        {
+                            bienesMancomunados ? 
+                            <div className='grid grid-cols-2 gap-4 mt-8'>
+                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-firstName', e.target.value, type, bienesMancomunados)} label="Primer Nombre" />
+                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-lastName', e.target.value, type, bienesMancomunados)} label="Apellido" />
+                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-dni', e.target.value, type, bienesMancomunados)} label="DNI" type='number' />
+                                <FormControl>
                                 <InputLabel>Género</InputLabel>
-                                <Select value={person?.gender}>
-                                <MenuItem value={person?.gender}>{person?.gender === 'Masculino' ? 'Femenino' : 'Masculino'}</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <TextField disabled={!bienesMancomunados} label="Nacionalidad"  />
-                            <TextField disabled={!bienesMancomunados} label="Edad" />
-                            <TextField disabled={!bienesMancomunados} label="Trabajo"  />
-    
-
-                        </div>
+                                    <Select
+                                        onChange={(e) =>
+                                        handleChange(idx, 'spouse-gender', e.target.value, type, bienesMancomunados)
+                                        }
+                                        value={person?.maritalStatus?.spouse?.gender || ''}
+                                    >
+                                        <MenuItem value="M">Masculino</MenuItem>
+                                        <MenuItem value="F">Femenino</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-nationality', e.target.value, type, bienesMancomunados)}  label="Nacionalidad"  />
+                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-job', e.target.value, type, bienesMancomunados)}  label="Trabajo" className='col-span-2' />
+                            </div> : 
+                            <div className='grid grid-cols-1 gap-4 mt-8'>
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-partidaRegistralNumber', e.target.value, type, bienesMancomunados)} label="Nro Partida Registral" type='number'/>
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-province', e.target.value, type, bienesMancomunados)} label="Provincia de la Boda" type='text' />
+                            </div>
+                        }
                     </section>
                 )
             }
+            </section>
         </section>
     )
 }
