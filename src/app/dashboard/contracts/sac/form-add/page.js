@@ -1,17 +1,15 @@
 'use client';
-import { parseTextoToJSON } from '@/common/parserText';
 import Title1 from '@/components/elements/Title1';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
-import EditorView from '@/components/Views/EditorView';
 import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -62,6 +60,7 @@ function RenderApp({
     fileLocation,
     handleClickClient,
     pushActiveStep,
+    pushActive2Step,
     handleChangeFileLocation
   } = useContracts();
 
@@ -131,10 +130,10 @@ function RenderApp({
   }
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minuta) {
+      if (!minutaWord || !minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -143,7 +142,7 @@ function RenderApp({
       };
       setLoading(true);
       const newFormData = new FormData();
-      newFormData.append('minutaFile', minuta);
+      newFormData.append('minutaFile', minutaPdf);
       const response = await sendDataMinuta(newFormData);
       const jsonResponseUpload =  await response.json();
       
@@ -169,6 +168,12 @@ function RenderApp({
       }
 
       const responsePreMinutaJSON = await responsePreMinuta?.json();
+      const idContract = responsePreMinutaJSON?.contractId;
+
+      const newFormDataWord = new FormData();
+      newFormDataWord.append('minutaFile', minutaWord);
+
+      await sendMinutaWord(newFormDataWord, idContract);
 
       agregarBloques(parserText?.data);
       setDataSendMinuta({
@@ -191,9 +196,23 @@ function RenderApp({
         position : 'bottom-right'
       });
 
-      pushActiveStep();
-
       if (dataSession?.payload?.role === 'junior') {
+        const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+        
+        if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 404) {
+          toast("No se puede agregar mas carga",{
+            type : 'error',
+            position : 'bottom-right'
+          });
+          return
+        }
+        toast("Se asigno el junior",{
+          type : 'info',
+          position : 'bottom-right'
+        });
+         
+        pushActive2Step();
+      } else {
         pushActiveStep();
       }
     
@@ -208,57 +227,6 @@ function RenderApp({
       setLoading(false);
     }
 
-  }
-
-  const handleSubmitPreMinuta=async()=>{
-    try {
-      setLoading(true);
-      const dataParseada = parserData();
-
-      const JSONPreMinuta = {
-        clientId : dataSelected?.client?.id,
-        processPayment : "Pago a la mitad",
-        minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-        datesDocument : {
-          processInitiate : formatDateToYMD(new Date())
-        },
-        directory : `DB_evidences/${fileLocation?.directory}`
-      }
-
-      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'sac');
-      if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
-        toast("Error al momento de subir la informacion",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return;
-      }
-      const responsePreMinutaJSON = await responsePreMinuta?.json();
-      
-      setDataSendMinuta((prev)=>({
-        ...dataSendMinuta,
-        minuta : {
-          ...prev?.minuta,
-          minutaContent : {
-            data : dataParseada
-          }
-        },
-        contractId : responsePreMinutaJSON?.contractId
-      }));
-
-      toast("Se creo el proceso",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      pushActiveStep();
-    } catch (err) {      
-      toast("Hubo un error en iniciar el proceso",{
-        type : 'error',
-        position : 'bottom-center'
-      });
-    } finally {
-      setLoading(false);
-    }
   }
 
   const handleSubmitFormStepperPerson=(dataFounder)=>{

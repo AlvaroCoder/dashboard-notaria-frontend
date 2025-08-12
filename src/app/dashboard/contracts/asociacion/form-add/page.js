@@ -9,7 +9,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -152,7 +152,7 @@ function RenderApp({
           },
           directory : `DB_evidences/${fileLocation?.directory}`,
           case : dataSendMinuta?.case
-      }
+      };
 
       const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'asociacion');
       if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
@@ -168,8 +168,7 @@ function RenderApp({
       const newFormDataWord = new FormData();
       newFormDataWord.append('minutaFile', minutaWord);
 
-      const responseSendMinutaWord = await sendMinutaWord(newFormDataWord, idContract);
-      console.log(await responseSendMinutaWord.json());
+      await sendMinutaWord(newFormDataWord, idContract);
       
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -262,7 +261,7 @@ function RenderApp({
 
   const handleSubmitData=async()=>{
     try {
-      setLoading(true);
+      setLoading(true);      
       const response = await generateScriptContract('asociacion',dataSendMinuta);
       
       if (!response.ok || response.status == 406) {
@@ -270,6 +269,7 @@ function RenderApp({
           type : 'error',
           position : 'bottom-center'
         });
+        return;
       }
 
       const blobResponse = await response.blob();
@@ -391,6 +391,7 @@ function RenderApp({
               handleChangeHeader={handleChangeHeader}
             />
             <Button 
+              
               onClick={()=>pushActiveStep()}
               className={'w-full mt-4'}>
               Continuar
@@ -435,7 +436,7 @@ function RenderApp({
             }
 
             <Button
-              disabled={!notarioSelected}
+              disabled={!notarioSelected || loading}
               onClick={handleSubmitData}
               className={'w-full mt-4'}
             > 

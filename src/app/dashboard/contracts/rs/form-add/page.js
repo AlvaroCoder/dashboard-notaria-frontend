@@ -6,13 +6,12 @@ import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
-import EditorView from '@/components/Views/EditorView';
 import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -61,17 +60,11 @@ function RenderApp({
   const {
     activeStep, 
     dataSelected,
-    fileLocation,
     handleClickClient,
     pushActiveStep,
-    changeLoading,
+    pushActive2Step,
     handleChangeFileLocation
   } = useContracts();
-
-  const {
-    agregarBloques,
-    parserData
-  } = useEditorContext();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
   const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
@@ -80,19 +73,16 @@ function RenderApp({
   const {
     data : dataClientes,
     loading: loadingDataClientes,
-    error : errorDataClientes
   } = useFetch(URL_GET_DATA_CLIENTES);
 
   const {
     data : dataJuniors,
     loading : loadingDataJuniors,
-    error : errorDataJuniors,
   } = useFetch(URL_GET_DATA_JUNIORS);
 
   const {
     data : dataSeniors,
     loading : loadingDataSeniors,
-    error : errroDataSeniors
   } = useFetch(URL_GET_DATA_SENIORS);
 
   const handleClickSelectClient=(client)=>{
@@ -137,10 +127,10 @@ function RenderApp({
   }
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minuta) {
+      if (!minutaWord || !minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -149,7 +139,7 @@ function RenderApp({
       };
       setLoading(true);
       const newFormData = new FormData();
-      newFormData.append('minutaFile', minuta);
+      newFormData.append('minutaFile', minutaPdf);
       const response = await sendDataMinuta(newFormData);
       const jsonResponseUpload =  await response.json();
       
@@ -163,7 +153,8 @@ function RenderApp({
           processInitiate : formatDateToYMD(new Date())
         },
         directory : `DB_evidences/${fileLocation?.directory}`
-      }
+      };
+
       const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'rs');
       if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
         toast("Error al momento de subir la informacion",{
@@ -173,8 +164,12 @@ function RenderApp({
         return;
       }
       const responsePreMinutaJSON = await responsePreMinuta?.json();
+      const idContract = responsePreMinutaJSON?.contractId;
 
-      handleChangeFileLocation(fileLocation);
+      const newFormDataWord = new FormData();
+      newFormDataWord.append('minutaFile', minutaWord);
+      
+      await sendMinutaWord(newFormDataWord, idContract);
 
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -190,9 +185,30 @@ function RenderApp({
         },
         contractId : responsePreMinutaJSON?.contractId
       });
+      
+      toast("Se creo el proceso",{
+        type : 'success',
+        position : 'bottom-right'
+      });
 
-      pushActiveStep();
       if (dataSession?.payload?.role === 'junior') {
+        const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+
+        if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 404) {
+          toast("No se puede agregar mas carga",{
+            type : 'error',
+            position : 'bottom-right'
+          });
+          return;
+        }
+
+        toast("Se asigno el junior",{
+          type : 'info',
+          position : 'bottom-right'
+        });
+        pushActive2Step();
+
+      } else {
         pushActiveStep();
       }
 
@@ -210,6 +226,8 @@ function RenderApp({
   }
 
   const handleSubmitFormStepperPerson=(dataFounder)=>{
+    console.log(dataFounder);
+    
     setDataSendMinuta({
       ...dataSendMinuta,
       founders : {
@@ -272,7 +290,7 @@ function RenderApp({
     case 0:
       // Primer paso definir el cliente que va a realizar el proceso
       return(
-        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
+        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 px-8 gap-2'>
            <TableSelectedUser
             title='Selecciona un cliente'
             descripcion='Tabla de clientes, selecciona uno para continuar'
@@ -288,7 +306,7 @@ function RenderApp({
     case 1:
       // Se sube la minuta
       return (
-        <section className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
+        <section className='px-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
           <FormUploadMinuta2
             loading={loading}
             handleUploadMinuta={handleUploadMinuta}
@@ -314,7 +332,7 @@ function RenderApp({
     case 2:
       // Seleccionar que Junior se encargara de la tarea
       return(
-        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'> 
+        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 px-8 gap-2'> 
           <Suspense>
             {
               (loadingDataJuniors || loading) ?
@@ -404,7 +422,7 @@ function RenderApp({
             }
 
             <Button
-              disabled={!notarioSelected}
+              disabled={!notarioSelected || loading}
               onClick={handleSubmitData}
               className={'w-full mt-4'}
             > 

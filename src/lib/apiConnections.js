@@ -16,7 +16,7 @@ const URL_GET_DOCUMENT_BY_PATH=process.env.NEXT_PUBLIC_URL_GET_DOCUMENT_BY_PATH;
 const URL_ESTABLECER_FIRMA=process.env.NEXT_PUBLIC_URL_FIRMAR_DOCUMENTO;
 // const URL_ACEPTAR_ESCRITURA =process.env.NEXT_PUBLIC_ACEPTAR_ESCRITURA;
 const URL_SEND_MINUTA_WORD= process.env.NEXT_PUBLIC_URL_SEND_MINUTA_WORD;
-
+const URL_SUBIR_EVIDENCIAS_SIN_DIR = process.env.NEXT_PUBLIC_URL_UPLOAD_EVIDENCE_WITHOUT_DIR;
 
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
@@ -140,7 +140,13 @@ export async function subirEvidencias(evidencias=[], directory='') {
     return Promise.all(responsesEvidences);
 }
 
-
+export async function subirEvidenciasSinDirectorio(dataImagesMinuta) {
+    return await fetch(URL_SUBIR_EVIDENCIAS_SIN_DIR,{
+        method : 'POST',
+        body : dataImagesMinuta,
+        redirect : 'follow'
+    })
+}
 
 export async function getDataContractByTypeContract(typeContract) {
     return fetch(`${URL_CONTRACTS}/${typeContract}`,{

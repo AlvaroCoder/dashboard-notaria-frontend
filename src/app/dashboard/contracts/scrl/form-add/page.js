@@ -11,7 +11,8 @@ import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, submitDataPreMinuta } from '@/lib/apiConnections';
+import { useSession } from '@/hooks/useSesion';
+import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -61,6 +62,7 @@ function RenderApp({
     dataSelected,
     handleClickClient,
     pushActiveStep,
+    pushActive2Step,
   } = useContracts();
 
 
@@ -128,10 +130,10 @@ function RenderApp({
   }
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minuta, detailsMinuta)=>{
+  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minuta) {
+      if (!minutaPdf || !minutaWord) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -140,7 +142,7 @@ function RenderApp({
       };
       setLoading(true);
       const newFormData = new FormData();
-      newFormData.append('minutaFile', minuta);
+      newFormData.append('minutaFile', minutaPdf);
       const response = await sendDataMinuta(newFormData);
       const jsonResponseUpload =  await response.json();
       
@@ -165,7 +167,13 @@ function RenderApp({
         return;
       }
       const responsePreMinutaJSON = await responsePreMinuta?.json();
-      
+      const idContract = responsePreMinutaJSON?.contractId;
+
+      const newFormDataWord = new FormData();
+      newFormDataWord.append('minutaFile', minutaWord);
+
+      await sendMinutaWord(newFormDataWord, idContract);
+
       setDataSendMinuta({
         ...dataSendMinuta,
         minuta : {
@@ -186,10 +194,26 @@ function RenderApp({
         position : 'bottom-right'
       });
 
-      pushActiveStep();
       if (dataSession?.payload?.role === 'junior') {
+        const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+
+        if (!responseJuniorAsigned.ok || responseJuniorAsigned?.status === 404) {
+          toast("No se puede agregar mas carga",{
+            type : 'error',
+            position : 'bottom-right'
+          });
+          return;
+        }
+        toast("Se asigno el junior",{
+          type : 'info',
+          position : 'bottom-right'
+        });
+        pushActive2Step();
+
+      } else{
         pushActiveStep();
       }
+
     } catch (err) {
       console.log(err);
       toast("Error con la vista de minuta",{
@@ -209,11 +233,13 @@ function RenderApp({
       founders : {
         people : dataFounder
       }
-    })
+    });
     pushActiveStep();    
   }
 
   const handleChangeHeader=(e)=>{
+
+    
     const target = e.target;
     setDataSendMinuta((prev)=>({
       ...dataSendMinuta,
@@ -363,7 +389,11 @@ function RenderApp({
               data={dataSendMinuta}
             />
             <Button 
-              onClick={()=>pushActiveStep()}
+              onClick={()=>{
+                console.log(dataSendMinuta);
+                
+                pushActiveStep()
+              }}
               className={'w-full mt-4'}>
               Continuar
             </Button>
@@ -429,6 +459,7 @@ function RenderApp({
 
 export default function Page() {
   const {loading} = useContracts();
+  const {dataSession} = useSession();
   if (loading) {
     return (<p>Cargando ...</p>)
   }
@@ -439,7 +470,9 @@ export default function Page() {
             <Title1 className='text-3xl'>Nuevo Contrato de constitucion de Constitución de Sociedad Comercial de Responsabilidad Limitada (SCRL)</Title1>
             <p className='text-gray-600 text-sm'>Genera la escritura de la SCRL</p>
         </section>
-        <RenderApp/>
+        <RenderApp
+          dataSession={dataSession}
+        />
       </main>
     )
   }

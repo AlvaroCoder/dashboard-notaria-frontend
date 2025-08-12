@@ -26,9 +26,7 @@ export function useFetch(URL="") {
                     return;
                 }
 
-                const jsonResponse = await response.json();          
-                console.log(jsonResponse);
-                
+                const jsonResponse = await response.json();                          
                 setData(jsonResponse);
 
             } catch (err) {

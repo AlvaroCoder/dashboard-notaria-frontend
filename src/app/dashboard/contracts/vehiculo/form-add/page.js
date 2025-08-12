@@ -1,5 +1,7 @@
 'use client';
+import CardAviso from '@/components/Cards/CardAviso';
 import CardNotarioSelected from '@/components/Cards/CardNotarioSelected';
+import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import Title1 from '@/components/elements/Title1';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
@@ -9,9 +11,10 @@ import { useContracts } from '@/context/ContextContract';
 import { cardDataVehiculos } from '@/data/CardData';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
-import { generateScriptCompraVenta } from '@/lib/apiConnections';
+import { useSession } from '@/hooks/useSesion';
+import { generateScriptCompraVenta, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
-import { Divider, TextField } from '@mui/material';
+import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react'
@@ -46,6 +49,7 @@ function RenderCardsFormStepper({
     pushActiveStep,
   } = useContracts();
 
+  const [imagesMinuta, setImagesMinuta] = useState([]);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({
     header : {
@@ -72,6 +76,10 @@ function RenderCardsFormStepper({
       number : "",
       place : ""
     }
+  },
+  payment : {
+    unit : 'dollar',
+    amount : ''
   }
   });
   
@@ -145,6 +153,63 @@ function RenderCardsFormStepper({
     }));
   }
 
+  const handleChangeImageMinuta=(files)=>{
+    setImagesMinuta([
+      ...imagesMinuta,
+      files
+    ]);
+  }
+
+  const handleChangeDeleteImageMinuta=(idx)=>{
+    const newDataImage = imagesMinuta?.filter((_, index)=>index!== idx);
+    setImagesMinuta(newDataImage);
+  }
+
+  const handleClickEvidences=async(e)=>{
+    e.preventDefault();
+    try {
+      console.log(imagesMinuta);
+      
+      if (imagesMinuta.length === 0) {
+        setDataSendMinuta({
+          ...dataSendMinuta,
+          paymentMethod : null
+        });
+        pushActiveStep();
+        return;
+      }
+      setLoading(true);
+      const formDataImages = new FormData();
+      imagesMinuta.forEach((image)=>{
+        formDataImages.append('evidence', image[0]);
+      });
+
+      const response = await subirEvidenciasSinDirectorio(formDataImages);
+      const fileLocation = (await response.json())?.fileLocation;
+      
+      const evidencesList = fileLocation?.fileNames?.map((file)=>{
+        return `DB_evidences/${fileLocation?.directory}/${file[0]}`
+      });
+      setDataSendMinuta((prev)=>({
+        ...dataSendMinuta,
+        paymentMethod : {
+          ...prev?.paymentMethod,
+          evidences : evidencesList
+        }
+      }));
+
+      toast("Imagenes subidas correctamente",{
+        type : 'success',
+        position : 'bottom-right'
+      });
+      pushActiveStep();
+    } catch (err) {
+      console.log(err);
+      
+    } finally{ 
+      setLoading(false);
+    }
+  }
   const handleSubmitData=async()=>{
     try {
       setLoading(true);
@@ -173,6 +238,16 @@ function RenderCardsFormStepper({
       setLoading(false);
     }
   }
+  const handleChangePaymentForm = (field, value) => {
+    // notifica al padre
+    setDataSendMinuta((prev)=>({
+      ...dataSendMinuta,
+      payment : {
+        ...prev.payment,
+        [field] : value
+      }
+    }))
+  };
   switch (activeStep) {
     case 0:
       return(
@@ -210,11 +285,68 @@ function RenderCardsFormStepper({
       )
     case 3:
       return(
+        <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
+          <section className='my-2'>
+              <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
+              <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG (No obligatorio)</p>
+          </section>
+          <ButtonUploadImageMinuta
+            handleChangeImage={handleChangeImageMinuta}
+            handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
+          />
+          {
+            imagesMinuta?.length > 0 &&
+            <div className='w-full mt-8'>
+              <section>
+                <Title1>Ejemplo de lo que debes de subir </Title1>
+                <CardAviso
+                  advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
+                />
+              </section>
+              <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth />
+            </div>
+          }
+          <Button
+            disabled={loading}
+            className={"w-full mt-6"}
+            onClick={handleClickEvidences}
+          >
+            {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
+          </Button>
+        </section>
+      )
+    case 4:
+      return(
         <section className='w-full flex justify-center'>
           <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
             <section>
               <Title1 className='text-3xl'>Información Restante</Title1>
               <p>Ingresa la información restantes para generar la escritura</p>
+            </section>
+            <section className='my-2'>
+              <Title1>Información del pago</Title1>
+              <div className='flex flex-row gap-4 w-full'>
+                <FormControl  className="min-w-[300px]">
+                  <InputLabel>Moneda</InputLabel>
+                  <Select
+                    value={dataSendMinuta?.payment.unit}
+                    onChange={(e) => handleChangePaymentForm("unit", e.target.value)}
+                  >
+                    <MenuItem value="soles">Soles</MenuItem>
+                    <MenuItem value="dollar">Dólares</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {/* Input de Monto */}
+                <TextField
+                  label="Monto"
+                  type="number"
+
+                  value={dataSendMinuta?.payment.amount}
+                  onChange={(e) => handleChangePaymentForm("amount", parseFloat(e.target.value) || 0)}
+                  fullWidth
+                />
+              </div>
             </section>
             <section className='my-2'>
               <Title1 className=''>Información del Vehiculo</Title1>
@@ -240,6 +372,7 @@ function RenderCardsFormStepper({
                 />  
               </section>
             </section>
+            
             <FormHeaderInformation
               data={dataSendMinuta}
               handleChangeHeader={handleChangeHeader}
@@ -253,7 +386,7 @@ function RenderCardsFormStepper({
           </div>
         </section>
       )
-    case 4:
+    case 5:
       return(
         <section className='flex flex-col gap-4'>
           <TableSelectedUser
@@ -280,7 +413,7 @@ function RenderCardsFormStepper({
           </Button>
         </section>
       )
-    case 5:
+    case 6:
       return(
         <FormViewerPdfEscritura
           viewerPdf={viewPdf}
@@ -290,9 +423,12 @@ function RenderCardsFormStepper({
 }
 
 export default function Page() {
+  const {dataSession} = useSession();
   return (
     <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-      <RenderCardsFormStepper/>
+      <RenderCardsFormStepper
+        dataSession={dataSession}
+      />
     </section>
   )
 };

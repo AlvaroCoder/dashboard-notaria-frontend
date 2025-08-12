@@ -63,6 +63,8 @@ export default function Page() {
       router.push('/dashboard');
 
     } catch (err) {
+      console.log(err);
+      
       toast('Ocurrio un error con el servidor', {
         type : 'error',
         position : 'bottom-right'
