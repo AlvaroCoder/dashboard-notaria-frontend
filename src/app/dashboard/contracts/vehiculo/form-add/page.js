@@ -52,6 +52,7 @@ function RenderCardsFormStepper({
   const [imagesMinuta, setImagesMinuta] = useState([]);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({
+    contractId : '',
     header : {
       numeroDocumentoNotarial : "",
       numeroRegistroEscritura : '',
@@ -186,10 +187,13 @@ function RenderCardsFormStepper({
 
       const response = await subirEvidenciasSinDirectorio(formDataImages);
       const fileLocation = (await response.json())?.fileLocation;
+      console.log(fileLocation);
       
       const evidencesList = fileLocation?.fileNames?.map((file)=>{
-        return `DB_evidences/${fileLocation?.directory}/${file[0]}`
+        return `DB_evidences/${fileLocation?.directory}/${file}`
       });
+      console.log(evidencesList);
+      
       setDataSendMinuta((prev)=>({
         ...dataSendMinuta,
         paymentMethod : {
