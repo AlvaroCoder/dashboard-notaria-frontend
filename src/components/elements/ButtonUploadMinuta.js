@@ -4,6 +4,7 @@ import { useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 export default function UploadMinuta({
+    dataPreview=null,
     handleSetFile
 }) {
   const [file, setFile] = useState(null);
@@ -43,11 +44,11 @@ export default function UploadMinuta({
         />
       </label>
 
-      {previewUrl && (
+      {(previewUrl || dataPreview) && (
         <div className="mt-6">
           <h3 className="text-md font-semibold text-negro mb-2">Vista previa del PDF:</h3>
           <iframe
-            src={previewUrl}
+            src={previewUrl || dataPreview}
             className="w-full h-96 border rounded"
             title="Vista previa del PDF"
           />

@@ -12,12 +12,16 @@ import UploadMinuta from '../elements/ButtonUploadMinuta';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
-    loading=false
+    loading=false,
+    dataPreviewPdf=null,
+    dataPreviewWord=null,
+    numberMinuta='',
+    districtPlaceMinuta=''
 }) {
     const [detailsMinuta, setDetailsMinuta] = useState({
-        number : '',
+        number : numberMinuta,
         namePlace : 'Notaria Rojas',
-        districtPlace : ''
+        districtPlace : districtPlaceMinuta
     });
     const [minuta, setMinuta] = useState(null);
     const [minutaPdf, setMinutaPdf] = useState(null);
@@ -70,6 +74,7 @@ export default function FormUploadMinuta2({
                     />
                 </div>
                 <UploadMinuta
+                    dataPreview={dataPreviewPdf}
                     handleSetFile={(data)=>setMinutaPdf(data)}
                 />
             </section>
@@ -86,10 +91,10 @@ export default function FormUploadMinuta2({
                 </div>
                 
                 <ButtonUploadWord
+                    dataPreview={dataPreviewWord}
                     handleSetFile={(data)=>setMinuta(data)}
                 />
                 <Button
-                    disabled={!minuta}
                     className='mt-4 w-full'
                     onClick={()=>handleUploadMinuta(minuta, detailsMinuta, minutaPdf)}
                 >

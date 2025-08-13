@@ -21,6 +21,8 @@ import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinu
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import { useSession } from '@/hooks/useSesion';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
+import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
+import CardAviso from '@/components/Cards/CardAviso';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -40,16 +42,11 @@ function RenderCardsFormStepper({
     dataSession
 }) {
     const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
-    const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
     const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
 
     const {
         data : dataClientes, 
     } = useFetch(URL_GET_DATA_CLIENTES);
-
-    const {
-        data : dataJuniors
-    } = useFetch(URL_GET_DATA_JUNIORS);
 
     const {
         data : dataSeniors 
@@ -61,6 +58,7 @@ function RenderCardsFormStepper({
         fileLocation,
         handleClickClient,
         pushActiveStep,
+        backActiveStep,
         pushActive2Step
     } = useContracts();
 
@@ -83,7 +81,22 @@ function RenderCardsFormStepper({
                 number : '1125V',
                 serie : "C"
             }
+        },
+        minuta : {
+            minutaNumber : '',
+            creationDay : {
+            date : formatDateToYMD(new Date())
+            },
+            place : {
+            name : 'Notaria Rojas',
+            district : ''
+            }
         }
+    });
+
+    const [dataMinuta, setDataMinuta] = useState({
+        minutaPdf : null,
+        minutaWord : null,
     });
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [viewPdf, setViewPdf] = useState(null);
@@ -115,45 +128,12 @@ function RenderCardsFormStepper({
                 return;
             }
             setLoading(true);
-        
-            const newFormData = new FormData();
-            newFormData.append('minutaFile', minutaPdf);
-
-            const response = await sendDataMinuta(newFormData);
-            const jsonResponseUpload = await response.json();
-
-            const fileLocation = jsonResponseUpload?.fileLocation;
-
-            const JSONPreMinuta = {
-                clientId : dataSelected?.client?.id,
-                processPayment : "Pago a la mitad",
-                minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-                datesDocument : {
-                    processInitiate : formatDateToYMD(new Date())
-                },
-                directory : `DB_evidences/${fileLocation?.directory}`,
-                case : dataSendMinuta?.case
-            };
-   
-            const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, 'propertyCompraVenta');
-            if (!responsePreMinuta?.ok || responsePreMinuta?.status === 422) {
-                toast("Error al subir la informacion",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                console.log(await responsePreMinuta.json());
-                
-                return;
-            }
-            const responsePreMinutaJSON = await responsePreMinuta?.json();
-            const idContract = responsePreMinutaJSON?.contractId;
-
-            const newFormDataWord = new FormData();
-            newFormDataWord.append("minutaFile", minutaWord);
-
-            const responseSendMinutaWord = await sendMinutaWord(newFormDataWord, idContract)
-            console.log(await responseSendMinutaWord?.json());
             
+            setDataMinuta({
+                minutaPdf : minutaPdf,
+                minutaWord : minutaWord
+            });
+
             setDataSendMinuta({
                 ...dataSendMinuta,
                 minuta : {
@@ -165,36 +145,15 @@ function RenderCardsFormStepper({
                         name : detailsMinuta?.namePlace,
                         district : detailsMinuta?.districtPlace
                     }
-                },
-                contractId : idContract
+                }
             });
+
+            pushActiveStep();
 
             toast("Se creo el proceso",{
                 type : 'success',
                 position : 'bottom-right'
             });
-
-            
-            if (dataSession?.payload?.role === 'junior') {
-                
-                const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
-                console.log(await responseJuniorAsigned.json());
-                
-                if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 404) {
-                    toast("No se puede agregar mas carga",{
-                        type : 'error',
-                        position : 'bottom-right'
-                    });
-                    return;
-                }
-                toast("Se asigno el junior",{
-                    type : 'info',
-                    position : 'bottom-right'
-                })
-                pushActive2Step();
-            } else {
-                pushActiveStep();
-            }
             
         } catch (err) {
             console.log(err);
@@ -206,34 +165,6 @@ function RenderCardsFormStepper({
             setLoading(false);
         }
     }
-
-    const handleClickSelectJunior=async(junior)=>{
-        try {
-            setLoading(true);
-            const responseJuniorAsigned = await asignJuniorToContracts(dataSendMinuta?.contractId, junior?.id);
-            if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-                toast("El junior excede la cantidad maxima que puede manipular",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                return;
-            }
-
-            toast("Se asigno el Junior correctamente",{
-                type : 'success',
-                position : 'bottom-right'
-            });
-
-            pushActiveStep();
-        } catch (err) {
-            toast("Sucedio un error al asignar el junior",{
-                type : 'error',
-                position : 'bottom-center'
-            });
-        } finally {
-            setLoading(false)
-        }
-    };
 
     const handleChangeHeader=(e)=>{
         const target = e.target;
@@ -274,21 +205,8 @@ function RenderCardsFormStepper({
                 return
             }
             setLoading(true);
-            
-            const response = await subirEvidencias(imagesMinuta, fileLocation?.directory);
         
-            setDataSendMinuta((prev)=>({
-                ...dataSendMinuta,
-                paymentMethod : {
-                    ...prev?.paymentMethod,
-                    evidences : response                    
-                }
-            }));
 
-            toast("Imagenes subidas correctamente",{
-                type : 'success',
-                position: 'bottom-right'
-            });
             pushActiveStep();
         } catch (err) {
             console.log(err);
@@ -319,8 +237,43 @@ function RenderCardsFormStepper({
             setLoading(true);
             console.log(dataSendMinuta);
             
-            const response = await generateScriptCompraVenta('inmueble', dataSendMinuta);
-            console.log(dataSendMinuta);
+            const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
+        
+            const {idContract} = await funUploadDataMinutaCompraVenta(
+                dataMinuta?.minutaWord,
+                dataMinuta?.minutaPdf,
+                dataSelected?.client?.id,
+                'propertyCompraVenta',
+                dataSendMinuta?.case
+            )
+
+            const newDataSendMinuta= {
+                ...dataSendMinuta,
+                contractId : idContract,
+                paymentMethod : {
+                    ...dataSendMinuta?.paymentMethod,
+                    evidences : responseEvidencias
+                }
+            }
+            
+
+            if (dataSession?.payload?.role === 'junior') {
+                const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+                if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+                    toast("El junior excede la cantidad maxima que puede manipular",{
+                    type : 'error',
+                    position : 'bottom-center'
+                    });
+                    return
+                }
+
+                toast("Se asigno el Junior correctamente",{
+                    type : 'success',
+                    position : 'bottom-right'
+                });
+            }
+
+            const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta);
             
             if (!response.ok || response.status === 406) {
                 toast("Sucedio un error",{
@@ -413,6 +366,10 @@ function RenderCardsFormStepper({
                 <FormUploadMinuta2
                     loading={loading}
                     handleUploadMinuta={handleUploadMinuta}
+                    dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+                    dataPreviewWord={dataMinuta?.minutaWord}
+                    numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
+                    districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
                 />
                 <section className='hidden col-span-1 bg-white p-4 h-fit shadow rounded-sm lg:flex flex-col gap-4'>
                     <section>
@@ -423,26 +380,11 @@ function RenderCardsFormStepper({
                 </section>
               </main>  
             );
-        
-        // Seleccionar que Junior se encargara de la tarea
         case 3:
-            return(
-                <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-                    <TableSelectedUser
-                        title='Selecciona un Junior'
-                        descripcion='Selecciona el junior que se va a encargar (5 tareas por Junior)'
-                        headers={headersTableroCliente}
-                        data={dataJuniors?.data}
-                        slugCrear={'/dashboard/juniors/form-add'}
-                        handleClickSelect={handleClickSelectJunior}
-                    />
-                </section>
-            )
-        case 4:
             return (<FormStepper
                handleSaveData={handleClickFormStepper}
             />);
-        case 5:
+        case 4:
             return (
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
@@ -456,6 +398,13 @@ function RenderCardsFormStepper({
                     {
                         imagesMinuta?.length > 0 &&
                         <div className='w-full mt-8'>
+                            <Title1>Ejemplo de lo que debes de subir </Title1>
+                            <section className='my-4'>
+                                <CardAviso
+                                    advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
+
+                                />
+                            </section>
                             <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required/>
                         </div>
                     }
@@ -468,11 +417,11 @@ function RenderCardsFormStepper({
                     </Button>
                 </section>
             )
-        case 6:
+        case 5:
             // Se pide la informacion restante
             return(
                 <section className='w-full flex justify-center items-center'>
-                    <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
+                    <div className=' w-full bg-white p-6 rounded-lg shadow mt-8'>
                       <section>
                         <Title1 className='text-3xl'>Informacion Restante</Title1>
                         <p>Ingresa la información restante para generar la escritura</p>
@@ -496,7 +445,7 @@ function RenderCardsFormStepper({
                     </div>
                 </section>
             )
-        case 7:
+        case 6:
             return(
                 <section className='flex flex-col gap-4'>
                     <TableSelectedUser
@@ -506,6 +455,7 @@ function RenderCardsFormStepper({
                         headers={headersTableroCliente}
                         data={dataSeniors?.data}
                         handleClickSelect={handleClickSelectSenior}
+                        showAddButton={dataSession?.payload?.role === 'admin'}
                     />
                     {
                         notarioSelected && (
@@ -529,7 +479,7 @@ function RenderCardsFormStepper({
                     </Button>
                 </section>
             )
-        case 8:
+        case 7:
             return (<FormViewerPdfEscritura
                 viewerPdf={viewPdf}
             />);

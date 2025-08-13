@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-export default function ButtonUploadWord({ handleSetFile }) {
+export default function ButtonUploadWord({ 
+  handleSetFile,
+  dataPreview=null
+}) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -34,7 +37,7 @@ export default function ButtonUploadWord({ handleSetFile }) {
       >
         <CloudUploadIcon className="text-gray-600 mb-2" style={{ fontSize: 48 }} />
         <p className="text-gray-700 font-medium text-center px-4">
-          {file ? file.name : 'Haz clic para subir el documento Word (.doc o .docx)'}
+          {(file ) ? (file?.name): dataPreview ? dataPreview?.name : 'Haz clic para subir el documento Word (.doc o .docx)'}
         </p>
         <input
           id="word-upload"
@@ -45,16 +48,6 @@ export default function ButtonUploadWord({ handleSetFile }) {
         />
       </label>
 
-      {previewUrl && (
-        <div className="mt-6">
-          <h3 className="text-md font-semibold text-negro mb-2">Vista previa del Word:</h3>
-          <iframe
-            src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(previewUrl)}`}
-            className="w-full h-96 border rounded"
-            title="Vista previa del Word"
-          />
-        </div>
-      )}
     </div>
   );
 }

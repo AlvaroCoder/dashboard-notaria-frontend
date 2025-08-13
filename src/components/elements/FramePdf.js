@@ -8,7 +8,7 @@ export default function FramePdf({
     directory,
     handlePdf=null  
 }) {
-    const URL_PDF = "http://localhost:8000/home/minuta";
+    const URL_PDF = `${process.env.NEXT_PUBLIC_URL_HOME}/minuta`;
     const [dataPdf, setDataPdf] = useState(null);
     const [loading, setloading] = useState(false);
     useEffect(()=>{

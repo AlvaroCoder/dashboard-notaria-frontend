@@ -25,7 +25,6 @@ export default function Page() {
         const session = await getSession();
         if (session) {
           const userRole = session?.user?.payload?.role;
-          console.log(session?.user);
           setUser(session?.user);
           setRole(userRole);
         }

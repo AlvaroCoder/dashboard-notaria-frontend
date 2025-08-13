@@ -12,7 +12,8 @@ const Contracts = React.createContext({
     handleClickClient : ()=>{},
     handleClickJunior : ()=>{},
     handleChangeFileLocation : ()=>{},
-    pushActive2Step : ()=>{}
+    pushActive2Step : ()=>{},
+    backActiveStep : ()=>{}
 });
 
 
@@ -36,6 +37,10 @@ export default function ContractContext({
             client
         })
     };
+
+    const backActiveStep=()=>{
+        setActiveStep(activeStep - 1);
+    }
 
     const handleClickJunior=(junior)=>{
         setDataSelected({
@@ -76,7 +81,8 @@ export default function ContractContext({
                 handleClickClient,
                 handleClickJunior,
                 handleChangeFileLocation,
-                pushActive2Step
+                pushActive2Step,
+                backActiveStep
             }}
         >
             {children}

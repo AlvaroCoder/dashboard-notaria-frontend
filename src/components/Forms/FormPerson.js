@@ -22,7 +22,6 @@ export default function FormPerson({
 
 }) {
     const nombreProceso = type === 'venta' ? 'Vendedor' : 'Comprador';
-    const [bienesMancomunados, setBienesMancomunados] = useState(true);
 
   return data?.map((person, idx)=>
         <section key={idx} className={cn('min-w-3xl relative h-fit mt-6', 'bg-white shadow rounded-lg ')}>
@@ -106,32 +105,30 @@ export default function FormPerson({
                         <p className='text-sm'>Información del conyuge del {nombreProceso}</p>
                         <div className='grid grid-cols-2 gap-4 mt-2'>
                             <Button
-                                variant={bienesMancomunados ? "" : "outline"}
-                                onClick={()=>{
-                                    //addSpouseData(type);
-                                    setBienesMancomunados(true)
-                                }}
+                                variant={person?.bienesMancomunados ? "" : "outline"}
+                                onClick={() => handleChangeFounder(idx, 'bienesMancomunados', true)}
+
                             >
                                 Con bienes mancomunados
                             </Button>
                             <Button
-                                variant={!bienesMancomunados ? "" : "outline"}
-                                onClick={()=>setBienesMancomunados(false)}
+                                variant={!person?.bienesMancomunados ? "" : "outline"}
+                                onClick={() => handleChangeFounder(idx, 'bienesMancomunados', true)}
                             >
                                 Con bienes separados
                             </Button>
                         </div>
                         {
-                            bienesMancomunados ? 
+                            person?.bienesMancomunados ? 
                             <div className='grid grid-cols-2 gap-4 mt-8'>
-                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-firstName', e.target.value, type, bienesMancomunados)} label="Primer Nombre" />
-                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-lastName', e.target.value, type, bienesMancomunados)} label="Apellido" />
-                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-dni', e.target.value, type, bienesMancomunados)} label="DNI" type='number' />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-firstName', e.target.value, type, person?.bienesMancomunados)} label="Primer Nombre" />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-lastName', e.target.value, type, person?.bienesMancomunados)} label="Apellido" />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-dni', e.target.value, type, person?.bienesMancomunados)} label="DNI" type='number' />
                                 <FormControl>
                                 <InputLabel>Género</InputLabel>
                                     <Select
                                         onChange={(e) =>
-                                        handleChange(idx, 'spouse-gender', e.target.value, type, bienesMancomunados)
+                                        handleChange(idx, 'spouse-gender', e.target.value, type, person?.bienesMancomunados)
                                         }
                                         value={person?.maritalStatus?.spouse?.gender || ''}
                                     >
@@ -139,12 +136,12 @@ export default function FormPerson({
                                         <MenuItem value="F">Femenino</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-nationality', e.target.value, type, bienesMancomunados)}  label="Nacionalidad"  />
-                                <TextField disabled={!bienesMancomunados} onChange={(e)=>handleChange(idx, 'spouse-job', e.target.value, type, bienesMancomunados)}  label="Trabajo" className='col-span-2' />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-nationality', e.target.value, type, person?.bienesMancomunados)}  label="Nacionalidad"  />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-job', e.target.value, type, person?.bienesMancomunados)}  label="Trabajo" className='col-span-2' />
                             </div> : 
                             <div className='grid grid-cols-1 gap-4 mt-8'>
-                                <TextField onChange={(e)=>handleChange(idx, 'spouse-partidaRegistralNumber', e.target.value, type, bienesMancomunados)} label="Nro Partida Registral" type='number'/>
-                                <TextField onChange={(e)=>handleChange(idx, 'spouse-province', e.target.value, type, bienesMancomunados)} label="Provincia de la Boda" type='text' />
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-partidaRegistralNumber', e.target.value, type, person?.bienesMancomunados)} label="Nro Partida Registral" type='number'/>
+                                <TextField onChange={(e)=>handleChange(idx, 'spouse-province', e.target.value, type, person?.bienesMancomunados)} label="Provincia de la Boda" type='text' />
                             </div>
                         }
                     </section>

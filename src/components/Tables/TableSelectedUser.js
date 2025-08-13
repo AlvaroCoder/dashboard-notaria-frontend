@@ -6,7 +6,6 @@ import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import CreateIcon from '@mui/icons-material/Create';
-import { toast } from 'react-toastify';
 
 export default function TableSelectedUser({
     title="Selecciona un usuario",
@@ -14,7 +13,8 @@ export default function TableSelectedUser({
     slugCrear,
     headers=[],
     data=[],
-    handleClickSelect
+    handleClickSelect,
+    showAddButton=true
 }) {
     const router = useRouter();
     const [queryInput, setQueryInput] = useState('');
@@ -34,18 +34,22 @@ export default function TableSelectedUser({
             <p className='text-gray-500 text-sm'>{descripcion}</p>
         </section>
         <section className='bg-white p-4 rounded-sm shadow-sm mt-4'>
-            <div className='flex flex-row gap-4 items-center justify-between mb-4'>
-                <Input
-                    className={"w-full"}
-                    placeholder = "Buscar por nombre, o apllido"
-                    onChange={(e)=>setQueryInput(e.target.value)}
-                />
-                <Button
-                    onClick={crearUsuario}
-                >
-                    Agregar nuevo cliente
-                </Button>
-            </div>
+            {
+                showAddButton && (
+                    <div className='flex flex-row gap-4 items-center justify-between mb-4'>
+                        <Input
+                            className={"w-full"}
+                            placeholder = "Buscar por nombre, o apellido ..."
+                            onChange={(e)=>setQueryInput(e.target.value)}
+                        />
+                        <Button
+                            onClick={crearUsuario}
+                        >
+                            Agregar nuevo cliente
+                        </Button>
+                    </div>
+                )
+            }
             <div className='space-y-6'>
                 <Table>
                     <TableHeader>

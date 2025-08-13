@@ -52,7 +52,6 @@ export const headerSCRL=[
 /** TABLERO CLIENTES */
 
 export const headersTableroCliente=[
-    {value : "Nombre", head :['firstName', 'lastName']},
     {value : "Usuario", head : 'userName'}
 ];
 

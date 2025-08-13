@@ -19,37 +19,45 @@ export default function FormStepper({
 
   const [compradores, setCompradores] = useState([
     {
-      firstName: '',
-      lastName: '',
-      dni: '',
-      gender: '',
-      nationality: '',
+      firstName: "",
+      lastName: "",
+      dni: "",
+      gender: "M",
+      nationality: "Peruano",
       age: '19',
-      job: '',
-      maritalStatus: { civilStatus: '' },
-      address: {
-        district: '',
-        province: '',
-        department: '',
-        name: '',
+      job: "",
+      maritalStatus: {
+        civilStatus: "soltero",
+        spouse: {}
       },
+      bienesMancomunados: true, // 👈 aquí
+      address: {
+        name: "",
+        district: "",
+        province: "",
+        department: ""
+      }
     }
   ]);
   const [vendedores, setVendedores] = useState([{
-    firstName: '',
-    lastName: '',
-    dni: '',
-    gender: '',
-    nationality: '',
+    firstName: "",
+    lastName: "",
+    dni: "",
+    gender: "M",
+    nationality: "Peruano",
     age: '19',
-    job: '',
-    maritalStatus: { civilStatus: '' },
-    address: {
-      district: '',
-      province: '',
-      department: '',
-      name: '',
+    job: "",
+    maritalStatus: {
+      civilStatus: "soltero",
+      spouse: {}
     },
+    bienesMancomunados: true, // 👈 aquí
+    address: {
+      name: "",
+      district: "",
+      province: "",
+      department: ""
+    }
   }]);
 
   const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
@@ -65,7 +73,10 @@ export default function FormStepper({
   const handleChange = useCallback((index, field, value, personType, bienesMancomunados = false) => {
     setData(personType, (prevData) => {
       const list = [...prevData];
-  
+      
+      if (field === 'bienesMancomunados') {
+        list[index].bienesMancomunados = value;
+      }
       // Asegurar que el objeto existe
       if (!list[index]) list[index] = {};
       if (!list[index].address) list[index].address = {};
@@ -77,6 +88,9 @@ export default function FormStepper({
         const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
         if (isCasado) {
           list[index].maritalStatus.marriageType = { type: bienesMancomunados ? 1 : 2 };
+          list[index].maritalStatus.spouse = {
+            age : 19
+          };
         }
       } 
       
@@ -110,20 +124,24 @@ export default function FormStepper({
   const addPerson = useCallback((personType) => {
     setData(personType, (prevData) => [...prevData, 
       {
-        firstName: '',
-        lastName: '',
-        dni: '',
-        gender: '',
-        nationality: '',
+        firstName: "",
+        lastName: "",
+        dni: "",
+        gender: "M",
+        nationality: "Peruano",
         age: '19',
-        job: '',
-        maritalStatus: { civilStatus: '' },
-        address: {
-          district: '',
-          province: '',
-          department: '',
-          name: '',
+        job: "",
+        maritalStatus: {
+          civilStatus: "soltero",
+          spouse: {}
         },
+        bienesMancomunados: true, // 👈 aquí
+        address: {
+          name: "",
+          district: "",
+          province: "",
+          department: ""
+        }
       }
     ]);
   }, [setData]);

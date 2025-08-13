@@ -12,6 +12,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptContract, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
+import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -51,18 +52,34 @@ function RenderApp({
         number:"1125V",
         serie:"C"
       }
-  }
+    },
+    corporation : '',
+    minuta : {
+      minutaNumber : '',
+      creationDay : {
+        date : formatDateToYMD(new Date())
+      },
+      place : {
+        name : 'Notaria Rojas',
+        district : ''
+      }
+    }
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [viewPdf, setViewPdf] = useState(null);
+  const [dataMinuta, setDataMinuta] = useState({
+    minutaPdf : null,
+    minutaWord : null,
+  });
 
   const {
     activeStep, 
     dataSelected,
     handleClickClient,
     pushActiveStep,
-    pushActive2Step
+    pushActive2Step,
+    backActiveStep
   } = useContracts();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
@@ -73,12 +90,7 @@ function RenderApp({
     data : dataClientes,
     loading: loadingDataClientes,
   } = useFetch(URL_GET_DATA_CLIENTES);
-
-  const {
-    data : dataJuniors,
-    loading : loadingDataJuniors,
-  } = useFetch(URL_GET_DATA_JUNIORS);
-
+  
   const {
     data : dataSeniors,
     loading : loadingDataSeniors,
@@ -97,33 +109,6 @@ function RenderApp({
     });
   };
 
-  const handleClickSelectJunior=async(junior)=>{
-    try {
-      setLoading(true);
-      const responseJuniorAsigned = await asignJuniorToContracts(dataSendMinuta?.contractId, junior?.id);
-      if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-        toast("El junior excede la cantidad maxima que puede manipular",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      }
-
-      toast("Se asigno el Junior correctamente",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      pushActiveStep();
-      
-    } catch (err) {
-      toast("Sucedio un error al asignar el junior",{
-        type : 'error',
-        position : 'bottom-center'
-      })
-    } finally{
-      setLoading(false);
-    }
-  }
 
   // Se encarga de mandar la minuta y luego procesarla
   const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
@@ -137,40 +122,12 @@ function RenderApp({
         return
       };
       setLoading(true);
-      const newFormData = new FormData();
-      newFormData.append('minutaFile', minutaPdf);
-      const response = await sendDataMinuta(newFormData);
-      const jsonResponseUpload =  await response.json();
-      
-      const fileLocation = jsonResponseUpload?.fileLocation;
 
-      const JSONPreMinuta = {
-          clientId : dataSelected?.client?.id,
-          processPayment : "Pago a la mitad",
-          minutaDirectory : `DB_evidences/${fileLocation?.directory}/${fileLocation?.fileName}`,
-          datesDocument : {
-              processInitiate : formatDateToYMD(new Date())
-          },
-          directory : `DB_evidences/${fileLocation?.directory}`,
-          case : dataSendMinuta?.case
-      };
+      setDataMinuta({
+        minutaPdf,
+        minutaWord,
+      });
 
-      const responsePreMinuta = await submitDataPreMinuta(JSONPreMinuta, 'asociacion');
-      if (!responsePreMinuta.ok || responsePreMinuta.status === 422) {
-        toast("Error al momento de subir la informacion",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return;
-      }
-      const responsePreMinutaJSON = await responsePreMinuta?.json();
-      const idContract = responsePreMinutaJSON?.contractId;
-
-      const newFormDataWord = new FormData();
-      newFormDataWord.append('minutaFile', minutaWord);
-
-      await sendMinutaWord(newFormDataWord, idContract);
-      
       setDataSendMinuta({
         ...dataSendMinuta,
         minuta : {
@@ -183,34 +140,14 @@ function RenderApp({
             district : detailsMinuta?.districtPlace
           } 
         },
-        contractId : responsePreMinutaJSON?.contractId
       });
       toast("Se creo el proceso",{
         type : 'success',
         position : 'bottom-right'
       });
       
-      if (dataSession?.payload?.role === 'junior') {
-        const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+      pushActiveStep();
 
-        if (!responseJuniorAsigned.ok || responseJuniorAsigned?.status === 404) {
-          toast("No se puede agregar mas carga",{
-            type : 'error',
-            position : 'bottom-right'
-          });
-          return;
-        }
-        toast("Se asigno el junior",{
-          type : 'info',
-          position : 'bottom-right'
-        });
-        pushActive2Step();
-
-      } else{
-        pushActiveStep();
-      }
-      
-      
     } catch (err) {
       console.log(err);
       toast("Error con la vista de minuta",{
@@ -263,7 +200,20 @@ function RenderApp({
   const handleSubmitData=async()=>{
     try {
       setLoading(true);      
-      const response = await generateScriptContract('asociacion',dataSendMinuta);
+
+      const {idContract} = await funUploadDataMinuta(
+        dataMinuta?.minutaWord,
+        dataMinuta?.minutaPdf,
+        dataSelected?.client?.id,
+        'asociacion'
+      );
+
+      const newDataSendMinuta = {
+        ...dataSendMinuta,
+        contractId : idContract
+      };
+
+      const response = await generateScriptContract('asociacion',newDataSendMinuta);
       
       if (!response.ok || response.status == 406) {
         toast("Sucedio un error",{
@@ -336,6 +286,10 @@ function RenderApp({
           <FormUploadMinuta2
             loading={loading}
             handleUploadMinuta={handleUploadMinuta}
+            dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+            dataPreviewWord={dataMinuta?.minutaWord}
+            numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
+            districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
           />
           <section className='hidden col-span-1 bg-white p-4 h-fit shadow rounded-sm lg:flex flex-col gap-4'>
             <section>
@@ -355,33 +309,14 @@ function RenderApp({
           </section>
         </section>
       )
-
-    case 2:
-      // Seleccionar que Junior se encargara de la tarea
-      return(
-        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 px-8 gap-2'> 
-          <Suspense>
-            {
-              (loadingDataJuniors || loading) ?
-              (<TableroCarga headers={headersTableroCliente}/>) : 
-              (<TableSelectedUser 
-                title='Selecciona un Junior'
-                descripcion='Selecciona el Junior que se va a encargar (5 tareas por Junior)'
-                headers={headersTableroCliente}  
-                data={dataJuniors?.data}
-                slugCrear={'/dashboard/juniors/form-add'}
-                handleClickSelect={handleClickSelectJunior}
-              />)
-            }
-          </Suspense>
-        </section>
-      )
     case 3:
       // Se generan los formularios de los fundadores
       return(
         <section className='w-full flex justify-center items-center'>
           <div className='max-w-5xl w-full'>
           <FormFounders
+            initialFounder={dataSendMinuta?.founders?.people}
+            handleClickBack={backActiveStep}
             handleSendFounder={handleSubmitFormStepperPerson}
           />
           </div>
@@ -405,18 +340,25 @@ function RenderApp({
             </section>
             <section className='my-4'>
               <Title1>Información de la asociacion</Title1>
-              <TextField label="Corporacion" onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required/>
+              <TextField label="Corporacion" value={dataSendMinuta?.corporation} onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required/>
             </section>
             <FormHeaderInformation
               data={dataSendMinuta}
               handleChangeHeader={handleChangeHeader}
             />
-            <Button 
-              
-              onClick={()=>pushActiveStep()}
-              className={'w-full mt-4'}>
-              Continuar
-            </Button>
+            <section className='w-full flex flex-row items-center gap-4'>
+              <Button
+                className={'flex-1 mt-4'}
+                onClick={backActiveStep}
+              >
+                Regresar
+              </Button>
+              <Button 
+                onClick={()=>pushActiveStep()}
+                className={'flex-1 mt-4'}>
+                Continuar
+              </Button>
+            </section>
           </div>
         </section>
       )
@@ -438,6 +380,7 @@ function RenderApp({
                   data={dataSeniors?.data}
                   slugCrear={'/dashboard/seniors/form-add'}
                   handleClickSelect={handleClickSenior}
+                  showAddButton={dataSession?.payload?.role === 'admin'}
                 />
               )
             }
@@ -456,13 +399,21 @@ function RenderApp({
               )
             }
 
+            <div className='flex flex-row items-center gap-4'>
+              <Button 
+              disabled={loading}
+                onClick={backActiveStep}
+              >
+                Retroceder
+              </Button>
             <Button
               disabled={!notarioSelected || loading}
               onClick={handleSubmitData}
-              className={'w-full mt-4'}
+              className={'flex-1 '}
             > 
               {loading ? <Loader2 className='animate-spin' /> : <p>Enviar data</p>}
             </Button>
+            </div>
         </section>
       )
       case 6:

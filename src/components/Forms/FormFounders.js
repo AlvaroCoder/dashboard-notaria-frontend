@@ -11,19 +11,24 @@ const getMaritalOptions = (gender) => {
   return [];
 };
 
-export default function FormFounders({ handleSendFounder = () => {} }) {
+export default function FormFounders({ 
+  handleSendFounder = () => {} ,
+  handleClickBack= ()=>{},
+  initialFounder=null
+}) {
   const initialDataFounder = {
     firstName: "",
     lastName: "",
     dni: "",
     gender: "M",
     nationality: "Peruano",
-    age: '',
+    age: '19',
     job: "",
     maritalStatus: {
       civilStatus: "soltero",
       spouse: {}
     },
+    bienesMancomunados: true, // 👈 aquí
     address: {
       name: "",
       district: "",
@@ -32,14 +37,17 @@ export default function FormFounders({ handleSendFounder = () => {} }) {
     }
   };
 
-  const [founders, setFounders] = React.useState([initialDataFounder]);
-  const [bienesMancomunados, setBienesMancomunados] = React.useState(true);
+  const [founders, setFounders] = React.useState(initialFounder ? initialFounder : [initialDataFounder]);
 
-  const handleChangeFounder = (index, field, value, bienes = bienesMancomunados) => {
+  const handleChangeFounder = (index, field, value) => {
     const list = [...founders];
-
-    // Campos del cónyuge
-    if (field?.startsWith("spouse-")) {
+  
+    if (field === 'bienesMancomunados') {
+      list[index].bienesMancomunados = value;
+    }
+    // resto de la lógica igual que antes...
+    
+    else if (field?.startsWith("spouse-")) {
       const fieldForm = field.split("-")[1];
       if (!list[index].maritalStatus.spouse) {
         list[index].maritalStatus.spouse = {};
@@ -55,14 +63,17 @@ export default function FormFounders({ handleSendFounder = () => {} }) {
     else if (field === 'maritalStatus') {
       list[index].maritalStatus.civilStatus = value?.toLowerCase();
       const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
-        if (isCasado) {
-            list[index].maritalStatus.marriageType = { type : bienes ? 1 : 2}
-        }
+      if (isCasado) {
+        list[index].maritalStatus.marriageType = { type : list[index].bienesMancomunados ? 1 : 2};
+        list[index].maritalStatus.spouse = {
+          age : 19
+        };
+      }
     }
     else {
       list[index][field] = value;
     }
-
+  
     setFounders(list);
   };
 
@@ -110,7 +121,6 @@ export default function FormFounders({ handleSendFounder = () => {} }) {
                         </Select>
                     </FormControl>
                     <TextField label="Nacionalidad" value={person.nationality} onChange={(e) => handleChangeFounder(idx, 'nationality', e.target.value)} fullWidth required />
-                    <TextField label="Edad" type="number" value={person.age} onChange={(e) => handleChangeFounder(idx, 'age', e.target.value)} fullWidth required />
                     <TextField label="Trabajo" value={person.job} onChange={(e) => handleChangeFounder(idx, 'job', e.target.value)} />
                     <FormControl fullWidth>
                         <InputLabel>Estado Civil</InputLabel>
@@ -145,42 +155,42 @@ export default function FormFounders({ handleSendFounder = () => {} }) {
                     <Title1 className="text-2xl">Información del Cónyuge</Title1>
                     <p className="text-sm">Información del cónyuge del Fundador</p>
                     <div className="grid grid-cols-2 gap-4 mt-2">
-                        <Button
-                        variant={bienesMancomunados ? "" : "outline"}
-                        onClick={() => setBienesMancomunados(true)}
-                        >
+                      <Button
+                        variant={person.bienesMancomunados ? "" : "outline"}
+                        onClick={() => handleChangeFounder(idx, 'bienesMancomunados', true)}
+                      >
                         Con bienes mancomunados
-                        </Button>
-                        <Button
-                        variant={!bienesMancomunados ? "" : "outline"}
-                        onClick={() => setBienesMancomunados(false)}
-                        >
+                      </Button>
+                      <Button
+                        variant={!person.bienesMancomunados ? "" : "outline"}
+                        onClick={() => handleChangeFounder(idx, 'bienesMancomunados', false)}
+                      >
                         Con bienes separados
-                        </Button>
+                      </Button>
                     </div>
 
-                    {bienesMancomunados ? (
+                    {person.bienesMancomunados ? (
                         <div className="grid grid-cols-2 gap-4 mt-8">
-                        <TextField label="Primer Nombre" onChange={(e) => handleChangeFounder(idx, 'spouse-firstName', e.target.value, bienesMancomunados)} />
-                        <TextField label="Apellido" onChange={(e) => handleChangeFounder(idx, 'spouse-lastName', e.target.value, bienesMancomunados)} />
-                        <TextField label="DNI" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-dni', e.target.value, bienesMancomunados)} />
+                        <TextField label="Primer Nombre" onChange={(e) => handleChangeFounder(idx, 'spouse-firstName', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="Apellido" onChange={(e) => handleChangeFounder(idx, 'spouse-lastName', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="DNI" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-dni', e.target.value, person.bienesMancomunados)} />
                         <FormControl>
                             <InputLabel>Género</InputLabel>
                             <Select
                             value={person?.maritalStatus?.spouse?.gender || ''}
-                            onChange={(e) => handleChangeFounder(idx, 'spouse-gender', e.target.value, bienesMancomunados)}
+                            onChange={(e) => handleChangeFounder(idx, 'spouse-gender', e.target.value, person.bienesMancomunados)}
                             >
                             <MenuItem value="M">Masculino</MenuItem>
                             <MenuItem value="F">Femenino</MenuItem>
                             </Select>
                         </FormControl>
-                        <TextField label="Nacionalidad" onChange={(e) => handleChangeFounder(idx, 'spouse-nationality', e.target.value, bienesMancomunados)} />
-                        <TextField label="Trabajo" className="col-span-2" onChange={(e) => handleChangeFounder(idx, 'spouse-job', e.target.value, bienesMancomunados)} />
+                        <TextField label="Nacionalidad" onChange={(e) => handleChangeFounder(idx, 'spouse-nationality', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="Trabajo" className="col-span-2" onChange={(e) => handleChangeFounder(idx, 'spouse-job', e.target.value, person.bienesMancomunados)} />
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 mt-8">
-                        <TextField label="Nro Partida Registral" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-partidaRegistralNumber', e.target.value, bienesMancomunados)} />
-                        <TextField label="Provincia de la Boda" onChange={(e) => handleChangeFounder(idx, 'spouse-province', e.target.value, bienesMancomunados)} />
+                        <TextField label="Nro Partida Registral" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-partidaRegistralNumber', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="Oficina Registral (lugar)" placeholder="Provincia" onChange={(e) => handleChangeFounder(idx, 'spouse-province', e.target.value, person.bienesMancomunados)} />
                         </div>
                     )}
                     </section>
@@ -189,12 +199,22 @@ export default function FormFounders({ handleSendFounder = () => {} }) {
         </div>
       ))}
 
-      <Button onClick={handleAddFounder} className="w-full py-4 cursor-pointer" variant="outline">
-        Agregar Persona
-      </Button>
-      <Button className="my-4 w-full" onClick={() => handleSendFounder(founders)}>
-        Continuar
-      </Button>
+      <section className="my-4">
+        <Button onClick={handleAddFounder} className="w-full py-4 cursor-pointer" variant="outline">
+          Agregar Persona
+        </Button>
+        <div className="flex flex-row items-center gap-4">
+          <Button
+            className={'my-4 flex-1'}
+            onClick={()=>handleClickBack()}
+          >    
+            Retroceder
+          </Button>   
+          <Button className="my-4 flex-1" onClick={() => handleSendFounder(founders)}>
+            Continuar
+          </Button>
+        </div>
+      </section>
     </section>
   );
 }

@@ -2,13 +2,13 @@ import { TextField, Grid } from "@mui/material";
 
 export default function FojasDataForm({ fojasData, handleChangeFojasDatas }) {
   return (
-    <div className="p-4 border rounded-lg shadow-sm bg-white">
-      <h2 className="text-lg font-semibold mb-4">Datos de Fojas</h2>
-
-      <Grid container spacing={2}>
-        {/* Bloque Start */}
-        <Grid item xs={12} sm={6}>
-          <h3 className="text-md font-medium mb-2">Inicio</h3>
+<div className="border rounded-lg bg-white w-full p-6">
+  <Grid container spacing={3} className="w-full">
+    {/* Bloque Start */}
+    <Grid item xs={12} sm={6} >
+      <h3 className="text-md font-medium mb-4 ">Inicio</h3>
+      <Grid container spacing={2}  >
+        <Grid item xs={12} sm={6} gridColumn={2}>
           <TextField
             fullWidth
             label="Número"
@@ -18,22 +18,26 @@ export default function FojasDataForm({ fojasData, handleChangeFojasDatas }) {
               handleChangeFojasDatas("fojasData.start.number", e.target.value)
             }
           />
-          <div className="mt-2">
-            <TextField
-              fullWidth
-              label="Serie"
-              variant="outlined"
-              value={fojasData.start.serie}
-              onChange={(e) =>
-                handleChangeFojasDatas("fojasData.start.serie", e.target.value)
-              }
-            />
-          </div>
         </Grid>
+        <Grid item xs={12} sm={6} >
+          <TextField
+            fullWidth
+            label="Serie"
+            variant="outlined"
+            value={fojasData.start.serie}
+            onChange={(e) =>
+              handleChangeFojasDatas("fojasData.start.serie", e.target.value)
+            }
+          />
+        </Grid>
+    </Grid>
+    </Grid>
 
-        {/* Bloque End */}
-        <Grid item xs={12} sm={6}>
-          <h3 className="text-md font-medium mb-2">Fin</h3>
+    {/* Bloque End */}
+    <Grid item xs={12} sm={6}>
+      <h3 className="text-md font-medium mb-4 ">Fin</h3>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
           <TextField
             fullWidth
             label="Número"
@@ -43,19 +47,21 @@ export default function FojasDataForm({ fojasData, handleChangeFojasDatas }) {
               handleChangeFojasDatas("fojasData.end.number", e.target.value)
             }
           />
-          <div className="mt-2">
-            <TextField
-              fullWidth
-              label="Serie"
-              variant="outlined"
-              value={fojasData.end.serie}
-              onChange={(e) =>
-                handleChangeFojasDatas("fojasData.end.serie", e.target.value)
-              }
-            />
-          </div>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Serie"
+            variant="outlined"
+            value={fojasData.end.serie}
+            onChange={(e) =>
+              handleChangeFojasDatas("fojasData.end.serie", e.target.value)
+            }
+          />
         </Grid>
       </Grid>
-    </div>
+    </Grid>
+  </Grid>
+</div>
   );
 }

@@ -53,41 +53,55 @@ function RenderCardsFormStepper({
   const [imagesMinuta, setImagesMinuta] = useState([]);
 
   const [dataSendMinuta, setDataSendMinuta] = useState({
-    contractId : '',
+    contractId : null,
     header : {
-      numeroDocumentoNotarial : "",
-      numeroRegistroEscritura : '',
-      year : '',
-      folio : '',
-      tomo : '',
-      kardex : ''
-  },
-  fojasData : {
-      start : {
-          number : "1123",
-          serie : "C",
-      },
-      end : {
-          number : '1125V',
-          serie : "C"
+        numeroDocumentoNotarial : "",
+        numeroRegistroEscritura : '',
+        year : '',
+        folio : '',
+        tomo : '',
+        kardex : ''
+    },
+    fojasData : {
+        start : {
+            number : "1123",
+            serie : "C",
+        },
+        end : {
+            number : '1125V',
+            serie : "C"
+        }
+    },
+    vehicleData : {
+      numberPlate : "",
+      propertyRecord : {
+        number : "",
+        place : ""
       }
-  },
-  vehicleData : {
-    numberPlate : "",
-    propertyRecord : {
-      number : "",
-      place : ""
+    },
+    payment : {
+      unit : 'dollar',
+      amount : ''
+    },
+    minuta : {
+        minutaNumber : '',
+        creationDay : {
+        date : formatDateToYMD(new Date())
+        },
+        place : {
+        name : 'Notaria Rojas',
+        district : ''
+        }
     }
-  },
-  payment : {
-    unit : 'dollar',
-    amount : ''
-  }
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [viewPdf, setViewPdf] = useState(null);
+  const [dataMinuta, setDataMinuta] = useState({
+    minutaPdf : null,
+    minutaWord : null,
+  });
 
   const handleClickSelectClient=(client)=>{
       handleClickClient(client);
@@ -218,6 +232,9 @@ function RenderCardsFormStepper({
   const handleSubmitData=async()=>{
     try {
       setLoading(true);
+
+      
+
       const response = await generateScriptCompraVenta('vehiculo', dataSendMinuta);
       console.log(dataSendMinuta);
       if (!response.ok || response.status === 404) {
@@ -320,9 +337,12 @@ function RenderCardsFormStepper({
             <div className='w-full mt-8'>
               <section>
                 <Title1>Ejemplo de lo que debes de subir </Title1>
-                <CardAviso
-                  advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
-                />
+                <section className='my-4'>
+                  <CardAviso
+                    advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
+    
+                  />
+                </section>
               </section>
               <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth />
             </div>
@@ -339,7 +359,7 @@ function RenderCardsFormStepper({
     case 4:
       return(
         <section className='w-full flex justify-center'>
-          <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
+          <div className='w-full bg-white px-6 rounded-lg shadow mt-8'>
             <section>
               <Title1 className='text-3xl'>Información Restante</Title1>
               <p>Ingresa la información restantes para generar la escritura</p>
