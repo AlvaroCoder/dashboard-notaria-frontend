@@ -13,7 +13,7 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, generateScriptCompraVenta, sendDataMinuta, sendMinutaWord, subirEvidencias, submitDataPreMinuta2 } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, subirEvidencias } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -37,7 +37,6 @@ const CardRequirements = dynamic(()=>import('@/components/Cards/CardRequirements
     ssr : false
 });
 
-
 function RenderCardsFormStepper({
     dataSession
 }) {
@@ -59,7 +58,6 @@ function RenderCardsFormStepper({
         handleClickClient,
         pushActiveStep,
         backActiveStep,
-        pushActive2Step
     } = useContracts();
 
     const [loading, setLoading] = useState(false);
@@ -205,7 +203,6 @@ function RenderCardsFormStepper({
                 return
             }
             setLoading(true);
-        
 
             pushActiveStep();
         } catch (err) {
@@ -235,7 +232,6 @@ function RenderCardsFormStepper({
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
-            console.log(dataSendMinuta);
             
             const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
         
@@ -256,7 +252,6 @@ function RenderCardsFormStepper({
                 }
             }
             
-
             if (dataSession?.payload?.role === 'junior') {
                 const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
                 if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
@@ -356,6 +351,12 @@ function RenderCardsFormStepper({
                             cardDataInmuebles?.map((item, idx)=><CardRequirements key={idx} handleClick={handleClickSelectCard} {...item} />)
                         }
                     </section>
+                    <Button
+                        onClick={backActiveStep}
+                        className={"max-w-4xl mx-auto w-full mt-8"}
+                    >
+                        Regresar
+                    </Button>
                 </div>
             );
 

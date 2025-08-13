@@ -13,8 +13,9 @@ import { cardDataVehiculos } from '@/data/CardData';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { generateScriptCompraVenta, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
+import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -46,6 +47,7 @@ function RenderCardsFormStepper({
 
   const {
     activeStep,
+    dataSelected,
     handleClickClient,
     pushActiveStep,
   } = useContracts();
@@ -195,32 +197,7 @@ function RenderCardsFormStepper({
         return;
       }
       setLoading(true);
-      const formDataImages = new FormData();
-      imagesMinuta.forEach((image)=>{
-        formDataImages.append('evidence', image[0]);
-      });
 
-      const response = await subirEvidenciasSinDirectorio(formDataImages);
-      const fileLocation = (await response.json())?.fileLocation;
-      console.log(fileLocation);
-      
-      const evidencesList = fileLocation?.fileNames?.map((file)=>{
-        return `DB_evidences/${fileLocation?.directory}/${file}`
-      });
-      console.log(evidencesList);
-      
-      setDataSendMinuta((prev)=>({
-        ...dataSendMinuta,
-        paymentMethod : {
-          ...prev?.paymentMethod,
-          evidences : evidencesList
-        }
-      }));
-
-      toast("Imagenes subidas correctamente",{
-        type : 'success',
-        position : 'bottom-right'
-      });
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -233,9 +210,33 @@ function RenderCardsFormStepper({
     try {
       setLoading(true);
 
-      
+      const formDataImages = new FormData();
+      imagesMinuta.forEach((image)=>{
+        formDataImages.append('evidence', image[0]);
+      });
 
-      const response = await generateScriptCompraVenta('vehiculo', dataSendMinuta);
+      const responseEvidencias = await subirEvidenciasSinDirectorio(formDataImages);
+      const fileLocation = (await responseEvidencias.json())?.fileLocation;
+      console.log(fileLocation);
+      
+      const evidencesList = fileLocation?.fileNames?.map((file)=>{
+        return `DB_evidences/${fileLocation?.directory}/${file}`
+      });
+
+      const newDataSendMinuta={
+        ...dataSendMinuta,
+        paymentMethod : {
+          ...dataSendMinuta?.paymentMethod,
+          evidences : evidencesList
+        }
+      };
+
+      toast("Imagenes subidas correctamente",{
+        type : 'success',
+        position : 'bottom-right'
+      });
+
+      const response = await generateScriptCompraVenta('vehiculo', newDataSendMinuta);
       console.log(dataSendMinuta);
       if (!response.ok || response.status === 404) {
         toast("Hubo un error al generar la escritura",{
@@ -245,6 +246,24 @@ function RenderCardsFormStepper({
         console.log(await response.json());
         return;
       }      
+
+      if (dataSession?.payload?.role === 'junior') {
+          const idContract = response.headers.get('contractId');
+          const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+          if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+              toast("El junior excede la cantidad maxima que puede manipular",{
+              type : 'error',
+              position : 'bottom-center'
+              });
+              return
+          }
+
+          toast("Se asigno el Junior correctamente",{
+              type : 'success',
+              position : 'bottom-right'
+          });
+      }
+
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
