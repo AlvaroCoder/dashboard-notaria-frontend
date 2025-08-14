@@ -19,7 +19,6 @@ export default function FormPerson({
     type='venta',
     handleDelete=()=>{},
     errores=[],
-
 }) {
     const nombreProceso = type === 'venta' ? 'Vendedor' : 'Comprador';
 
@@ -106,14 +105,14 @@ export default function FormPerson({
                         <div className='grid grid-cols-2 gap-4 mt-2'>
                             <Button
                                 variant={person?.bienesMancomunados ? "" : "outline"}
-                                onClick={() => handleChangeFounder(idx, 'bienesMancomunados', true)}
+                                onClick={() => handleChange(idx, 'bienesMancomunados', true, type)}
 
                             >
                                 Con bienes mancomunados
                             </Button>
                             <Button
                                 variant={!person?.bienesMancomunados ? "" : "outline"}
-                                onClick={() => handleChangeFounder(idx, 'bienesMancomunados', true)}
+                                onClick={() => handleChange(idx, 'bienesMancomunados', false, type)}
                             >
                                 Con bienes separados
                             </Button>
