@@ -84,7 +84,7 @@ export default function FormStepper({
           // Lógica para bienes separados (type: 1)
           if (!bienesMancomunados) {
             person.maritalStatus.marriageType = {
-              type: 1,
+              type: 1, 
               partidaRegistralNumber: person.maritalStatus.spouse?.partidaRegistralNumber || '',
               province: person.maritalStatus.spouse?.province || ''
             };
