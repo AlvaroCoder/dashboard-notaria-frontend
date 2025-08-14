@@ -14,8 +14,6 @@ import { toast } from 'react-toastify';
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
   const {idContract} = useParams();
-  console.log(idContract);
-  
 
   const {
     data : dataResponseContract,
@@ -63,19 +61,13 @@ function RenderPageContracts() {
    const handleCheckViewEscritura=async()=>{
       try {
         setLoading(true);
-        const response = await aceptarEscritura(idContract);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
+        await aceptarEscritura(idContract);
         toast("La escritura fue aceptada",{
           type : 'success',
           position : 'bottom-right'
         });
         router.push("/dashboard/contracts");
-  
-  
       } catch (err) {
-        console.log(err);
-        
         toast("Surgio un error al aceptar la escritura",{
           type : 'error',
           position : 'bottom-center'

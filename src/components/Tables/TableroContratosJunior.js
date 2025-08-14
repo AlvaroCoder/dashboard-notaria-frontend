@@ -129,7 +129,7 @@ export default function TableroContratosJunior({
                                             <TableCellClient clientId={contrato?.clientId} />
                                         </TableCell>
                                         <TableCell>
-                                            <ButtonDownloadPdf minutaDirectory={contrato?.minutaDirectory} />
+                                            {contrato?.contractType !== 'compraVentaVehiculo' && <ButtonDownloadPdf minutaDirectory={contrato?.minutaDirectory} />}
                                         </TableCell>
                                         <TableCell>
                                             <TableCellStatus idStatus={contrato?.status} />

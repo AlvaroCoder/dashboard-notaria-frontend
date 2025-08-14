@@ -4,9 +4,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useFetch } from '@/hooks/useFetch'
 import { useContractDetails } from '@/hooks/useContractsDetails'
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion'
-import View2ContractEscritura from '@/components/Views/View2ContractEscritura'
 import { toast } from 'react-toastify'
-import { aceptarEscritura, generateScriptCompraVenta, generateScriptMarcaAguaCompraVenta, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections'
+import { aceptarEscritura, generateScriptMarcaAguaCompraVenta, submitFirmarDocumento } from '@/lib/apiConnections'
 import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVenta'
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma'
 import { formatDateToYMD } from '@/lib/fechas'
@@ -48,7 +47,6 @@ function RenderPageContracts() {
         position : 'bottom-right'
       });
     } catch (err) {
-      console.error("Error al enviar escritura:", err);
       toast("Surgio un error al generar la escritura", {
         type: 'error',
         position: 'bottom-center'
@@ -62,19 +60,14 @@ function RenderPageContracts() {
   const handleCheckViewEscritura=async()=>{
     try {
       setLoading(true);
-      const response = await aceptarEscritura(idContract);
-      const responseJSON = await response.json();
-      console.log(responseJSON);
+      await aceptarEscritura(idContract);
       toast("La escritura fue aceptada",{
         type : 'success',
         position : 'bottom-right'
       });
       router.push("/dashboard/contracts");
 
-
-    } catch (err) {
-      console.log(err);
-      
+    } catch (err) {      
       toast("Surgio un error al aceptar la escritura",{
         type : 'error',
         position : 'bottom-center'

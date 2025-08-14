@@ -24,8 +24,6 @@ export default function View2ContractEscritura({
 	handleClickSubmit=()=>{},
 	checkViewEscritura =()=>{}
 }) {
-
-	console.log(dataContract);
 	
 	const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
   return (

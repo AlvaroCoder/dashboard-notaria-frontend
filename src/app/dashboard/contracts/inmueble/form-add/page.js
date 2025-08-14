@@ -155,7 +155,6 @@ function RenderCardsFormStepper({
             });
             
         } catch (err) {
-            console.log(err);
             toast("Error con la vista de minuta",{
                 type : 'error',
                 position : 'bottom-center'
@@ -275,9 +274,7 @@ function RenderCardsFormStepper({
                 toast("Sucedio un error",{
                     type :'error',
                     position : 'bottom-center'
-                });
-                console.log(await response.json());
-                
+                });                
                 return;
             }
             const blobResponse = await response.blob();

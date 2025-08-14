@@ -69,7 +69,7 @@ const handleClickSetFirma=async()=>{
         position : 'bottom-right'
       });
       
-      router.push("/dashboard")
+      router.push("/dashboard/contracts");
     } catch (err) {
       toast("Surgio un error al generar la escritura",{
         type : 'error',

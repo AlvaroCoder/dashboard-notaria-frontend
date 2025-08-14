@@ -10,7 +10,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { generateScriptContract} from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -30,10 +30,7 @@ const TableroCarga = dynamic(()=>import('@/components/Loading/TableroCarga'),{
 function RenderApp({
   dataSession=null
 }) {
-  console.log(dataSession);
-  
   const [loading, setLoading] = useState(false);
-
   const [dataSendMinuta, setDataSendMinuta] = useState({
     header : {
       numeroDocumentoNotarial : '',
@@ -83,7 +80,6 @@ function RenderApp({
   } = useContracts();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
-  const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
   const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
 
   const {

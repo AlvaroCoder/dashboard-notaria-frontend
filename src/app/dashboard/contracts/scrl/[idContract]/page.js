@@ -84,19 +84,14 @@ function RenderPageContracts() {
      const handleCheckViewEscritura=async()=>{
         try {
           setLoading(true);
-          const response = await aceptarEscritura(idContract);
-          const responseJSON = await response.json();
-          console.log(responseJSON);
+          await aceptarEscritura(idContract);
           toast("La escritura fue aceptada",{
             type : 'success',
             position : 'bottom-right'
           });
           router.push("/dashboard/contracts");
     
-    
-        } catch (err) {
-          console.log(err);
-          
+        } catch (err) {          
           toast("Surgio un error al aceptar la escritura",{
             type : 'error',
             position : 'bottom-center'

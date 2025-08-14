@@ -25,43 +25,11 @@ function RenderPageContracts() {
     const dataContract = dataResponseContract?.data || null;
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [viewPdf, setViewPdf] = useState(null);
 
-      const handleSubmitEscritura=async()=>{
-        try {
-          setLoading(true);
-          const prevData = dataResponseContract?.data;
-          const newDataToSend = {
-            contractId : idContract,
-            ...prevData
-          };
-    
-          const response = await generateScriptMarcaAguaCompraVenta('inmueble', newDataToSend);
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-    
-          setViewPdf(url);
-          toast("Se genero la escritura",{
-            type :'success',
-            position : 'bottom-right'
-          });
-        } catch (err) {
-          console.error("Error al enviar escritura:", err);
-          toast("Surgio un error al generar la escritura", {
-            type: 'error',
-            position: 'bottom-center'
-          });
-          
-        }finally {
-          setLoading(false);
-        }
-      }
   const handleCheckViewEscritura=async()=>{
     try {
       setLoading(true);
-      const response = await aceptarEscritura(idContract);
-      const responseJSON = await response.json();
-      console.log(responseJSON);
+      await aceptarEscritura(idContract);
       toast("La escritura fue aceptada",{
         type : 'success',
         position : 'bottom-right'
@@ -69,9 +37,7 @@ function RenderPageContracts() {
       router.push("/dashboard/contracts");
 
 
-    } catch (err) {
-      console.log(err);
-      
+    } catch (err) {      
       toast("Surgio un error al aceptar la escritura",{
         type : 'error',
         position : 'bottom-center'
@@ -91,7 +57,7 @@ function RenderPageContracts() {
            position : 'bottom-right'
          });
    
-         router.push("/dashboard")
+         router.push("/dashboard/contracts")
        } catch (err) {
          toast("Surgio un error al generar la escritura",{
            type : 'error',
@@ -156,7 +122,6 @@ function RenderPageContracts() {
             loadingDataClient={loadingDataClient}
             client={client}
             loading={loading}
-            viewPdfEscrituraMarcaAgua={handleSubmitEscritura}
             checkViewEscritura={handleCheckViewEscritura}
           />
         )
