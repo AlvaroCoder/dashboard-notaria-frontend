@@ -12,7 +12,8 @@ export default function Page() {
 
   const [dataClient, setDataClient] = useState({
     userName : "",
-    password : ""
+    password : "",
+    phone : ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -34,8 +35,7 @@ export default function Page() {
           value : "client"
         }
       }
-      const response = await registerClient(newDataClient);
-      const jsonResponseClient = await response.json();
+      await registerClient(newDataClient);
 
       toast("Se guardo correctamente el cliente", {
         type : 'success'
@@ -68,6 +68,13 @@ export default function Page() {
           onChange={handleChange} />
         <InputPasswordMaterialUi
           value={dataClient?.password}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Telefono del usuario"
+          className='font-poppins'
+          name='phone'
+          value={dataClient?.phone}
           onChange={handleChange}
         />
         <Button
