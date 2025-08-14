@@ -176,12 +176,12 @@ function RenderCardsFormStepper({
       
       if (imagesMinuta.length === 0) {
         setDataSendMinuta({
-          ...dataSendMinuta,
-          paymentMethod : null
-        });
+            ...dataSendMinuta,
+            paymentMethod : null
+        })
         pushActiveStep();
-        return;
-      }
+        return
+    }
       setLoading(true);
 
       pushActiveStep();
@@ -192,86 +192,97 @@ function RenderCardsFormStepper({
       setLoading(false);
     }
   }
-  const handleSubmitData=async()=>{
+  const handleSubmitData = async () => {
     try {
       setLoading(true);
-
-      const formDataImages = new FormData();
-      imagesMinuta.forEach((image)=>{
-        formDataImages.append('evidence', image[0]);
-      });
-
-      const responseEvidencias = await subirEvidenciasSinDirectorio(formDataImages);
-      const fileLocation = (await responseEvidencias.json())?.fileLocation;
-      console.log(fileLocation);
-      
-      const evidencesList = fileLocation?.fileNames?.map((file)=>{
-        return `DB_evidences/${fileLocation?.directory}/${file}`
-      });
-
-      const newDataSendMinuta={
+  
+      let newDataSendMinuta = {
         ...dataSendMinuta,
-        paymentMethod : {
-          ...dataSendMinuta?.paymentMethod,
-          evidences : evidencesList
-        },
-        clientId : dataSelected?.client?.id
+        clientId: dataSelected?.client?.id
       };
-
-      toast("Imagenes subidas correctamente",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-
-      const responseGenerateScript = await generateScriptCompraVenta('vehiculo', newDataSendMinuta);
+  
+      if (imagesMinuta && imagesMinuta.length > 0) {
+        // Si hay imágenes, las subimos
+        const formDataImages = new FormData();
+        imagesMinuta.forEach((image) => {
+          formDataImages.append("evidence", image[0]);
+        });
+  
+        const responseEvidencias = await subirEvidenciasSinDirectorio(formDataImages);
+        const fileLocation = (await responseEvidencias.json())?.fileLocation;
+  
+        const evidencesList = fileLocation?.fileNames?.map((file) => {
+          return `DB_evidences/${fileLocation?.directory}/${file}`;
+        });
+  
+        newDataSendMinuta.paymentMethod = {
+          ...dataSendMinuta?.paymentMethod,
+          evidences: evidencesList
+        };
+  
+        toast("Imagenes subidas correctamente", {
+          type: "success",
+          position: "bottom-right"
+        });
+      } else {
+        // Si no hay imágenes, se asigna null
+        newDataSendMinuta.paymentMethod = null;
+      }
       
+      const responseGenerateScript = await generateScriptCompraVenta(
+        "vehiculo",
+        newDataSendMinuta
+      );
+  
       if (!responseGenerateScript.ok || responseGenerateScript.status === 404) {
-        toast("Hubo un error al generar la escritura",{
-          type : 'error',
-          position : 'bottom-center'
+        toast("Hubo un error al generar la escritura", {
+          type: "error",
+          position: "bottom-center"
         });
         console.log(await responseGenerateScript.json());
         return;
-      }      
-
-      if (dataSession?.payload?.role === 'junior') {
-
-          const idContract = responseGenerateScript.headers.get('contractId');
-
-          const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
-          if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-            console.log(await responseJuniorAsigned.json());
-              
-            toast("El junior excede la cantidad maxima que puede manipular",{
-              type : 'error',
-              position : 'bottom-center'
-              });
-              return
-          }
-
-          toast("Se asigno el Junior correctamente",{
-              type : 'success',
-              position : 'bottom-right'
-          });
       }
-
+  
+      if (dataSession?.payload?.role === "junior") {
+        const idContract = responseGenerateScript.headers.get("contractId");
+  
+        const responseJuniorAsigned = await asignJuniorToContracts(
+          idContract,
+          dataSession?.payload?.id
+        );
+  
+        if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+          console.log(await responseJuniorAsigned.json());
+  
+          toast("El junior excede la cantidad maxima que puede manipular", {
+            type: "error",
+            position: "bottom-center"
+          });
+          return;
+        }
+  
+        toast("Se asigno el Junior correctamente", {
+          type: "success",
+          position: "bottom-right"
+        });
+      }
+  
       const blobResponse = await responseGenerateScript.blob();
       const url = URL.createObjectURL(blobResponse);
-
+  
       setViewPdf(url);
       pushActiveStep();
-
     } catch (err) {
       console.log(err);
-      
-      toast("Surgio un error en la api",{
-        type : 'error',
-        position : 'bottom-center'
+  
+      toast("Surgio un error en la api", {
+        type: "error",
+        position: "bottom-center"
       });
-    } finally{
+    } finally {
       setLoading(false);
     }
-  }
+  };
   const handleChangePaymentForm = (field, value) => {
     // notifica al padre
     setDataSendMinuta((prev)=>({
