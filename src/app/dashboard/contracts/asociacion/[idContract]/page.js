@@ -14,6 +14,8 @@ import { toast } from 'react-toastify';
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
   const {idContract} = useParams();
+  console.log(idContract);
+  
 
   const {
     data : dataResponseContract,

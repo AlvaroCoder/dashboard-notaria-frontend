@@ -15,6 +15,8 @@ import { toast } from 'react-toastify';
 function RenderPageContracts() {
     const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
     const {idContract} = useParams();
+    console.log(idContract);
+    
     const{
         data : dataResponseContract,
         loading : loadingDataContract,
@@ -23,7 +25,8 @@ function RenderPageContracts() {
 
     const {loadingDataClient, client}  = useContractDetails(dataResponseContract);
     const dataContract = dataResponseContract?.data || null;
-    
+    console.log(dataContract);
+
     const router = useRouter();
 
     const [loading, setLoading] = useState(false);
@@ -178,6 +181,10 @@ function RenderPageContracts() {
           loadingDataClient={loadingDataClient}
           client={client}
         />
+      )
+    case 6:
+      return (
+        <p>Caso 6</p>
       )
   }
 }

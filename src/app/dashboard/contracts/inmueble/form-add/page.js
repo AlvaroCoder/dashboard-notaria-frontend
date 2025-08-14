@@ -23,6 +23,7 @@ import { useSession } from '@/hooks/useSesion';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import CardAviso from '@/components/Cards/CardAviso';
+import CardNotarioSelected from '@/components/Cards/CardNotarioSelected';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -460,15 +461,9 @@ function RenderCardsFormStepper({
                     />
                     {
                         notarioSelected && (
-                            <div>
-                                <Title1>Notario seleccionado : </Title1>
-                                <p>Informacón del notario seleccionado</p>
-
-                                <section className='bg-white rounded-sm shadow p-4'>
-                                    <h1>Nombre : {notarioSelected?.firstName} {notarioSelected?.lastName}</h1>
-                                    <h1>Usuario : {notarioSelected?.userName}</h1>
-                                </section>
-                            </div>
+                            <CardNotarioSelected
+                                notario={notarioSelected}
+                            />
                         )
                     }
                     <Button 

@@ -85,25 +85,11 @@ function RenderCardsFormStepper({
       unit : 'dollar',
       amount : ''
     },
-    minuta : {
-        minutaNumber : '',
-        creationDay : {
-        date : formatDateToYMD(new Date())
-        },
-        place : {
-        name : 'Notaria Rojas',
-        district : ''
-        }
-    }
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [viewPdf, setViewPdf] = useState(null);
-  const [dataMinuta, setDataMinuta] = useState({
-    minutaPdf : null,
-    minutaWord : null,
-  });
 
   const handleClickSelectClient=(client)=>{
       handleClickClient(client);
@@ -228,7 +214,8 @@ function RenderCardsFormStepper({
         paymentMethod : {
           ...dataSendMinuta?.paymentMethod,
           evidences : evidencesList
-        }
+        },
+        clientId : dataSelected?.client?.id
       };
 
       toast("Imagenes subidas correctamente",{
@@ -236,22 +223,26 @@ function RenderCardsFormStepper({
         position : 'bottom-right'
       });
 
-      const response = await generateScriptCompraVenta('vehiculo', newDataSendMinuta);
-      console.log(dataSendMinuta);
-      if (!response.ok || response.status === 404) {
+      const responseGenerateScript = await generateScriptCompraVenta('vehiculo', newDataSendMinuta);
+      
+      if (!responseGenerateScript.ok || responseGenerateScript.status === 404) {
         toast("Hubo un error al generar la escritura",{
           type : 'error',
           position : 'bottom-center'
         });
-        console.log(await response.json());
+        console.log(await responseGenerateScript.json());
         return;
       }      
 
       if (dataSession?.payload?.role === 'junior') {
-          const idContract = response.headers.get('contractId');
+
+          const idContract = responseGenerateScript.headers.get('contractId');
+
           const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
           if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-              toast("El junior excede la cantidad maxima que puede manipular",{
+            console.log(await responseJuniorAsigned.json());
+              
+            toast("El junior excede la cantidad maxima que puede manipular",{
               type : 'error',
               position : 'bottom-center'
               });
@@ -264,13 +255,15 @@ function RenderCardsFormStepper({
           });
       }
 
-      const blobResponse = await response.blob();
+      const blobResponse = await responseGenerateScript.blob();
       const url = URL.createObjectURL(blobResponse);
 
       setViewPdf(url);
       pushActiveStep();
 
     } catch (err) {
+      console.log(err);
+      
       toast("Surgio un error en la api",{
         type : 'error',
         position : 'bottom-center'
@@ -378,7 +371,7 @@ function RenderCardsFormStepper({
     case 4:
       return(
         <section className='w-full flex justify-center'>
-          <div className='w-full bg-white px-6 rounded-lg shadow mt-8'>
+          <div className='w-full bg-white px-6 rounded-lg shadow mt-8 pb-4'>
             <section>
               <Title1 className='text-3xl'>Información Restante</Title1>
               <p>Ingresa la información restantes para generar la escritura</p>
@@ -393,7 +386,7 @@ function RenderCardsFormStepper({
             <section className='my-2'>
               <Title1>Información del pago</Title1>
               <div className='flex flex-row gap-4 w-full'>
-                <FormControl  className="min-w-[300px]">
+                <FormControl  className="w-[400px]">
                   <InputLabel>Moneda</InputLabel>
                   <Select
                     value={dataSendMinuta?.payment.unit}
@@ -463,6 +456,7 @@ function RenderCardsFormStepper({
             headers={headersTableroCliente}
             data={dataSeniors?.data}
             handleClickSelect={handleClickSelectSenior}
+            showAddButton={dataSession?.payload?.role === 'admin'}
           />
           {
             notarioSelected && (

@@ -7,6 +7,7 @@ import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
 import CardPersonFounder from '../Cards/CardPersonFounder';
 import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
+import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -24,6 +25,8 @@ export default function View2ContractEscritura({
 	checkViewEscritura =()=>{}
 }) {
 
+	console.log(dataContract);
+	
 	const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
   return (
     <div className="h-screen pb-24 p-8 space-y-6 overflow-y-auto">
@@ -61,7 +64,7 @@ export default function View2ContractEscritura({
 		<div className='w-full grid grid-cols-1 mt-4 gap-4 md:grid-cols-2 lg:grid-cols-3'>
 			{
 				dataContract?.founders?.people?.map((found, idx)=>(
-					<CardPersonFounder
+					<CardPersonBuyerSeller
 						key={idx}
 						person={found}
 					/>
