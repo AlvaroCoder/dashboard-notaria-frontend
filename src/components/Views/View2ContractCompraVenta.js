@@ -91,8 +91,6 @@ export default function View2ContractCompraVenta({
                 </div>
             </section>
         </section>
-    {
-        dataContract?.contractType !== 'compraVentaVehiculo' &&
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
             <Title1 className='text-xl'>Escritura del cliente</Title1>
             {
@@ -117,7 +115,6 @@ export default function View2ContractCompraVenta({
                 {loading ? <Loader2 className='animate-spin' /> : <p>Ver Escritura con marca de agua</p>}
             </Button>
         </section>
-    }
     <section className='bg-white p-4 rounded-lg mt-4 shadow'>
         <Title1 className='text-xl'>Escritura generada</Title1>
         {

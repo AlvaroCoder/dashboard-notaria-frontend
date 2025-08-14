@@ -25,6 +25,8 @@ function RenderPageContracts() {
     const dataContract = dataResponseContract?.data || null;
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [viewPdf, setViewPdf] = useState(null);
+
 
   const handleCheckViewEscritura=async()=>{
     try {
@@ -35,14 +37,42 @@ function RenderPageContracts() {
         position : 'bottom-right'
       });
       router.push("/dashboard/contracts");
-
-
     } catch (err) {      
       toast("Surgio un error al aceptar la escritura",{
         type : 'error',
         position : 'bottom-center'
       });
     } finally {
+      setLoading(false);
+    }
+  }
+  const handleSubmitEscritura=async()=>{
+    try {
+      setLoading(true);
+      const prevData = dataResponseContract?.data;
+      const newDataToSend = {
+        contractId : idContract,
+        ...prevData
+      };
+
+      const response = await generateScriptMarcaAguaCompraVenta('vehiculo', newDataToSend);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      setViewPdf(url);
+      toast("Se genero la escritura",{
+        type :'success',
+        position : 'bottom-right'
+      });
+    } catch (err) {
+      console.log(err);
+      
+      toast("Surgio un error al generar la escritura", {
+        type: 'error',
+        position: 'bottom-center'
+      });
+      
+    }finally {
       setLoading(false);
     }
   }
@@ -122,7 +152,9 @@ function RenderPageContracts() {
             loadingDataClient={loadingDataClient}
             client={client}
             loading={loading}
+            viewPdfEscrituraMarcaAgua={viewPdf}
             checkViewEscritura={handleCheckViewEscritura}
+            handleClickSubmit={handleSubmitEscritura}
           />
         )
       case 3:
