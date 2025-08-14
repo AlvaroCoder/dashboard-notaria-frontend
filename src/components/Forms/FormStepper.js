@@ -73,50 +73,62 @@ export default function FormStepper({
   const handleChange = useCallback((index, field, value, personType, bienesMancomunados = false) => {
     setData(personType, (prevData) => {
       const list = [...prevData];
-      
-      if (field === 'bienesMancomunados') {
-        list[index].bienesMancomunados = value;
-      }
-      // Asegurar que el objeto existe
-      if (!list[index]) list[index] = {};
-      if (!list[index].address) list[index].address = {};
-      if (!list[index].maritalStatus) list[index].maritalStatus = {};
+      const person = { ...list[index] };
   
-      // Estado Civil
+      // Lógica para el estado civil y campos relacionados.
       if (field === 'maritalStatus') {
-        list[index].maritalStatus.civilStatus = value?.toLowerCase();
-        const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
-        if (isCasado) {
-          list[index].maritalStatus.marriageType = { type: bienesMancomunados ? 1 : 2 };
-          list[index].maritalStatus.spouse = {
-            age : 19
-          };
+        const civilStatus = value?.toLowerCase();
+        person.maritalStatus.civilStatus = civilStatus;
+  
+        if (civilStatus === 'casado' || civilStatus === 'casada') {
+          // Lógica para bienes separados (type: 1)
+          if (!bienesMancomunados) {
+            person.maritalStatus.marriageType = {
+              type: 1,
+              partidaRegistralNumber: person.maritalStatus.spouse?.partidaRegistralNumber || '',
+              province: person.maritalStatus.spouse?.province || ''
+            };
+            person.maritalStatus.spouse = {}; // Se limpia el objeto del cónyuge
+          }
+          // Lógica para bienes mancomunados (type: 2)
+          else {
+            person.maritalStatus.marriageType = { type: 2 };
+            if (!person.maritalStatus.spouse || Object.keys(person.maritalStatus.spouse).length === 0) {
+              person.maritalStatus.spouse = {
+                age: 19
+              };
+            }
+          }
+        } else {
+          person.maritalStatus.spouse = {};
+          if (person.maritalStatus.marriageType) {
+            delete person.maritalStatus.marriageType;
+          }
         }
       } 
-      
       // Campos del cónyuge
       else if (field?.startsWith("spouse-")) {
         const fieldForm = field.split("-")[1];
-        if (!list[index].maritalStatus.spouse) {
-          list[index].maritalStatus.spouse = {};
-        }
-        list[index].maritalStatus.spouse[fieldForm] = value;
+        person.maritalStatus.spouse = {
+          ...person.maritalStatus.spouse,
+          [fieldForm]: value
+        };
       } 
-      
       // Campos de dirección
-      else if (['district', 'province', 'department'].includes(field)) {
-        list[index].address[field] = value;
+      else if (field === 'address' || ['district', 'province', 'department'].includes(field)) {
+        person.address = {
+          ...person.address,
+          [field]: value,
+          name: field === 'address' ? value : person.address.name,
+        };
       } 
-      
-      else if (field === 'address') {
-        list[index].address.name = value;
-      } 
-      
-      // Resto de campos
+      // El resto de campos
       else {
-        list[index][field] = value;
+        person[field] = value;
       }
-  
+      
+      // Asigna la persona actualizada a la lista
+      list[index] = person;
       return list;
     });
   }, [setData]);
@@ -215,7 +227,7 @@ export default function FormStepper({
               handleDelete={(idx) => deletePerson(idx, 'vendedores')}
               errores={errores}
             />
-            <div className='flex flex-row gap-2'>
+            <div className='flex flex-row gap-2 mt-4'>
               <Button 
               variant={"outline"}
               onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
@@ -237,7 +249,7 @@ export default function FormStepper({
               handleDelete={(idx) => deletePerson(idx, 'vendedores')}
               errores={errores}
             />
-            <div className='flex flex-row gap-2'>
+            <div className='flex flex-row gap-2 mt-4'>
               <Button 
               variant={"outlined"}
               onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
@@ -257,7 +269,7 @@ export default function FormStepper({
               handleDelete={(idx) => deletePerson(idx, 'compradores')}
               errores={errores}
             />
-            <div className='flex flex-row gap-2'>
+            <div className='flex flex-row gap-2 mt-4'>
               <Button onClick={() => addPerson('compradores')} className='flex-1 py-4'>
                 Agregar Comprador
               </Button>

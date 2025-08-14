@@ -155,6 +155,7 @@ function RenderPageContracts() {
           dataContract={dataContract}
           loadingDataClient={loadingDataClient}
           client={client}
+          
           handleClickSetFirma={handleClickSetFirma}
         />
       )

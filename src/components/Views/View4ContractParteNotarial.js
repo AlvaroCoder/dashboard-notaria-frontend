@@ -29,69 +29,8 @@ export default function View4ContractParteNotarial({
         // Logic to generate notarial part
         try {
             setLoadingParteNotarial(true);
-            const newData = {
-                ...dataContract,
-                contractId : idContract,
-                signedDocumentDate : {
-                    date : formatDateToYMD(new Date())
-                }
-            }
-            if (dataContract?.contractType === 'compraVentaPropiedad') {
-                let buyers = dataContract?.buyers?.people?.map((buyer)=>({
-                    ...buyer,
-                    signedDate : {
-                        date : formatDateToYMD(new Date())
-                    }
-                }));
-
-                let sellers = dataContract?.sellers?.people?.map((seller)=>({
-                    ...seller,
-                    signedDate : {
-                        date : formatDateToYMD(new Date())
-                    }
-                }));
-                newData.buyers = {
-                    people : buyers
-                };
-                newData.sellers = {
-                    people : sellers
-                };
-            }
-            if (["asociacion", "RS", "SCRL", "SAC"].includes(dataContract?.contractType)) {
-                let founders = dataContract?.founders?.people?.map((founder)=>({
-                    ...founder,
-                    signedDate : {
-                        date : formatDateToYMD(new Date())
-                    }
-                }))
-                newData.founders = {
-                    people : founders
-                };
-            }
-
-            let response;
-
-            const { contractType } = dataContract || {};
-
-            if (contractType === 'compraVentaPropiedad') {
-                response = await generarParteNotarial(newData, contractType);
-            } 
-            else if (["RS", "SCRL", "SAC", "asociacion"].includes(contractType)) {
-                const tipo = contractType === 'RS' ? 'razonSocial' : contractType?.toLowerCase();
-                response = await generarParteNotarialConstitucion(newData, tipo);
-            }
-
-            if (!response.ok) {
-                const responseJSON = await response.json();
-                console.log(responseJSON);
-                return;   
-            }
+            console.log(dataContract);
             
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
-
-            setViewParteNotarial(url);
-            toast("Se genero la parte notarial correctamente", {type : 'success', position : 'bottom-right'}); 
         } catch (err) {
             console.log(err);
             
