@@ -75,7 +75,6 @@ function RenderApp({
     dataSelected,
     handleClickClient,
     pushActiveStep,
-    pushActive2Step,
     backActiveStep
   } = useContracts();
 
@@ -305,7 +304,7 @@ function RenderApp({
           </section>
         </section>
       )
-    case 3:
+    case 2:
       // Se generan los formularios de los fundadores
       return(
         <section className='w-full flex justify-center items-center'>
@@ -318,7 +317,7 @@ function RenderApp({
           </div>
         </section>
       )
-    case 4:
+    case 3:
       // Se pide la información restante
       return(
         <section className='w-full flex justify-center items-center'>
@@ -358,7 +357,7 @@ function RenderApp({
           </div>
         </section>
       )
-    case 5:
+    case 4:
       // Se pide la informacion del senior
       return(
         <section className='w-full h-screen overflow-y-auto px-8 pb-24 flex flex-col gap-4'> 
@@ -412,7 +411,7 @@ function RenderApp({
             </div>
         </section>
       )
-      case 6:
+      case 5:
         return(
           <section className='p-4 w-full'>
             <FormViewerPdfEscritura

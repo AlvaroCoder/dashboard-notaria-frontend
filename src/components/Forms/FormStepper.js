@@ -7,210 +7,198 @@ import { toast } from 'react-toastify';
 import { RenderStepper } from './elements';
 import { cn } from '@/lib/utils';
 
+const mkPerson = () => ({
+  firstName: '',
+  lastName: '',
+  dni: '',
+  gender: 'M',
+  nationality: 'Peruano',
+  age: '19',
+  job: '',
+  bienesMancomunados: true,
+  address: { name: '', district: '', province: '', department: '' },
+  maritalStatus: { civilStatus: 'soltero' } // minúsculas para UI
+});
+
 export default function FormStepper({
   tipoProceso = 'compra',
   handleSaveData = () => {},
 }) {
   const stepsCompra = useMemo(() => ['Comprador(es)', 'Vendedor(es)'], []);
   const stepsVenta = useMemo(() => ['Vendedor(es)', 'Comprador(es)'], []);
+  const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
 
   const [activeStep, setActiveStep] = useState(0);
   const [errores, setErrores] = useState([]);
 
-  const [compradores, setCompradores] = useState([
-    {
-      firstName: "",
-      lastName: "",
-      dni: "",
-      gender: "M",
-      nationality: "Peruano",
-      age: '19',
-      job: "",
-      maritalStatus: {
-        civilStatus: "soltero",
-        spouse: {}
-      },
-      bienesMancomunados: true, // 👈 aquí
-      address: {
-        name: "",
-        district: "",
-        province: "",
-        department: ""
-      }
-    }
-  ]);
-  const [vendedores, setVendedores] = useState([{
-    firstName: "",
-    lastName: "",
-    dni: "",
-    gender: "M",
-    nationality: "Peruano",
-    age: '19',
-    job: "",
-    maritalStatus: {
-      civilStatus: "soltero",
-      spouse: {}
-    },
-    bienesMancomunados: true, // 👈 aquí
-    address: {
-      name: "",
-      district: "",
-      province: "",
-      department: ""
-    }
-  }]);
+  const [compradores, setCompradores] = useState([mkPerson()]);
+  const [vendedores, setVendedores] = useState([mkPerson()]);
 
-  const steps = tipoProceso === 'compra' ? stepsCompra : stepsVenta;
-  const data = useMemo(() => ({ compradores, vendedores }), [compradores, vendedores]);
-  const setData = useCallback((personType, newData) => {
+  const setData = useCallback((personType, updater) => {
     if (personType === 'compradores') {
-      setCompradores(newData);
+      setCompradores((prev) => (typeof updater === 'function' ? updater(prev) : updater));
     } else {
-      setVendedores(newData);
+      setVendedores((prev) => (typeof updater === 'function' ? updater(prev) : updater));
     }
   }, []);
 
+  /**
+   * Maneja TODOS los cambios de campos (normales y anidados)
+   * field puede ser:
+   *  - 'firstName', 'dni', etc.
+   *  - 'maritalStatus'
+   *  - 'bienesMancomunados'
+   *  - 'address-*' (name, district, province, department)
+   *  - 'spouse-*'  (firstName, dni, gender, nationality, age, job)
+   *  - 'marriageType-*' (partidaRegistralNumber, province)
+   */
   const handleChange = useCallback((index, field, value, personType, bienesMancomunados = false) => {
     setData(personType, (prevData) => {
       const list = [...prevData];
       const person = { ...list[index] };
-  
-      // Lógica para el estado civil y campos relacionados.
-      if (field === 'maritalStatus') {
-        const civilStatus = value?.toLowerCase();
-        person.maritalStatus.civilStatus = civilStatus;
-  
-        if (civilStatus === 'casado' || civilStatus === 'casada') {
-          // Lógica para bienes separados (type: 1)
-          if (!bienesMancomunados) {
-            person.maritalStatus.marriageType = {
-              type: 1, 
-              partidaRegistralNumber: person.maritalStatus.spouse?.partidaRegistralNumber || '',
-              province: person.maritalStatus.spouse?.province || ''
-            };
-            person.maritalStatus.spouse = {}; // Se limpia el objeto del cónyuge
-          }
-          // Lógica para bienes mancomunados (type: 2)
-          else {
+
+      // Asegurar contenedores
+      if (!person.address) person.address = {};
+      if (!person.maritalStatus) person.maritalStatus = {};
+
+      // Cambiar tipo de bienes
+      if (field === 'bienesMancomunados') {
+        person.bienesMancomunados = Boolean(value);
+        const civil = (person.maritalStatus.civilStatus || '').toLowerCase();
+        const isCasado = civil === 'casado' || civil === 'casada';
+        if (isCasado) {
+          if (person.bienesMancomunados) {
+            // Mancomunados => type 2 + spouse presente
             person.maritalStatus.marriageType = { type: 2 };
-            if (!person.maritalStatus.spouse || Object.keys(person.maritalStatus.spouse).length === 0) {
-              person.maritalStatus.spouse = {
-                age: 19
-              };
+            if (!person.maritalStatus.spouse) {
+              person.maritalStatus.spouse = { age: 19 };
             }
-          }
-        } else {
-          person.maritalStatus.spouse = {};
-          if (person.maritalStatus.marriageType) {
-            delete person.maritalStatus.marriageType;
+          } else {
+            // Separados => type 1 + sin spouse
+            person.maritalStatus.marriageType = {
+              type: 1,
+              partidaRegistralNumber: person.maritalStatus.marriageType?.partidaRegistralNumber || '',
+              province: person.maritalStatus.marriageType?.province || ''
+            };
+            delete person.maritalStatus.spouse;
           }
         }
-      } 
-      // Campos del cónyuge
-      else if (field?.startsWith("spouse-")) {
-        const fieldForm = field.split("-")[1];
-        person.maritalStatus.spouse = {
-          ...person.maritalStatus.spouse,
-          [fieldForm]: value
-        };
-      } 
-      // Campos de dirección
-      else if (field === 'address' || ['district', 'province', 'department'].includes(field)) {
-        person.address = {
-          ...person.address,
-          [field]: value,
-          name: field === 'address' ? value : person.address.name,
-        };
-      } 
-      // El resto de campos
-      else {
-        person[field] = value;
+        list[index] = person;
+        return list;
       }
-      
-      // Asigna la persona actualizada a la lista
+
+      // Cambio de estado civil
+      if (field === 'maritalStatus') {
+        const civil = String(value || '').toLowerCase();
+        person.maritalStatus.civilStatus = civil;
+        const isCasado = civil === 'casado' || civil === 'casada';
+
+        if (isCasado) {
+          if (bienesMancomunados) {
+            person.maritalStatus.marriageType = { type: 2 };
+            if (!person.maritalStatus.spouse) {
+              person.maritalStatus.spouse = { age: 19 };
+            }
+          } else {
+            person.maritalStatus.marriageType = {
+              type: 1,
+              partidaRegistralNumber: person.maritalStatus.marriageType?.partidaRegistralNumber || '',
+              province: person.maritalStatus.marriageType?.province || ''
+            };
+            delete person.maritalStatus.spouse;
+          }
+        } else {
+          delete person.maritalStatus.spouse;
+          delete person.maritalStatus.marriageType;
+        }
+        list[index] = person;
+        return list;
+      }
+
+      // spouse-*
+      if (field?.startsWith('spouse-')) {
+        const key = field.split('-')[1];
+        if (!person.maritalStatus.spouse) person.maritalStatus.spouse = {};
+        person.maritalStatus.spouse[key] = value;
+        list[index] = person;
+        return list;
+      }
+
+      // marriageType-*
+      if (field?.startsWith('marriageType-')) {
+        const key = field.split('-')[1];
+        if (!person.maritalStatus.marriageType) person.maritalStatus.marriageType = { type: 1 };
+        person.maritalStatus.marriageType[key] = value;
+        list[index] = person;
+        return list;
+      }
+
+      // address-*
+      if (field?.startsWith('address-')) {
+        const key = field.split('-')[1];
+        person.address[key] = value;
+        list[index] = person;
+        return list;
+      }
+
+      // Campos planos
+      person[field] = value;
       list[index] = person;
       return list;
     });
   }, [setData]);
 
   const addPerson = useCallback((personType) => {
-    setData(personType, (prevData) => [...prevData, 
-      {
-        firstName: "",
-        lastName: "",
-        dni: "",
-        gender: "M",
-        nationality: "Peruano",
-        age: '19',
-        job: "",
-        maritalStatus: {
-          civilStatus: "soltero",
-          spouse: {}
-        },
-        bienesMancomunados: true, // 👈 aquí
-        address: {
-          name: "",
-          district: "",
-          province: "",
-          department: ""
-        }
-      }
-    ]);
+    setData(personType, (prev) => [...prev, mkPerson()]);
   }, [setData]);
 
   const deletePerson = useCallback((idx, personType) => {
-    setData(personType, (prevData) => prevData.filter((_, index) => idx !== index));
+    setData(personType, (prev) => prev.filter((_, i) => i !== idx));
   }, [setData]);
 
-  const handleNext = useCallback(async (e) => {
+  const handleNext = useCallback((e) => {
     e.preventDefault();
+    const dataToValidate =
+      tipoProceso === 'compra'
+        ? activeStep === 0 ? compradores : vendedores
+        : activeStep === 0 ? vendedores : compradores;
 
-    let dataToValidate = [];
-    if (tipoProceso === 'compra') {
-      if (activeStep === 0) dataToValidate = compradores;
-      if (activeStep === 1) dataToValidate = vendedores;
-    } else { // tipoProceso === 'venta'
-      if (activeStep === 0) dataToValidate = vendedores;
-      if (activeStep === 1) dataToValidate = compradores;
-    }
-
-    // Lógica de validación
     const validationErrors = checkEmptyFieldsFormCompra(dataToValidate);
-    
     if (validationErrors.length > 0) {
       setErrores(validationErrors);
       toast('Formulario incompleto', { type: 'error' });
       return;
     }
-    setErrores([]); // Limpiar errores si la validación es exitosa
+    setErrores([]);
 
     if (activeStep === steps.length - 1) {
-      handleSaveData(compradores, vendedores);
+      // Normaliza civilStatus capitalizado al enviar
+      const normalize = (arr) =>
+        arr.map((p) => {
+          const cloned = JSON.parse(JSON.stringify(p));
+          if (cloned.maritalStatus?.civilStatus) {
+            const cs = cloned.maritalStatus.civilStatus;
+            cloned.maritalStatus.civilStatus = cs.charAt(0).toUpperCase() + cs.slice(1);
+          }
+          return cloned;
+        });
+      handleSaveData(normalize(compradores), normalize(vendedores));
+    } else {
+      setActiveStep((prev) => prev + 1);
     }
+  }, [activeStep, compradores, vendedores, steps.length, tipoProceso, handleSaveData]);
 
-    setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-  }, [activeStep, compradores, vendedores, handleSaveData, steps.length, tipoProceso]);
-
-  const handleBack = useCallback(() => {
-    setActiveStep((prev) => prev - 1);
-  }, []);
+  const handleBack = useCallback(() => setActiveStep((p) => p - 1), []);
 
   const renderCurrentStepForm = () => {
+    const commonProps = { handleChange, handleDelete: deletePerson, errores };
     if (tipoProceso === 'compra') {
       if (activeStep === 0) {
         return (
           <>
-            <FormPerson
-              data={compradores}
-              handleChange={(index, field, value) => handleChange(index, field, value, 'compradores')}
-              type='compra'
-              handleDelete={(idx) => deletePerson(idx, 'compradores')}
-              errores={errores}
-            />
-            <div className='flex flex-row gap-2 mt-6'>
-              <Button 
-              variant={"outline"}
-              onClick={() => addPerson('compradores')} className='flex-1 py-4'>
+            <FormPerson data={compradores} type="compra" {...commonProps} />
+            <div className="flex flex-row gap-2 mt-6">
+              <Button variant="outline" onClick={() => addPerson('compradores')} className="flex-1 py-4">
                 Agregar Comprador
               </Button>
             </div>
@@ -220,39 +208,22 @@ export default function FormStepper({
       if (activeStep === 1) {
         return (
           <>
-            <FormPerson
-              data={vendedores}
-              handleChange={(index, field, value) => handleChange(index, field, value, 'vendedores')}
-              type='venta'
-              handleDelete={(idx) => deletePerson(idx, 'vendedores')}
-              errores={errores}
-            />
-            <div className='flex flex-row gap-2 mt-4'>
-              <Button 
-              variant={"outline"}
-              onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+            <FormPerson data={vendedores} type="venta" {...commonProps} />
+            <div className="flex flex-row gap-2 mt-6">
+              <Button variant="outline" onClick={() => addPerson('vendedores')} className="flex-1 py-4">
                 Agregar Vendedor
               </Button>
             </div>
           </>
         );
       }
-      // Los casos 2 y 3 no tienen un FormPerson, por lo que no se muestran aquí.
-    } else { // tipoProceso === 'venta'
+    } else {
       if (activeStep === 0) {
         return (
           <>
-            <FormPerson
-              data={vendedores}
-              handleChange={(index, field, value) => handleChange(index, field, value, 'vendedores')}
-              type='venta'
-              handleDelete={(idx) => deletePerson(idx, 'vendedores')}
-              errores={errores}
-            />
-            <div className='flex flex-row gap-2 mt-4'>
-              <Button 
-              variant={"outlined"}
-              onClick={() => addPerson('vendedores')} className='flex-1 py-4'>
+            <FormPerson data={vendedores} type="venta" {...commonProps} />
+            <div className="flex flex-row gap-2 mt-6">
+              <Button variant="outline" onClick={() => addPerson('vendedores')} className="flex-1 py-4">
                 Agregar Vendedor
               </Button>
             </div>
@@ -262,15 +233,9 @@ export default function FormStepper({
       if (activeStep === 1) {
         return (
           <>
-            <FormPerson
-              data={compradores}
-              handleChange={(index, field, value) => handleChange(index, field, value, 'compradores')}
-              type='compra'
-              handleDelete={(idx) => deletePerson(idx, 'compradores')}
-              errores={errores}
-            />
-            <div className='flex flex-row gap-2 mt-4'>
-              <Button onClick={() => addPerson('compradores')} className='flex-1 py-4'>
+            <FormPerson data={compradores} type="compra" {...commonProps} />
+            <div className="flex flex-row gap-2 mt-6">
+              <Button variant="outline" onClick={() => addPerson('compradores')} className="flex-1 py-4">
                 Agregar Comprador
               </Button>
             </div>
@@ -284,20 +249,15 @@ export default function FormStepper({
   return (
     <section>
       <RenderStepper steps={steps} active={activeStep} />
-      <section className='mt-8'>{renderCurrentStepForm()}</section>
+      <section className="mt-8">{renderCurrentStepForm()}</section>
 
-      <div className={`mt-6 ${tipoProceso === 'compra' ? 'flex flex-row gap-4' : 'w-full'}`}>
+      <div className={cn('mt-6', tipoProceso === 'compra' ? 'flex flex-row gap-4' : 'w-full')}>
         {tipoProceso === 'compra' && (
-          <Button 
-          className={"flex-1"}
-          disabled={activeStep === 0} onClick={handleBack}>
+          <Button className="flex-1" disabled={activeStep === 0} onClick={handleBack}>
             Atrás
           </Button>
         )}
-        <Button
-          onClick={handleNext}
-          className={cn(tipoProceso === 'venta' ? 'w-full' : '','flex-1')}
-        >
+        <Button onClick={handleNext} className={cn(tipoProceso === 'venta' ? 'w-full' : '', 'flex-1')}>
           {activeStep === steps.length - 1 ? 'Finalizar' : 'Siguiente'}
         </Button>
       </div>
