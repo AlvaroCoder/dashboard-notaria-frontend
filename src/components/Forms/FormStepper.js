@@ -75,59 +75,57 @@ export default function FormStepper({
       const list = [...prevData];
       const person = { ...list[index] };
   
-      // Lógica para el estado civil y campos relacionados.
+      if (!person.maritalStatus) person.maritalStatus = {};
+      if (!person.address) person.address = {};
+  
       if (field === 'maritalStatus') {
         const civilStatus = value?.toLowerCase();
         person.maritalStatus.civilStatus = civilStatus;
   
         if (civilStatus === 'casado' || civilStatus === 'casada') {
-          // Lógica para bienes separados (type: 1)
           if (!bienesMancomunados) {
             person.maritalStatus.marriageType = {
               type: 1,
-              partidaRegistralNumber: person.maritalStatus.spouse?.partidaRegistralNumber || '',
-              province: person.maritalStatus.spouse?.province || ''
+              partidaRegistralNumber: '',
+              province: ''
             };
-            person.maritalStatus.spouse = {}; // Se limpia el objeto del cónyuge
-          }
-          // Lógica para bienes mancomunados (type: 2)
-          else {
+            delete person.maritalStatus.spouse;
+          } else {
             person.maritalStatus.marriageType = { type: 2 };
-            if (!person.maritalStatus.spouse || Object.keys(person.maritalStatus.spouse).length === 0) {
-              person.maritalStatus.spouse = {
-                age: 19
-              };
+            if (!person.maritalStatus.spouse) {
+              person.maritalStatus.spouse = { age: 19 };
             }
           }
         } else {
-          person.maritalStatus.spouse = {};
-          if (person.maritalStatus.marriageType) {
-            delete person.maritalStatus.marriageType;
-          }
+          delete person.maritalStatus.spouse;
+          delete person.maritalStatus.marriageType;
         }
-      } 
-      // Campos del cónyuge
+      }
+      // spouse fields
       else if (field?.startsWith("spouse-")) {
         const fieldForm = field.split("-")[1];
-        person.maritalStatus.spouse = {
-          ...person.maritalStatus.spouse,
-          [fieldForm]: value
-        };
-      } 
-      // Campos de dirección
-      else if (field === 'address' || ['district', 'province', 'department'].includes(field)) {
+        if (!person.maritalStatus.spouse) person.maritalStatus.spouse = {};
+        person.maritalStatus.spouse[fieldForm] = value;
+      }
+      // marriageType fields (for bienes separados)
+      else if (field?.startsWith("marriageType-")) {
+        const fieldForm = field.split("-")[1];
+        if (!person.maritalStatus.marriageType) person.maritalStatus.marriageType = { type: 1 };
+        person.maritalStatus.marriageType[fieldForm] = value;
+      }
+      // address fields
+      else if (field?.startsWith("address-")) {
+        const fieldForm = field.split("-")[1];
         person.address = {
           ...person.address,
-          [field]: value,
-          name: field === 'address' ? value : person.address.name,
+          [fieldForm]: value
         };
-      } 
-      // El resto de campos
+      }
+      // others
       else {
         person[field] = value;
       }
-      
-      // Asigna la persona actualizada a la lista
+  
       list[index] = person;
       return list;
     });

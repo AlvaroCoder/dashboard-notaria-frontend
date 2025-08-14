@@ -77,8 +77,6 @@ function RenderApp({
     dataSelected,
     handleClickClient,
     pushActiveStep,
-    pushActive2Step,
-    handleChangeFileLocation,
     backActiveStep
   } = useContracts();
 

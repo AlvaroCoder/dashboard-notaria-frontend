@@ -1,9 +1,8 @@
-'use client'
-
+'use client';
 import Title1 from '@/components/elements/Title1';
 import { useFetch } from '@/hooks/useFetch';
 import { Divider, TextField } from '@mui/material';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import FormStepper from '@/components/Forms/FormStepper';
 import { useContratoContext } from '@/context/ContratosContext';
 import { toast } from 'react-toastify';
@@ -178,7 +177,8 @@ function RenderCardsFormStepper({
     const handleClickFormStepper=(compradores, vendedores)=>{
         console.log(compradores);
         console.log(vendedores);
-        setDataSendMinuta({
+/**
+ *         setDataSendMinuta({
             ...dataSendMinuta,
             sellers : {
                 people : vendedores
@@ -192,6 +192,7 @@ function RenderCardsFormStepper({
             type : 'info',
             position : 'bottom-right'
         })
+ */
         
     }
     const handleClickEvidences=async(e)=>{
