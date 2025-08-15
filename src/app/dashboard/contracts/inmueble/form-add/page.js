@@ -232,9 +232,7 @@ function RenderCardsFormStepper({
         try {
             setLoading(true);
             
-            const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
-        
-            const {idContract} = await funUploadDataMinutaCompraVenta(
+            const {idContract, fileLocation} = await funUploadDataMinutaCompraVenta(
                 dataMinuta?.minutaWord,
                 dataMinuta?.minutaPdf,
                 dataSelected?.client?.id,
@@ -242,6 +240,8 @@ function RenderCardsFormStepper({
                 dataSendMinuta?.case
             )
 
+            const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
+            
             const newDataSendMinuta= {
                 ...dataSendMinuta,
                 contractId : idContract,
