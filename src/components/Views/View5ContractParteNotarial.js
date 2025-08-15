@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Title1 from '../elements/Title1'
 import { camelCaseToTitle, cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation';
 import { statusContracts } from '@/lib/commonJSON';
 import { Loader2, User2 } from 'lucide-react';
+import { getDocumentByPath } from '@/lib/apiConnections';
+import FramePdf from '../elements/FramePdf';
+import { Button } from '../ui/button';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -13,7 +16,6 @@ export default function View5ContractParteNotarial({
   title="Detalles del Contrato",
   description="Información del contrato"
 }) {
-    const router = useRouter();
   return (
     <div className='h-screen pb-24 p-8 space-y-6  overflow-y-auto'>
        <section className='flex flex-row justify-between'>
@@ -29,8 +31,14 @@ export default function View5ContractParteNotarial({
             <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient ?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
           </section>
 
-        <section>
-        vehiculo
+          <section className='bg-white p-4 rounded-lg mt-4 shadow'>
+            <Title1>Partida Notarial Generada</Title1>
+            <FramePdf
+              directory={ dataContract?.documentPaths?.parteNotarialPath}
+            /> 
+            <Button>
+              Generar Testimonio
+            </Button>
         </section>
     </div>
   )

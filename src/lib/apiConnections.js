@@ -234,7 +234,6 @@ export async function getDocumentByPath(path) {
         body : JSON.stringify({path})
     });
 }
-
 export async function submitFirmarDocumento(contractId, fecha) {
     return fetch(`${URL_ESTABLECER_FIRMA}${contractId}&signedDocumentDate=${fecha}`,{
         method : 'PUT',
