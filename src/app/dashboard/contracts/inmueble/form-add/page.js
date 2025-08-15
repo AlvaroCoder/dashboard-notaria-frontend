@@ -240,15 +240,19 @@ function RenderCardsFormStepper({
                 dataSendMinuta?.case
             )
 
-            const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
-            
-            const newDataSendMinuta= {
+            let newDataSendMinuta = {
                 ...dataSendMinuta,
-                contractId : idContract,
-                paymentMethod : {
+                contractId : idContract
+            }
+            if (imagesMinuta && imagesMinuta.length > 0) {
+                const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
+                newDataSendMinuta.paymentMethod = {
                     ...dataSendMinuta?.paymentMethod,
                     evidences : responseEvidencias
-                }
+                };
+
+            } else {
+                newDataSendMinuta.paymentMethod = null;
             }
             
             if (dataSession?.payload?.role === 'junior') {

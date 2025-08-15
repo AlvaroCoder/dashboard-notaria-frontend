@@ -67,8 +67,9 @@ export default function ViewJuniorDashboard({
       </div>
       <section className='w-full grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 '>
         {
-          dataButtons?.map((butt)=>
+          dataButtons?.map((butt, idx)=>
             <RedirectButton
+              key={idx}
               indicator={butt}
             />
           )
