@@ -10,6 +10,7 @@ import { generarParteNotarial, generarParteNotarialConstitucion } from '@/lib/ap
 import SignCompraVenta from '../Forms/SignCompraVenta';
 import Separator2 from '../elements/Separator2';
 import { toast } from 'react-toastify';
+import SignConstitucion from '../Forms/SignConstitucion';
 
 export default function View4ContractParteNotarial({
     idContract="",
@@ -44,10 +45,10 @@ export default function View4ContractParteNotarial({
             } else if (dataContract?.contractType === 'compraVentaVehiculo') {
                 typeContract = 'vehiculo';
             } else {
-                typeContract = dataContract?.contractType;
+                typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
             }
             
-            const response = ['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType) 
+            const response = ['asociacion', 'razonSocial', 'rs', 'scrl', 'sac'].includes(dataContract?.contractType?.toLowerCase()) 
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
 
@@ -130,11 +131,13 @@ export default function View4ContractParteNotarial({
                         (
                             <section>
                                 {['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(dataContract.contractType?.toLowerCase()) ?
-                                <p>
-                                    {JSON.stringify(dataFormated)}
-                                </p> : 
+                                <SignConstitucion
+                                    data={dataFormated}
+                                    onGenerateParteNotarial={handleSubmitParteNotarial}
+                                />: 
                                 <SignCompraVenta
                                     data={dataFormated}
+                                    onGenerateParteNotarial={handleSubmitParteNotarial}
                                 />    
                             }
                             </section>

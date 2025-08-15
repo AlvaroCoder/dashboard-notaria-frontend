@@ -1,18 +1,87 @@
 import React, { useState } from 'react'
+import { Button } from '../ui/button';
+import Title1 from '../elements/Title1';
+import { Card, CardContent, TextField } from '@mui/material';
 
 export default function SignConstitucion({
     data : initialData,
-    onGnerateParteNotarial=()=>{}
+    onGenerateParteNotarial=()=>{}
 }) {
     const [data, setData] = useState(initialData);
 
-    const handleChange=(index, isSpouse, newDate)=>{
+    const handleDateChange=(index, isSpouse, newDate)=>{
         setData((prev)=>{
         const updated = {...prev};
-        
+            if (isSpouse) {
+                updated['founders'].people[index].maritalStatus.spouse.signedDate.date= newDate;
+            }else {
+                updated['founders'].people[index].signedDate.date = newDate;
+            }
+            return updated;
         })
     }
+    const renderPerson = (person, idx, role) => (
+        <Card key={`${role}-${idx}`} className="shadow-md">
+          <CardContent>
+            <div className="my-2">
+              <Title1>{role === 'buyers' ? 'Comprador ' :'Vendedor'}</Title1>
+              <p>Nombre : {person?.firstName}</p>
+              <p>Apellido : {person?.lastName}</p>
+              <p>DNI : {person?.dni}</p>
+            </div>
+            <TextField
+              label="Fecha de firma"
+              type="date"
+              value={person.signedDate.date}
+              onChange={(e) => handleDateChange( idx, false, e.target.value)}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+            />
+    
+            {/* Cónyuge */}
+            {person.maritalStatus.spouse && (
+              <>
+                <div className="my-2">
+                  <Title1>Conyugue : </Title1>
+                  <p>Nombre : {person.maritalStatus.spouse.firstName}{" "}</p>
+                  <p>Apellido : {person.maritalStatus.spouse.lastName}</p>
+                  <p>DNI : {person.maritalStatus.spouse.dni}</p>
+                </div>
+    
+                <TextField
+                  label="Fecha de firma del cónyuge"
+                  type="date"
+                  value={person.maritalStatus.spouse.signedDate.date}
+                  onChange={(e) => handleDateChange( idx, true, e.target.value)}
+                  fullWidth
+                  margin="normal"
+                  InputLabelProps={{ shrink: true }}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+      );
+    
   return (
-    <div>SignConstitucion</div>
+    <div className="space-y-6">
+        <section>
+          <Title1 className="my-2">Fundadores</Title1>
+          <div className="grid gap-4 md:grid-cols-2">
+            {data.founders.people.map((person, idx) =>
+              renderPerson(person, idx, "founders")
+            )}
+          </div>
+        </section>
+        <div className="flex justify-end mt-6">
+        <Button
+          className={"w-full"}
+          onClick={() => onGenerateParteNotarial(data)}
+        >
+          Generar Parte Notarial
+        </Button>
+      </div>
+    </div>
   )
 }

@@ -55,7 +55,9 @@ export function filtrarCampos(obj) {
     })
     return {
       contractId : obj?.id,
-      founders : foundersPeople,
+      founders : {
+        people : foundersPeople
+      },
       signedDocumentDate : {
         date : formatDateToYMD(new Date())
       }
