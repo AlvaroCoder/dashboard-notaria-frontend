@@ -41,16 +41,16 @@ export default function View4ContractParteNotarial({
 
             if (dataContract?.contractType === 'compraVentaPropiedad') {
                 typeContract = 'inmueble';
-            }
-            if (dataContract?.contractType === 'compraVentaVehiculo') {
+            } else if (dataContract?.contractType === 'compraVentaVehiculo') {
                 typeContract = 'vehiculo';
-            }
-            else{
+            } else {
                 typeContract = dataContract?.contractType;
             }
-            const response = ['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType) ? 
-            await generarParteNotarialConstitucion(data, typeContract) : 
-            await generarParteNotarial(data, typeContract);
+            
+            const response = ['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType) 
+                ? await generarParteNotarialConstitucion(data, typeContract) 
+                : await generarParteNotarial(data, typeContract);
+
             const responseBlob = await response.blob();
             setViewParteNotarial(URL.createObjectURL(responseBlob));
 
@@ -129,10 +129,14 @@ export default function View4ContractParteNotarial({
                         dataFormated ?
                         (
                             <section>
+                                {['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(dataContract.contractType?.toLowerCase()) ?
+                                <p>
+                                    {JSON.stringify(dataFormated)}
+                                </p> : 
                                 <SignCompraVenta
                                     data={dataFormated}
-                                    onGenerateParteNotarial={handleSubmitParteNotarial}
-                                />
+                                />    
+                            }
                             </section>
                         ) :
                         <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>

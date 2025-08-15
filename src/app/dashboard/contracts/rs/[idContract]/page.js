@@ -21,7 +21,8 @@ function RenderPageContracts() {
     loading : loadingDataContract,
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
-
+  console.log(dataResponseContract);
+  
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
   
   const router = useRouter();
