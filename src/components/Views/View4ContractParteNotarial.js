@@ -36,16 +36,26 @@ export default function View4ContractParteNotarial({
 
     const handleSubmitParteNotarial=async(data)=>{
         try {
-            console.log(data);
             setLoading(true);
-            const response = await generarParteNotarial(data, 'inmueble')
+            let typeContract;
+
+            if (dataContract?.contractType === 'compraVentaPropiedad') {
+                typeContract = 'inmueble';
+            }
+            if (dataContract?.contractType === 'compraVentaVehiculo') {
+                typeContract = 'vehiculo';
+            }
+            if (['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType)) {
+                
+            }
+            const response = await generarParteNotarial(data, typeContract)
             const responseBlob = await response.blob();
             setViewParteNotarial(URL.createObjectURL(responseBlob));
 
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
                 position : 'bottom-right'
-            })
+            });
 
         } catch (err) {
             console.log(err);

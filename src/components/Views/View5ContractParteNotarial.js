@@ -28,6 +28,10 @@ export default function View5ContractParteNotarial({
             <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
             <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient ?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
           </section>
+
+        <section>
+        vehiculo
+        </section>
     </div>
   )
 };
