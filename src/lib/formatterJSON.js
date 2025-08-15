@@ -1,3 +1,5 @@
+import { formatDateToYMD } from "./fechas";
+
 export function transformarJSON(jsonOriginal) {
     // Parsear el string JSON a un objeto JavaScript
     let datos = jsonOriginal
@@ -23,3 +25,24 @@ export function transformarJSON(jsonOriginal) {
     // Devolver el objeto transformado como un string JSON formateado
     return datos
   }
+
+export function filtrarCampos(obj) {
+  console.log(obj);
+  if (['asociacion', 'sac', 'razonSocial', 'scrl'].includes(obj.contractType)) {
+    return {
+      contractId : obj?.id,
+      founders : obj.founders,
+      signedDocumentDate : {
+        date : formatDateToYMD(new Date())
+      }
+    }
+  }
+  return {
+    contractId: obj.id,
+    sellers: obj.sellers,
+    buyers: obj.buyers,
+    signedDocumentDate: {
+      date : formatDateToYMD(new Date())
+    }
+  };
+}
