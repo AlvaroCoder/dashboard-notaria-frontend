@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Title1 from '../elements/Title1'
 import { camelCaseToTitle, cn } from '@/lib/utils'
-import { useRouter } from 'next/navigation';
 import { statusContracts } from '@/lib/commonJSON';
 import { Loader2, User2 } from 'lucide-react';
-import { getDocumentByPath } from '@/lib/apiConnections';
 import FramePdf from '../elements/FramePdf';
 import { Button } from '../ui/button';
 
@@ -14,7 +12,8 @@ export default function View5ContractParteNotarial({
   loadingDataClient,
   client=null,
   title="Detalles del Contrato",
-  description="Información del contrato"
+  description="Información del contrato",
+
 }) {
   return (
     <div className='h-screen pb-24 p-8 space-y-6  overflow-y-auto'>
@@ -36,9 +35,14 @@ export default function View5ContractParteNotarial({
             <FramePdf
               directory={ dataContract?.documentPaths?.parteNotarialPath}
             /> 
-            <Button>
-              Generar Testimonio
-            </Button>
+            {
+              dataContract?.contractType !== 'compraVentaVehiculo' &&
+              <Button
+
+            >
+                Generar Testimonio
+              </Button>
+            }
         </section>
     </div>
   )

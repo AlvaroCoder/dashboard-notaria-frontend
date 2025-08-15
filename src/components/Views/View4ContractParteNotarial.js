@@ -45,10 +45,12 @@ export default function View4ContractParteNotarial({
             if (dataContract?.contractType === 'compraVentaVehiculo') {
                 typeContract = 'vehiculo';
             }
-            if (['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType)) {
-                
+            else{
+                typeContract = dataContract?.contractType;
             }
-            const response = await generarParteNotarial(data, typeContract)
+            const response = ['asociacion', 'razonSocial', 'scrl', 'sac'].includes(dataContract?.contractType) ? 
+            await generarParteNotarialConstitucion(data, typeContract) : 
+            await generarParteNotarial(data, typeContract);
             const responseBlob = await response.blob();
             setViewParteNotarial(URL.createObjectURL(responseBlob));
 

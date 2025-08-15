@@ -27,10 +27,35 @@ export function transformarJSON(jsonOriginal) {
   }
 
 export function filtrarCampos(obj) {
+  const foundersPeople = obj?.founders?.people?.map((found)=>{
+    const { dni, maritalStatus, firstName, lastName  } = found || {};
+    const base = {
+      dni,
+      firstName, 
+      lastName,
+      signedDate: { date: formatDateToYMD(new Date()) },
+      maritalStatus: {
+        civilStatus: maritalStatus?.civilStatus
+      }
+    };
+    const isCasadoMancomunado =
+    maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
+    maritalStatus?.marriageType?.type === 2;
+
+  if (isCasadoMancomunado) {
+    base.maritalStatus.spouse = {
+      firstName : maritalStatus?.spouse?.firstName,
+        lastName : maritalStatus?.spouse?.lastName,
+      dni: maritalStatus?.spouse?.dni,
+      signedDate: { date: formatDateToYMD(new Date()) }
+    };
+  }
+  return base;
+  })
   if (['asociacion', 'sac', 'razonSocial', 'scrl'].includes(obj.contractType)) {
     return {
       contractId : obj?.id,
-      founders : obj.founders,
+      founders : foundersPeople,
       signedDocumentDate : {
         date : formatDateToYMD(new Date())
       }
