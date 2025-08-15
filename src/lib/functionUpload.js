@@ -82,5 +82,5 @@ import { formatDateToYMD } from "./fechas";
 
     await sendMinutaWord(newFormDataWord, idContract);
     
-    return {idContract}
+    return {idContract, fileLocation}
   }
