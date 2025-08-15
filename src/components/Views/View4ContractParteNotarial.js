@@ -9,6 +9,7 @@ import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import { Loader2 } from 'lucide-react';
 import { generarParteNotarial, generarParteNotarialConstitucion } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
+import SignCompraVenta from '../Forms/SignCompraVenta';
 
 export default function View4ContractParteNotarial({
     idContract="",
@@ -24,19 +25,15 @@ export default function View4ContractParteNotarial({
 
     const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
     const [viewParteNotarial, setViewParteNotarial] = useState(null);
-    
+    const [dataFormated, setDataFormated] = useState(null);
     console.log(dataContract);
     
 
     const handleClickGenerateNotarialPart =async () => {
         // Logic to generate notarial part
         try {
-            
-            console.log(dataContract);
             const filtrado = filtrarCampos(dataContract);
-            console.log(filtrado);
-            
-            setViewParteNotarial(filtrado)
+            setDataFormated(filtrado)
         } catch (err) {
             console.log(err);
             
@@ -103,10 +100,12 @@ export default function View4ContractParteNotarial({
             <section className='bg-white p-4 shadow rounded-lg mt-4'>
                 <Title1 className='text-xl'>Parte Notarial Generada</Title1>
                 {
-                    viewParteNotarial ?
+                    dataFormated ?
                     (
                         <section>
-                            {JSON.stringify(viewParteNotarial)}
+                            <SignCompraVenta
+                                initialData={dataFormated}
+                            />
                         </section>
                     ) :
                     <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>

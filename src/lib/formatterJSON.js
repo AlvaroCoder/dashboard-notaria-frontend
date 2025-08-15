@@ -37,12 +37,65 @@ export function filtrarCampos(obj) {
       }
     }
   }
-  return {
-    contractId: obj.id,
-    sellers: obj.sellers,
-    buyers: obj.buyers,
-    signedDocumentDate: {
-      date : formatDateToYMD(new Date())
+  else {
+    const buyersPeople = obj?.buyers?.people?.map((buyer)=>{
+      const { dni, maritalStatus } = buyer || {};
+      const base = {
+        dni,
+        signedDate: { date: formatDateToYMD(new Date()) },
+        maritalStatus: {
+          civilStatus: maritalStatus?.civilStatus
+        }
+      };
+      const isCasadoMancomunado =
+      maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
+      maritalStatus?.marriageType?.type === 2;
+  
+    if (isCasadoMancomunado) {
+      base.maritalStatus.spouse = {
+        dni: maritalStatus?.spouse?.dni,
+        signedDate: { date: formatDateToYMD(new Date()) }
+      };
     }
-  };
+  
+    return base;
+    });
+
+    const sellersPeople = obj?.sellers?.people?.map((seller) => {
+      const { dni, maritalStatus } = seller || {};
+      const base = {
+        dni,
+        signedDate: { date: formatDateToYMD(new Date()) },
+        maritalStatus: {
+          civilStatus: maritalStatus?.civilStatus
+        }
+      };
+    
+      const isCasadoMancomunado =
+        maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
+        maritalStatus?.marriageType?.type === 2;
+    
+      if (isCasadoMancomunado) {
+        base.maritalStatus.spouse = {
+          dni: maritalStatus?.spouse?.dni,
+          signedDate: { date: formatDateToYMD(new Date()) }
+        };
+      }
+    
+      return base;
+    });
+    
+    return {
+      contractId: obj.id,
+      sellers: {
+        people : sellersPeople
+      },
+      buyers: {
+        people : buyersPeople
+      },
+      signedDocumentDate: {
+        date : formatDateToYMD(new Date())
+      }
+    };
+  }
 }
