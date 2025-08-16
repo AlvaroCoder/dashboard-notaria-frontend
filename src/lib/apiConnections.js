@@ -18,6 +18,7 @@ const URL_ESTABLECER_FIRMA=process.env.NEXT_PUBLIC_URL_FIRMAR_DOCUMENTO;
 const URL_SEND_MINUTA_WORD= process.env.NEXT_PUBLIC_URL_SEND_MINUTA_WORD;
 const URL_SUBIR_EVIDENCIAS_SIN_DIR = process.env.NEXT_PUBLIC_URL_UPLOAD_EVIDENCE_WITHOUT_DIR;
 
+
 export async function getDataClientByClientId(idClient) {
     return fetch(`${URL_GET_DATA_CLIENT}${idClient}`,{
         method : 'GET',
@@ -239,4 +240,26 @@ export async function submitFirmarDocumento(contractId, fecha) {
         method : 'PUT',
         mode : 'cors'
     })
+};
+
+export async function setUpTestimonioCompraVenta(data, type) {
+    return fetch(`${URL_BASE}/contracts/compra_venta/${type}/testimonio/`,{
+        method : 'POST',
+        mode : 'cors',
+        headers : {
+            'Content-type' :'application/json'
+        },
+        body : JSON.stringify(data)
+    });
+}
+
+export async function setUpTestimonioConstitucion(data, type) {
+    return fetch(`${URL_BASE}/contracts/constitucion/${type}/testimonio/`,{
+        method : 'POST',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        mode : 'cors',
+        body : JSON.stringify(data)
+    });
 }

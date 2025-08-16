@@ -240,6 +240,7 @@ function RenderCardsFormStepper({
                 dataSendMinuta?.case
             )
 
+            
             let newDataSendMinuta = {
                 ...dataSendMinuta,
                 contractId : idContract

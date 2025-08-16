@@ -38,6 +38,8 @@ export default function View4ContractParteNotarial({
     const handleSubmitParteNotarial=async(data)=>{
         try {
             setLoading(true);
+            console.log(data);
+            
             let typeContract;
 
             if (dataContract?.contractType === 'compraVentaPropiedad') {

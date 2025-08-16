@@ -33,7 +33,6 @@ import { formatDateToYMD } from "./fechas";
     const responsePreMinutaJSON =  await responsePreMinuta.json();
     
     const idContract = responsePreMinutaJSON?.contractId;
-
     
     const newFormDataWord = new FormData();
     newFormDataWord.append('minutaFile', minutaWord);
@@ -48,10 +47,10 @@ import { formatDateToYMD } from "./fechas";
     newFormDataPdf.append('minutaFile', minutaPdf);
 
     const response = await sendDataMinuta(newFormDataPdf);
-    const jsonResponseUpload = await response.json();
-
+    
+    const jsonResponseUpload = await response.json();    
     const fileLocation = jsonResponseUpload?.fileLocation;
-
+    
     const JSONPreMinuta = {
       clientId,
       processPayment : "Pago a la mitad",
