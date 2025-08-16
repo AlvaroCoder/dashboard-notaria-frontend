@@ -3,11 +3,15 @@ import React, { useState } from "react";
 import { TextField, Card, CardContent,  } from "@mui/material";
 import Title1 from "../elements/Title1";
 import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
-export default function SignCompraVenta({ data: initialData, onGenerateParteNotarial=()=>{} }) {
+export default function SignCompraVenta({ 
+  data: initialData, 
+  onGenerateParteNotarial=()=>{}, 
+  loading= false
+}) {
   const [data, setData] = useState(initialData);
 
-  // Manejar cambios de fecha
   const handleDateChange = (role, index, isSpouse, newDate) => {
     setData((prev) => {
       const updated = { ...prev };
@@ -20,7 +24,6 @@ export default function SignCompraVenta({ data: initialData, onGenerateParteNota
     });
   };
 
-  // Renderizar una persona
   const renderPerson = (person, idx, role) => (
     <Card key={`${role}-${idx}`} className="shadow-md">
       <CardContent>
@@ -92,8 +95,9 @@ export default function SignCompraVenta({ data: initialData, onGenerateParteNota
         <Button
           className={"w-full"}
           onClick={() => onGenerateParteNotarial(data)}
+          disabled={loading}
         >
-          Generar Parte Notarial
+          {loading ? <Loader2 className="animate-spin" /> : <p>Generar Parte Notarial</p>}
         </Button>
       </div>
 

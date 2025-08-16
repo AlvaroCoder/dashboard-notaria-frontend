@@ -26,7 +26,7 @@ export default function FormFounders({
     job: "",
     maritalStatus: {
       civilStatus: "soltero",
-      spouse: {}
+      spouse: null
     },
     bienesMancomunados: true, // 👈 aquí
     address: {
@@ -50,7 +50,7 @@ export default function FormFounders({
     else if (field?.startsWith("spouse-")) {
       const fieldForm = field.split("-")[1];
       if (!list[index].maritalStatus.spouse) {
-        list[index].maritalStatus.spouse = {};
+        list[index].maritalStatus.spouse = null;
       }
       list[index].maritalStatus.spouse[fieldForm] = value;
     }

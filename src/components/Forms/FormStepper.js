@@ -17,7 +17,10 @@ const mkPerson = () => ({
   job: '',
   bienesMancomunados: true,
   address: { name: '', district: '', province: '', department: '' },
-  maritalStatus: { civilStatus: 'soltero' } // minúsculas para UI
+  maritalStatus: { 
+    civilStatus: 'soltero',
+    spouse : null
+  } // minúsculas para UI
 });
 
 export default function FormStepper({

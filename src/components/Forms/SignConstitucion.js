@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { Button } from '../ui/button';
 import Title1 from '../elements/Title1';
 import { Card, CardContent, TextField } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 
 export default function SignConstitucion({
     data : initialData,
-    onGenerateParteNotarial=()=>{}
+    onGenerateParteNotarial=()=>{},
+    loading = false
 }) {
     const [data, setData] = useState(initialData);
 
@@ -77,9 +79,10 @@ export default function SignConstitucion({
         <div className="flex justify-end mt-6">
         <Button
           className={"w-full"}
+          disabled={loading}
           onClick={() => onGenerateParteNotarial(data)}
         >
-          Generar Parte Notarial
+         {loading? <Loader2 className='animate-spin' /> : <p> Generar Parte Notarial</p>}
         </Button>
       </div>
     </div>

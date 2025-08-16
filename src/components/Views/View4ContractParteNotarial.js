@@ -21,7 +21,6 @@ export default function View4ContractParteNotarial({
     description="Informacion del contrato",
 
 }) {
-
     const [loadingParteNotarial, setLoadingParteNotarial] = useState(false);
 
     const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
@@ -62,7 +61,6 @@ export default function View4ContractParteNotarial({
             });
 
         } catch (err) {
-            console.log(err);
             toast("Surgio un error de la API",{
                 type : 'error',
                 position : 'bottom-center'
@@ -134,10 +132,12 @@ export default function View4ContractParteNotarial({
                                 {['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(dataContract.contractType?.toLowerCase()) ?
                                 <SignConstitucion
                                     data={dataFormated}
+                                    loading={loadingParteNotarial}
                                     onGenerateParteNotarial={handleSubmitParteNotarial}
                                 />: 
                                 <SignCompraVenta
                                     data={dataFormated}
+                                    loading={loadingParteNotarial}
                                     onGenerateParteNotarial={handleSubmitParteNotarial}
                                 />    
                             }
