@@ -1,5 +1,4 @@
 'use client'
-import { Button } from '@/components/ui/button';
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
@@ -7,9 +6,11 @@ import View4ContractParteNotarial from '@/components/Views/View4ContractParteNot
 import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
-import { aceptarEscritura, submitEscrituraCliente } from '@/lib/apiConnections';
+import { aceptarEscritura, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
+import { formatDateToYMD } from '@/lib/fechas';
 import { useParams, useRouter } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
+import { toast } from 'react-toastify';
 
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT + "/contractId/?idContract=";
@@ -70,7 +71,7 @@ function RenderPageContracts() {
           position : 'bottom-right'
         });
         
-        router.push("/dashboard");
+        router.push("/dashboard/contracts");
 
       } catch (err) {
         toast("Surgio un error al firmar la escritura",{

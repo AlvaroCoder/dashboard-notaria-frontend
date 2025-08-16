@@ -7,6 +7,7 @@ import FramePdf from '../elements/FramePdf';
 import TestimonyForm from '../Forms/FormTestimony';
 import { formatDateToYMD } from '@/lib/fechas';
 import { setUpTestimonioCompraVenta } from '@/lib/apiConnections';
+import { toast } from 'react-toastify';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -34,8 +35,15 @@ export default function View5ContractParteNotarial({
       const blob = await response.blob();
 
       setViewPdfTestimonio(URL.createObjectURL(blob));
-      
+      toast("Se genero el testimonio correctamente",{
+        type : 'success',
+        position : 'bottom-right'
+      });
     } catch (err) {
+      toast("Se genero el testimonio correctamente",{
+        type : 'error',
+        position : 'bottom-center'
+      });
       console.log(err);
       
     } finally {

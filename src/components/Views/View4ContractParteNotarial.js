@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Title1 from '../elements/Title1';
 import CardDetailContract from '../Cards/CardDetailContract';
 import { Button } from '../ui/button';
-import { filtrarCampos, reducCompraVentaJSON } from '@/lib/formatterJSON';
+import { filtrarCampos } from '@/lib/formatterJSON';
 import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import { Loader2 } from 'lucide-react';
 import { generarParteNotarial, generarParteNotarialConstitucion } from '@/lib/apiConnections';
@@ -27,7 +27,6 @@ export default function View4ContractParteNotarial({
     const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
     const [viewParteNotarial, setViewParteNotarial] = useState(null);
     const [dataFormated, setDataFormated] = useState(null);
-    const [loading, setLoading] = useState(false);
 
     const handleChangeDataFormated =() => {
         // Logic to generate notarial part
@@ -37,7 +36,7 @@ export default function View4ContractParteNotarial({
 
     const handleSubmitParteNotarial=async(data)=>{
         try {
-            setLoading(true);
+            setLoadingParteNotarial(true);
             console.log(data);
             
             let typeContract;
@@ -69,7 +68,7 @@ export default function View4ContractParteNotarial({
                 position : 'bottom-center'
             })
         } finally {
-            setLoading(false)
+            setLoadingParteNotarial(false)
         }
     }
     if (viewParteNotarial) {
