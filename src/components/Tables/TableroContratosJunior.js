@@ -25,15 +25,29 @@ export default function TableroContratosJunior({
         return types;
     }, [dataContracts]);
 
+    
     // Filtrar datos
     const filteredContracts = useMemo(() => {
         return dataContracts.filter(contract => {
-            const matchType = filterType ? contract.contractType === filterType : true;
-            const matchStatus = filterStatus ? String(contract.status) === String(filterStatus) : true;
-            const matchDate = filterDate ? contract?.datesDocument?.processInitiate === filterDate : true;
-            return matchType && matchStatus && matchDate;
+          const matchType = filterType ? contract.contractType === filterType : true;
+          const matchStatus = filterStatus ? String(contract.status) === String(filterStatus) : true;
+      
+          // 🔹 Normalizamos ambas fechas al mismo formato YYYY-MM-DD
+          const contractDate = contract?.datesDocument?.processInitiate
+            ? new Date(contract.datesDocument.processInitiate).toISOString().split("T")[0]
+            : null;
+      
+          const filterDateNormalized = filterDate
+            ? new Date(filterDate).toISOString().split("T")[0]
+            : null;
+      
+          const matchDate = filterDate
+            ? contractDate === filterDateNormalized
+            : true;
+      
+          return matchType && matchStatus && matchDate;
         });
-    }, [dataContracts, filterType, filterStatus, filterDate]);
+      }, [dataContracts, filterType, filterStatus, filterDate]);
 
     return (
         <div className='w-full rounded-sm shadow-sm bg-white p-4'>
@@ -63,11 +77,11 @@ export default function TableroContratosJunior({
             </section>
 
             {/* Filtros */}
-            <section className='mt-4 flex flex-col sm:flex-row gap-3'>
+            <section className='w-full mt-4 flex flex-col sm:flex-row gap-3'>
                 <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
-                    className="border p-2 rounded-sm"
+                    className="border p-2 rounded-sm flex-q"
                 >
                     <option value="">Todos los tipos</option>
                     {contractTypes.map(type => (
@@ -78,7 +92,7 @@ export default function TableroContratosJunior({
                 <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="border p-2 rounded-sm"
+                    className="border p-2 rounded-sm flex-1"
                 >
                     <option value="">Todos los estados</option>
                     {statusContracts.map(status => (
@@ -90,7 +104,7 @@ export default function TableroContratosJunior({
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="border p-2 rounded-sm"
+                    className="border p-2 rounded-sm flex-1"
                 />
             </section>
 

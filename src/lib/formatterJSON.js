@@ -27,21 +27,13 @@ export function transformarJSON(jsonOriginal) {
   }
 
 export function filtrarCampos(obj) {
-  console.log(obj);
-  if (['asociacion', 'sac', 'razonSocial', 'scrl'].includes(obj.contractType)) {
-    return {
-      contractId : obj?.id,
-      founders : obj.founders,
-      signedDocumentDate : {
-        date : formatDateToYMD(new Date())
-      }
-    }
-  }
-  else {
-    const buyersPeople = obj?.buyers?.people?.map((buyer)=>{
-      const { dni, maritalStatus } = buyer || {};
+  if (['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(obj.contractType?.toLowerCase())) {
+    const foundersPeople = obj?.founders?.people?.map((found)=>{
+      const { dni, maritalStatus, firstName, lastName  } = found || {};
       const base = {
         dni,
+        firstName, 
+        lastName,
         signedDate: { date: formatDateToYMD(new Date()) },
         maritalStatus: {
           civilStatus: maritalStatus?.civilStatus
@@ -53,6 +45,44 @@ export function filtrarCampos(obj) {
   
     if (isCasadoMancomunado) {
       base.maritalStatus.spouse = {
+        firstName : maritalStatus?.spouse?.firstName,
+          lastName : maritalStatus?.spouse?.lastName,
+        dni: maritalStatus?.spouse?.dni,
+        signedDate: { date: formatDateToYMD(new Date()) }
+      };
+    }
+    return base;
+    })
+    return {
+      contractId : obj?.id,
+      founders : {
+        people : foundersPeople
+      },
+      signedDocumentDate : {
+        date : formatDateToYMD(new Date())
+      }
+    }
+  }
+  else {
+    const buyersPeople = obj?.buyers?.people?.map((buyer)=>{
+      const { dni, maritalStatus, firstName, lastName  } = buyer || {};
+      const base = {
+        dni,
+        firstName, 
+        lastName,
+        signedDate: { date: formatDateToYMD(new Date()) },
+        maritalStatus: {
+          civilStatus: maritalStatus?.civilStatus
+        }
+      };
+      const isCasadoMancomunado =
+      maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
+      maritalStatus?.marriageType?.type === 2;
+  
+    if (isCasadoMancomunado) {
+      base.maritalStatus.spouse = {
+        firstName : maritalStatus?.spouse?.firstName,
+          lastName : maritalStatus?.spouse?.lastName,
         dni: maritalStatus?.spouse?.dni,
         signedDate: { date: formatDateToYMD(new Date()) }
       };
@@ -62,9 +92,11 @@ export function filtrarCampos(obj) {
     });
 
     const sellersPeople = obj?.sellers?.people?.map((seller) => {
-      const { dni, maritalStatus } = seller || {};
+      const { dni, maritalStatus, firstName, lastName } = seller || {};
       const base = {
         dni,
+        firstName, 
+        lastName,
         signedDate: { date: formatDateToYMD(new Date()) },
         maritalStatus: {
           civilStatus: maritalStatus?.civilStatus
@@ -77,6 +109,8 @@ export function filtrarCampos(obj) {
     
       if (isCasadoMancomunado) {
         base.maritalStatus.spouse = {
+          firstName : maritalStatus?.spouse?.firstName,
+          lastName : maritalStatus?.spouse?.lastName,
           dni: maritalStatus?.spouse?.dni,
           signedDate: { date: formatDateToYMD(new Date()) }
         };
@@ -97,5 +131,41 @@ export function filtrarCampos(obj) {
         date : formatDateToYMD(new Date())
       }
     };
+  }
+}
+
+export function reducCompraVentaJSON(data) {
+  const {contractId, signedDocumentDate} = data;
+  const buyersPeople = data?.buyers?.people?.map((buyer)=>{
+    const { dni, maritalStatus, } = buyer || {};
+    const base = {
+      dni,
+      signedDate: { date: formatDateToYMD(new Date()) },
+      maritalStatus: {
+        civilStatus: maritalStatus?.civilStatus
+      }
+    };
+    
+  return base;
+  });
+  const sellersPeople = data?.sellers?.people?.map((seller) => {
+    const { dni, maritalStatus } = seller || {};
+    const base = {
+      dni,
+      signedDate: { date: formatDateToYMD(new Date()) },
+      maritalStatus: {
+        civilStatus: maritalStatus?.civilStatus
+      }
+    };
+  
+
+  
+    return base;
+  });
+  return {
+    contractId,
+    sellers : sellersPeople,
+    buyers : buyersPeople,
+    signedDocumentDate
   }
 }

@@ -1,61 +1,106 @@
-// components/SignCompraVenta.jsx
 "use client";
-import { useState } from "react";
-import { TextField, Typography, Paper } from "@mui/material";
+import React, { useState } from "react";
+import { TextField, Card, CardContent,  } from "@mui/material";
+import Title1 from "../elements/Title1";
+import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
-export default function SignCompraVenta({ initialData }) {
+export default function SignCompraVenta({ 
+  data: initialData, 
+  onGenerateParteNotarial=()=>{}, 
+  loading= false
+}) {
   const [data, setData] = useState(initialData);
 
-  const handleDateChange = (buyerIndex, isSpouse = false, newDate) => {
+  const handleDateChange = (role, index, isSpouse, newDate) => {
     setData((prev) => {
       const updated = { ...prev };
       if (isSpouse) {
-        updated.buyers.people[buyerIndex].maritalStatus.spouse.signedDate.date =
-          newDate;
+        updated[role].people[index].maritalStatus.spouse.signedDate.date = newDate;
       } else {
-        updated.buyers.people[buyerIndex].signedDate.date = newDate;
+        updated[role].people[index].signedDate.date = newDate;
       }
       return updated;
     });
   };
 
-  return (
-    <div className="space-y-6 mt-6">
-      
+  const renderPerson = (person, idx, role) => (
+    <Card key={`${role}-${idx}`} className="shadow-md">
+      <CardContent>
+        <div className="my-2">
+          <Title1>{role === 'buyers' ? 'Comprador ' :'Vendedor'}</Title1>
+          <p>Nombre : {person?.firstName}</p>
+          <p>Apellido : {person?.lastName}</p>
+          <p>DNI : {person?.dni}</p>
+        </div>
+        <TextField
+          label="Fecha de firma"
+          type="date"
+          value={person.signedDate.date}
+          onChange={(e) => handleDateChange(role, idx, false, e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
 
-      {data.buyers.people.map((buyer, index) => (
-        <Paper key={buyer.dni} className="p-4 space-y-4 shadow-md">
-          <Typography variant="subtitle1" className="font-semibold">
-            Comprador: {buyer.dni}
-          </Typography>
-          <TextField
-            label="Fecha de firma"
-            type="date"
-            value={buyer.signedDate.date}
-            onChange={(e) => handleDateChange(index, false, e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-
-          {buyer.maritalStatus?.spouse && (
-            <div className="pt-4 border-t border-gray-300">
-              <Typography variant="subtitle2" className="font-semibold">
-                Cónyuge: {buyer.maritalStatus.spouse.dni}
-              </Typography>
-              <TextField
-                label="Fecha de firma (cónyuge)"
-                type="date"
-                value={buyer.maritalStatus.spouse.signedDate.date}
-                onChange={(e) =>
-                  handleDateChange(index, true, e.target.value)
-                }
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-              />
+        {/* Cónyuge */}
+        {person.maritalStatus.spouse && (
+          <>
+            <div className="my-2">
+              <Title1>Conyugue : </Title1>
+              <p>Nombre : {person.maritalStatus.spouse.firstName}{" "}</p>
+              <p>Apellido : {person.maritalStatus.spouse.lastName}</p>
+              <p>DNI : {person.maritalStatus.spouse.dni}</p>
             </div>
+
+            <TextField
+              label="Fecha de firma del cónyuge"
+              type="date"
+              value={person.maritalStatus.spouse.signedDate.date}
+              onChange={(e) => handleDateChange(role, idx, true, e.target.value)}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+            />
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Vendedores */}
+      <section>
+        <Title1 className="my-2">Vendedores</Title1>
+        <div className="grid gap-4 md:grid-cols-2">
+          {data.sellers.people.map((person, idx) =>
+            renderPerson(person, idx, "sellers")
           )}
-        </Paper>
-      ))}
+        </div>
+      </section>
+
+      {/* Compradores */}
+      <section>
+          <Title1 className="my-2">Compradores</Title1>
+        <div className="grid gap-4 md:grid-cols-2">
+          {data.buyers.people.map((person, idx) =>
+            renderPerson(person, idx, "buyers")
+          )}
+        </div>
+      </section>
+
+      {/* Botón de acción */}
+      <div className="flex justify-end mt-6">
+        <Button
+          className={"w-full"}
+          onClick={() => onGenerateParteNotarial(data)}
+          disabled={loading}
+        >
+          {loading ? <Loader2 className="animate-spin" /> : <p>Generar Parte Notarial</p>}
+        </Button>
+      </div>
+
 
     </div>
   );

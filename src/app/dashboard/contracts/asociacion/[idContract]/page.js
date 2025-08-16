@@ -3,6 +3,8 @@ import View1ContractConstitucion from '@/components/Views/View1ContractConstituc
 import View2ContractEscritura from '@/components/Views/View2ContractEscritura';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
+import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial';
+import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { aceptarEscritura, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
@@ -165,7 +167,24 @@ function RenderPageContracts() {
           client={client}
         />
       )
-  
+    case 6:
+      return(
+        <View5ContractParteNotarial
+          dataContract={dataContract}
+          idContract={idContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+        />
+      )
+    case 8:
+      return(
+        <View6ContractTestimonio
+        dataContract={dataContract}
+        idContract={idContract}
+        loadingDataClient={loadingDataClient}
+        client={client}
+        />
+      )
   }
 
 }

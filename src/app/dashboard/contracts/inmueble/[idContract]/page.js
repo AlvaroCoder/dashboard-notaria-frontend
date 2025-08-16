@@ -10,6 +10,8 @@ import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVent
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma'
 import { formatDateToYMD } from '@/lib/fechas'
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial'
+import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial'
+import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio'
 
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";
@@ -165,6 +167,24 @@ function RenderPageContracts() {
           dataContract={dataContract}
           loadingDataClient={loadingDataClient}
           client={client}
+        />
+      )
+    case 6:
+      return(
+        <View5ContractParteNotarial
+          dataContract={dataContract}
+          idContract={idContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+        />
+      )
+    case 8:
+      return(
+        <View6ContractTestimonio
+        dataContract={dataContract}
+        idContract={idContract}
+        loadingDataClient={loadingDataClient}
+        client={client}
         />
       )
   }
