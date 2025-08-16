@@ -105,6 +105,7 @@ export default function TestimonyForm({
         <Button
             onClick={()=>generateTestimony(formData)}
             className={"w-full my-4"}
+            disabled={loading}
         >
            {loading ? <Loader2 className="animate-spin"/> : <p> Generar Testimonio</p>}
         </Button>

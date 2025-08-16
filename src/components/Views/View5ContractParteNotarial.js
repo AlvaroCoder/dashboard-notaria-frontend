@@ -6,7 +6,7 @@ import { Loader2, User2 } from 'lucide-react';
 import FramePdf from '../elements/FramePdf';
 import TestimonyForm from '../Forms/FormTestimony';
 import { formatDateToYMD } from '@/lib/fechas';
-import { setUpTestimonioCompraVenta } from '@/lib/apiConnections';
+import { setUpTestimonioCompraVenta, setUpTestimonioConstitucion } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
 
 export default function View5ContractParteNotarial({
@@ -31,7 +31,19 @@ export default function View5ContractParteNotarial({
           date : formatDateToYMD(new Date())
         }
       }
-      const response = await setUpTestimonioCompraVenta(newDataToSend, 'inmueble');
+
+      let typeContract;
+
+      if (dataContract?.contractType === 'compraVentaPropiedad') {
+          typeContract = 'inmueble';
+      } else {
+          typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
+      }
+
+      const response = ['asociacion','razonSocial','rs','scrl','sac'].includes(dataContract?.contractType?.toLowerCase())
+      ? await setUpTestimonioConstitucion(newDataToSend, typeContract):
+      await setUpTestimonioCompraVenta(newDataToSend, typeContract);
+
       const blob = await response.blob();
 
       setViewPdfTestimonio(URL.createObjectURL(blob));
@@ -89,13 +101,16 @@ export default function View5ContractParteNotarial({
               /> 
   
           </section>
-          <section>
+          {
+            dataContract?.contractType !== 'compraVentaVehiculo' &&
+            <section>
             <Title1>Generar Testimonio</Title1>
             <TestimonyForm
               loading={loading}
               generateTestimony={handleClickTestimonio}
             />
           </section>
+          }
       </div>
     )
   }
