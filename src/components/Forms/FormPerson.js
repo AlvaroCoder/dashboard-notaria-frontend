@@ -18,18 +18,18 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
   if (person?.bienesMancomunados) {
     return (
       <div className="grid grid-cols-2 gap-4 mt-8">
-        <TextField label="Primer Nombre" value={person?.maritalStatus?.spouse?.firstName || ''} onChange={(e) => onChange(idx, 'spouse-firstName', e.target.value, personType, person?.bienesMancomunados)} />
-        <TextField label="Apellido" value={person?.maritalStatus?.spouse?.lastName || ''} onChange={(e) => onChange(idx, 'spouse-lastName', e.target.value, personType, person?.bienesMancomunados)} />
-        <TextField label="DNI" type="number" value={person?.maritalStatus?.spouse?.dni || ''} onChange={(e) => onChange(idx, 'spouse-dni', e.target.value, personType, person?.bienesMancomunados)} />
+        <TextField label="Primer Nombre" value={person?.maritalStatus?.spouse?.firstName || ''} onChange={(e) => onChange(idx, 'spouse-firstName', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField label="Apellido" value={person?.maritalStatus?.spouse?.lastName || ''} onChange={(e) => onChange(idx, 'spouse-lastName', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField label="DNI" type="number" value={person?.maritalStatus?.spouse?.dni || ''} onChange={(e) => onChange(idx, 'spouse-dni', e.target.value, personType, person?.bienesMancomunados)} required />
         <FormControl>
           <InputLabel>Género</InputLabel>
-          <Select value={person?.maritalStatus?.spouse?.gender || ''} onChange={(e) => onChange(idx, 'spouse-gender', e.target.value, personType, person?.bienesMancomunados)}>
+          <Select value={person?.maritalStatus?.spouse?.gender || ''} onChange={(e) => onChange(idx, 'spouse-gender', e.target.value, personType, person?.bienesMancomunados)} required>
             <MenuItem value="M">Masculino</MenuItem>
             <MenuItem value="F">Femenino</MenuItem>
           </Select>
         </FormControl>
-        <TextField label="Nacionalidad" value={person?.maritalStatus?.spouse?.nationality || ''} onChange={(e) => onChange(idx, 'spouse-nationality', e.target.value, personType, person?.bienesMancomunados)} />
-        <TextField label="Trabajo" className="col-span-2" value={person?.maritalStatus?.spouse?.job || ''} onChange={(e) => onChange(idx, 'spouse-job', e.target.value, personType, person?.bienesMancomunados)} />
+        <TextField label="Nacionalidad" value={person?.maritalStatus?.spouse?.nationality || ''} onChange={(e) => onChange(idx, 'spouse-nationality', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField label="Trabajo" className="col-span-2" value={person?.maritalStatus?.spouse?.job || ''} onChange={(e) => onChange(idx, 'spouse-job', e.target.value, personType, person?.bienesMancomunados)} required />
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function FormPerson({
 
       {(errores?.length > 0 && errores[idx]?.error) && (
         <div className="w-full p-4">
-          <ErrorCard title="Error en el formulario" description={errores[idx]?.value} />
+          <ErrorCard title="Campos incompleto" description={'Por favor completa el formulario'} />
         </div>
       )}
 
