@@ -35,7 +35,7 @@ export default function ButtonDownloadWord({
                 onClick={handleDownload}
 
             >
-                Descargar Escritura
+                Descargar documento
             </Button>
         </section>
     </section>

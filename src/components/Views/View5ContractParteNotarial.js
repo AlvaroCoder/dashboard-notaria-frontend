@@ -80,6 +80,7 @@ export default function View5ContractParteNotarial({
         type : 'success',
         position : 'bottom-right'
       });
+      router.push("/dashboard/contracts");
     } catch (err) {
       toast("Se genero el testimonio correctamente",{
         type : 'error',
@@ -120,7 +121,7 @@ export default function View5ContractParteNotarial({
         </section>
         <section className='w-full rounded-sm shadow p-4'>
           <div className='w-full'>
-            <Title1>Subir Parte Ntarial actualizada</Title1>
+            <Title1>Subir Parte Notarial actualizada</Title1>
             <div className='my-4'>
               <CardAviso
                 advise='NO OLVIDAR DE RELLENAR LOS ESPACIOS'
