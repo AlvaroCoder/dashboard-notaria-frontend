@@ -24,6 +24,7 @@ export default function View4ContractParteNotarial({
 
 }) {
     const router = useRouter();
+
     const [loadingParteNotarial, setLoadingParteNotarial] = useState(false);
     const [viewParteNotarial, setViewParteNotarial] = useState(null);
     const [dataFormated, setDataFormated] = useState(null);
@@ -36,9 +37,7 @@ export default function View4ContractParteNotarial({
 
     const handleSubmitParteNotarial=async(data)=>{
         try {
-            setLoadingParteNotarial(true);
-            console.log(data);
-            
+            setLoadingParteNotarial(true);            
             let typeContract;
 
             if (dataContract?.contractType === 'compraVentaPropiedad') {
@@ -53,8 +52,11 @@ export default function View4ContractParteNotarial({
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
 
+            //const responseBlob = await response.blob();
+            // setViewParteNotarial(URL.createObjectURL(responseBlob));
+
             router.refresh();
-            
+
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
                 position : 'bottom-right'

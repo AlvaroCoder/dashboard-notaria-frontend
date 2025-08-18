@@ -8,6 +8,7 @@ import TestimonyForm from '../Forms/FormTestimony';
 import { formatDateToYMD } from '@/lib/fechas';
 import { setUpTestimonioCompraVenta, setUpTestimonioConstitucion } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
+import FramePdfWord from '../elements/FramePdfWord';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -96,7 +97,7 @@ export default function View5ContractParteNotarial({
   
             <section className='bg-white p-4 rounded-lg mt-4 shadow'>
               <Title1>Partida Notarial Generada</Title1>
-              <FramePdf
+              <FramePdfWord
                 directory={ dataContract?.documentPaths?.parteNotarialPath}
               /> 
   
