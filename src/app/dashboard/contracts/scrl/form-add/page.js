@@ -113,10 +113,10 @@ function RenderApp({
   };
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minutaPdf || !minutaWord) {
+      if (!minutaPdf ) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -126,8 +126,7 @@ function RenderApp({
       setLoading(true);
 
       setDataMinuta({
-        minutaPdf,
-        minutaWord,
+        minutaPdf
       });
     
       setDataSendMinuta({
@@ -234,6 +233,15 @@ function RenderApp({
       
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "escritura_scrl.docx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+
 
       setViewPdf(url);
       pushActiveStep();
@@ -429,9 +437,9 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <FormViewerPdfEscritura
-            viewerPdf={viewPdf}
-          />
+            <Title1>Descarga el documento si es necesario</Title1>
+            <p>En caso no haya empezado la descarga, descarga el documento</p>
+                        
           </section>
         )
   }

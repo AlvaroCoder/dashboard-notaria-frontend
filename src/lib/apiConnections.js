@@ -263,3 +263,13 @@ export async function setUpTestimonioConstitucion(data, type) {
         body : JSON.stringify(data)
     });
 }
+
+export async function fetchEscrituraWord(path) {
+    return fetch(`${URL_BASE}/home/document`,{
+        method : 'POST',
+        headers : {
+            'Content-type' : 'application/json'
+        },
+        body : JSON.stringify({path})
+    })
+}

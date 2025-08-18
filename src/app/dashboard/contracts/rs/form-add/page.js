@@ -1,4 +1,5 @@
 'use client';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
@@ -112,39 +113,12 @@ function RenderApp({
     });
   };
 
-  const handleClickSelectJunior=async(junior)=>{
-    try {
-      setLoading(true);
-      const responseJuniorAsigned = await asignJuniorToContracts(dataSendMinuta?.contractId, junior?.id);
-      if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-        toast("El junior excede la cantidad maxima que puede manipular",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      }
-
-      toast("Se asigno el Junior correctamente",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      pushActiveStep();
-      
-    } catch (err) {
-      toast("Sucedio un error al asignar el junior",{
-        type : 'error',
-        position : 'bottom-center'
-      })
-    } finally{
-      setLoading(false);
-    }
-  }
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minutaWord || !minutaPdf) {
+      if (!minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -154,9 +128,8 @@ function RenderApp({
       setLoading(true);
 
       setDataMinuta({
-        minutaPdf,
-        minutaWord
-      });
+        minutaPdf
+        });
 
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -264,6 +237,15 @@ function RenderApp({
       
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "escritura_razonSocial.docx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
 
       setViewPdf(url);
       pushActiveStep();
@@ -451,9 +433,9 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <FormViewerPdfEscritura
-            viewerPdf={viewPdf}
-          />
+            <Title1>Descarga el documento si es necesario</Title1>
+            <p>En caso no haya empezado la descarga, descarga el documento</p>
+            
           </section>
         )
   }

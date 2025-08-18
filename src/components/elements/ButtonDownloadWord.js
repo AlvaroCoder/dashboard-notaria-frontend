@@ -1,27 +1,41 @@
 import React from 'react'
 import { Button } from '../ui/button'
+import Title1 from './Title1';
+import { fetchEscrituraWord } from '@/lib/apiConnections';
 
 export default function ButtonDownloadWord({
-    viewWord=null,
-    fileName="contrato_inmueble"
+    dataContract=null,
+    idContract="asdasd"
 }) {
-    const handleClickDownload=()=>{
-        if(!viewWord) return;
-        const link = document.createElement('a');
-        link.href = viewWord;
-        link.download = `${fileName}.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const handleDownload =async(e)=>{
+        e.preventDefault();
+        
+        const response = await fetchEscrituraWord(dataContract?.documentPaths?.escrituraPath);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `escritura-${idContract}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(()=>URL.revokeObjectURL(url), 4000);
+
     }
   return (
-    <div className='w-full border border-gray-200 rounded-sm mt-6 flex justify-between items-center p-4 px-6 gap-4'>
-        <p className=''>Escritura generada</p>
-        <Button
-            onClick={handleClickDownload}
-        >
-            Descargar Documento
-        </Button>
-    </div>
+    <section className='bg-white p-4 rounded-lg mt-4 shadow'>
+        <Title1 className='text-xl'>Escritura generada</Title1>
+        <section>
+            <p>Descarga el word de la escitura</p>
+            <Button
+                onClick={handleDownload}
+
+            >
+                Descargar Escritura
+            </Button>
+        </section>
+    </section>
   )
 };

@@ -236,7 +236,7 @@ function RenderApp({
 
       setViewPdf(url);
 
-      window.URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -430,10 +430,7 @@ function RenderApp({
         return(
           <section className='p-4 w-full'>
             <Title1 className='text-xl'>Descarga el documento si es necesario</Title1>
-            <ButtonDownloadWord
-              viewWord={viewPdf}
-              fileName='contrato_asociacion'
-            />
+            
           </section>
         )
   }

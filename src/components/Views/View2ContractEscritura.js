@@ -5,9 +5,9 @@ import {Button} from '../ui/button';
 import {camelCaseToTitle, cn} from '@/lib/utils';
 import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
-import CardPersonFounder from '../Cards/CardPersonFounder';
 import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
+import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -71,49 +71,11 @@ export default function View2ContractEscritura({
 		</div>
 	</section>
 
-	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
-		<Title1 className='text-xl'>Escritura del cliente</Title1>
-		{
-			viewPdfEscrituraMarcaAgua ?
-			(
-				<embed
-					src={viewPdfEscrituraMarcaAgua}
-					className='w-full h-96 border rounded'
-					type='application/json'
-					title='Vista previa de PDF'
-				/>
-			) :
-			<section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                <p className=' font-bold'>No se pudo cargar el PDF :/</p>
-            </section>
-		}
-		<Button
-			disabled={loading}
-			onClick={handleClickSubmit}
-			className={'w-full my-4'}
-		>
-			{loading ? <Loader2 className='animate-spin' /> : <p>Ver Escritura con marca de agua</p>}
-		</Button>
-	</section>
-	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
-		<Title1 className='text-xl'>Escritura generada</Title1>
-		{
-			loadingViewEscritura ?
-			<div className='w-full rounded border border-dotted h-40 flex justify-center items-center'>
-				<Loader2 className='animate-spin' />
-			</div> : 
-			(viewPdf ? 
-				<embed
-					src={viewPdf}
-					className='w-full h-96 border mt-4 rounded'
-					type='application/json'
-					title='Vista previa de PDF'
-				/> :
-				<section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-					<p className='font-bold'>No se pudo cargar el PDF :/</p>
-				</section>)
-		}
-	</section>
+
+	<ButtonDownloadWord
+		dataContract={dataContract}
+		idContract={idContract}
+	/>
 	<Button
 		className={"w-full my-4 "}
 		onClick={checkViewEscritura}

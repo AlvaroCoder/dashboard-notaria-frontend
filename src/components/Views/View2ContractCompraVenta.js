@@ -8,10 +8,9 @@ import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
 import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
+import { fetchEscrituraWord } from '@/lib/apiConnections';
+import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 
-function ButtonWordPrevisualizer(minutaPath="") {
-    
-}
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -26,10 +25,9 @@ export default function View2ContractCompraVenta({
 	viewPdfEscrituraMarcaAgua=null,
 	loading=false,
 	handleClickSubmit=()=>{},
-    checkViewEscritura =()=>{}
+    checkViewEscritura =()=>{},
 }) {
-    console.log(dataContract);
-        
+    
     return (
     <div className='h-screen pb-24 p-8 space-y-6 overflow-y-auto'>
         <section className="flex flex-row justify-between">
@@ -93,17 +91,12 @@ export default function View2ContractCompraVenta({
                         }
                     </div>
                 </div>
-            </section>
+            </section> 
         </section>
-    <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-        <Title1 className='text-xl'>Escritura generada</Title1>
-        <section>
-            <p>Descarga el word de la escitura</p>
-            <Button>
-                Descargar Escritura
-            </Button>
-        </section>
-    </section>
+<ButtonDownloadWord
+    dataContract={dataContract}
+    idContract={idContract}
+/>
     <Button
         className={"w-full my-4 "}
         onClick={checkViewEscritura}
