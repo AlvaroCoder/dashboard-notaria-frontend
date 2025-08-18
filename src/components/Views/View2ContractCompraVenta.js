@@ -12,6 +12,7 @@ import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { useRouter } from 'next/navigation';
 import { updateEscrituraWord } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
+import CardAviso from '../Cards/CardAviso';
 
 
 // ✅ Dynamic imports
