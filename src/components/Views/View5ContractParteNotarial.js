@@ -3,7 +3,6 @@ import Title1 from '../elements/Title1'
 import { camelCaseToTitle, cn } from '@/lib/utils'
 import { statusContracts } from '@/lib/commonJSON';
 import { Loader2, User2 } from 'lucide-react';
-import FramePdf from '../elements/FramePdf';
 import TestimonyForm from '../Forms/FormTestimony';
 import { formatDateToYMD } from '@/lib/fechas';
 import { setUpTestimonioCompraVenta, setUpTestimonioConstitucion } from '@/lib/apiConnections';
