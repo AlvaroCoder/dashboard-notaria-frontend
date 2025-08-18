@@ -1,4 +1,5 @@
 'use client';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
@@ -106,10 +107,16 @@ function RenderApp({
 
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async(detailsMinuta, minutaPdf)=>{
     try {
-      
-      if (!minutaWord || !minutaPdf) {
+      if (detailsMinuta?.number.trim() === '' || detailsMinuta?.districtPlace.trim() === '') {
+        toast("Complete el formulario",{
+          type: 'error',
+          position : 'bottom-center'
+        });
+        return;
+      }
+      if (!minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -120,7 +127,6 @@ function RenderApp({
 
       setDataMinuta({
         minutaPdf,
-        minutaWord,
       });
 
       setDataSendMinuta({
@@ -221,7 +227,16 @@ function RenderApp({
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "escritura_asociacion.docx";
+      document.body.appendChild(a); 
+      a.click();
+      document.body.removeChild(a); 
+
       setViewPdf(url);
+
+      window.URL.revokeObjectURL(url);
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -414,9 +429,11 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <FormViewerPdfEscritura
-            viewerPdf={viewPdf}
-          />
+            <Title1 className='text-xl'>Descarga el documento si es necesario</Title1>
+            <ButtonDownloadWord
+              viewWord={viewPdf}
+              fileName='contrato_asociacion'
+            />
           </section>
         )
   }

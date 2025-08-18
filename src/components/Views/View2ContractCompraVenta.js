@@ -9,6 +9,10 @@ import { TextField } from '@mui/material';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
 import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 
+function ButtonWordPrevisualizer(minutaPath="") {
+    
+}
+
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
 const Title1 = dynamic(() => import('@/components/elements/Title1'));
@@ -24,8 +28,8 @@ export default function View2ContractCompraVenta({
 	handleClickSubmit=()=>{},
     checkViewEscritura =()=>{}
 }) {
-    const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
-    
+    console.log(dataContract);
+        
     return (
     <div className='h-screen pb-24 p-8 space-y-6 overflow-y-auto'>
         <section className="flex flex-row justify-between">
@@ -91,48 +95,14 @@ export default function View2ContractCompraVenta({
                 </div>
             </section>
         </section>
-        <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-            <Title1 className='text-xl'>Escritura del cliente</Title1>
-            {
-                viewPdfEscrituraMarcaAgua ?
-                (
-                    <embed
-                        src={viewPdfEscrituraMarcaAgua}
-                        className='w-full h-96 border rounded'
-                        type='application/json'
-                        title='Vista previa de PDF'
-                    />
-                ) :
-                <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                    <p className=' font-bold'>No se pudo cargar el PDF :/</p>
-                </section>
-            }
-            <Button
-                disabled={loading}
-                onClick={handleClickSubmit}
-                className={'w-full my-4'}
-            >
-                {loading ? <Loader2 className='animate-spin' /> : <p>Ver Escritura con marca de agua</p>}
-            </Button>
-        </section>
     <section className='bg-white p-4 rounded-lg mt-4 shadow'>
         <Title1 className='text-xl'>Escritura generada</Title1>
-        {
-            loadingViewEscritura ?
-            <div className='w-full rounded border border-dotted h-40 flex justify-center items-center'>
-                <Loader2 className='animate-spin' />
-            </div> : 
-            (viewPdf ? 
-                <embed
-                    src={viewPdf}
-                    className='w-full h-96 border mt-4 rounded'
-                    type='application/json'
-                    title='Vista previa de PDF'
-                /> :
-                <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                    <p className='font-bold'>No se pudo cargar el PDF :/</p>
-                </section>)
-        }
+        <section>
+            <p>Descarga el word de la escitura</p>
+            <Button>
+                Descargar Escritura
+            </Button>
+        </section>
     </section>
     <Button
         className={"w-full my-4 "}

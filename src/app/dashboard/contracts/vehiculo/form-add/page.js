@@ -1,6 +1,7 @@
 'use client';
 import CardAviso from '@/components/Cards/CardAviso';
 import CardNotarioSelected from '@/components/Cards/CardNotarioSelected';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
@@ -269,8 +270,18 @@ function RenderCardsFormStepper({
   
       const blobResponse = await responseGenerateScript.blob();
       const url = URL.createObjectURL(blobResponse);
-  
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "escritura_vehiculo.docx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+
       setViewPdf(url);
+
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -487,9 +498,14 @@ function RenderCardsFormStepper({
       )
     case 6:
       return(
-        <FormViewerPdfEscritura
-          viewerPdf={viewPdf}
-        />
+        < section className='p-4 w-full'>
+          <Title1>Descarga el documento si es necesario</Title1>
+          <p>En caso no haya empezado la descarga, descarga el documento</p>
+          <ButtonDownloadWord
+              viewWord={viewPdf}
+              fileName='escritura_vehiculo'
+          />
+        </section>
       )
   }
 }
