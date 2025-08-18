@@ -11,6 +11,7 @@ import FramePdfWord from '../elements/FramePdfWord';
 import CardAviso from '../Cards/CardAviso';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
+import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -100,14 +101,18 @@ export default function View5ContractParteNotarial({
               <p>{description}</p> 
             </div>
        </section>
-       <section className=''>
+        <section className=''>
             <p><b>ID: </b>{idContract}</p>
             <p className='my-1'><b>Estado : </b>{statusContracts?.filter((est)=>est.id === dataContract?.status).map((item)=><span key={item.title} className={cn('px-2 py-1 rounded-sm text-sm space-y-4', item.bgColor)}>{item.title}</span>)}</p>
             <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
             <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient ?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
-          </section>
-
-          <section className='bg-white p-4 rounded-lg mt-4 shadow'>
+        </section>
+        <ButtonDownloadWord
+            dataContract={dataContract}
+            idContract={idContract}
+            title='Descarga la parte notarial'
+        />
+        <section className='bg-white p-4 rounded-lg mt-4 shadow'>
             <Title1>Partida Notarial Generada</Title1>
             <FramePdfWord
               directory={ dataContract?.documentPaths?.parteNotarialPath}

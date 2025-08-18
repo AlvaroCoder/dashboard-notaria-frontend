@@ -5,7 +5,8 @@ import { fetchEscrituraWord } from '@/lib/apiConnections';
 
 export default function ButtonDownloadWord({
     dataContract=null,
-    idContract="asdasd"
+    idContract="asdasd",
+    title="Escritura generada"
 }) {
     const handleDownload =async(e)=>{
         e.preventDefault();
@@ -26,9 +27,9 @@ export default function ButtonDownloadWord({
     }
   return (
     <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-        <Title1 className='text-xl'>Escritura generada</Title1>
+        <Title1 className='text-xl'>{title}</Title1>
         <section>
-            <p>Descarga el word de la escitura</p>
+            <p>Descarga el word si es necesario</p>
             <Button
                 onClick={handleDownload}
 
