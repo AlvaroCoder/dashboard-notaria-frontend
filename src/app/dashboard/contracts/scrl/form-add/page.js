@@ -1,5 +1,5 @@
 'use client';
-import { parseTextoToJSON } from '@/common/parserText';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
@@ -7,13 +7,11 @@ import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
-import EditorView from '@/components/Views/EditorView';
-import { useEditorContext } from '@/context/ConextEditor';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -68,11 +66,12 @@ function RenderApp({
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
-  const [viewPdf, setViewPdf] = useState(null);
-    const [dataMinuta, setDataMinuta] = useState({
-      minutaPdf : null,
-      minutaWord : null,
-    });
+  const [dataContract, setDataContract] = useState(null);
+
+  const [dataMinuta, setDataMinuta] = useState({
+    minutaPdf : null,
+    minutaWord : null,
+  });
 
   const {
     activeStep, 
@@ -241,9 +240,13 @@ function RenderApp({
       a.click();
       document.body.removeChild(a);
 
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
 
+      const responseContract = await getDataContractByIdContract(idContract);
+      const responseContractJSON = await responseContract.json();
 
-      setViewPdf(url);
+      setDataContract(responseContractJSON?.data);
+
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -332,7 +335,7 @@ function RenderApp({
       // Se generan los formularios de los fundadores
       return(
         <section className='w-full flex justify-center items-center'>
-          <div className='max-w-5xl w-full'>
+          <div className='w-full'>
           <FormFounders
             initialFounder={dataSendMinuta?.founders?.people}
             handleSendFounder={handleSubmitFormStepperPerson}
@@ -439,7 +442,10 @@ function RenderApp({
           <section className='p-4 w-full'>
             <Title1>Descarga el documento si es necesario</Title1>
             <p>En caso no haya empezado la descarga, descarga el documento</p>
-                        
+            <ButtonDownloadWord
+              dataContract={dataContract}
+              idContract={dataContract?.id}
+            />   
           </section>
         )
   }

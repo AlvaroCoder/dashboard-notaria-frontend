@@ -12,7 +12,7 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, generateScriptCompraVenta, subirEvidencias } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -98,8 +98,8 @@ function RenderCardsFormStepper({
         minutaWord : null,
     });
     const [notarioSelected, setNotarioSelected] = useState(null);
-    const [viewPdf, setViewPdf] = useState(null);
     const [imagesMinuta, setImagesMinuta] = useState([]);
+    const [dataContract, setDataContract] = useState(null);
 
     const handleClickSelectClient=(client)=>{
         handleClickClient(client);
@@ -293,7 +293,10 @@ function RenderCardsFormStepper({
             
             setTimeout(() => URL.revokeObjectURL(url), 4000);
 
-            setViewPdf(url);
+            const responseContract = await getDataContractByIdContract(idContract);
+            const responseContractJSON = await responseContract.json();
+
+            setDataContract(responseContractJSON?.data);
 
             pushActiveStep();
 
@@ -493,8 +496,8 @@ function RenderCardsFormStepper({
                 <Title1>Descarga el documento si es necesario</Title1>
                 <p>En caso no haya empezado la descarga, descarga el documento</p>
                 <ButtonDownloadWord
-                    viewWord={viewPdf}
-                    fileName='escritura_inmueble'
+                    dataContract={dataContract}
+                    idContract={dataContract?.id}
                 />
             </section>);
     }

@@ -27,6 +27,7 @@ export default function View2ContractCompraVenta({
 	handleClickSubmit=()=>{},
     checkViewEscritura =()=>{},
 }) {
+    console.log(dataContract);
     
     return (
     <div className='h-screen pb-24 p-8 space-y-6 overflow-y-auto'>

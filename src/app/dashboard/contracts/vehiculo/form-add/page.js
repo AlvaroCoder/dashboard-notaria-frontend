@@ -14,7 +14,7 @@ import { cardDataVehiculos } from '@/data/CardData';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptCompraVenta, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
@@ -91,6 +91,7 @@ function RenderCardsFormStepper({
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [viewPdf, setViewPdf] = useState(null);
+  const [dataContract, setDataContract] = useState(null);
 
   const handleClickSelectClient=(client)=>{
       handleClickClient(client);
@@ -243,9 +244,10 @@ function RenderCardsFormStepper({
         console.log(await responseGenerateScript.json());
         return;
       }
-  
+      
+      let idContract;
       if (dataSession?.payload?.role === "junior") {
-        const idContract = responseGenerateScript.headers.get("contractId");
+        idContract = responseGenerateScript.headers.get("contractId");
   
         const responseJuniorAsigned = await asignJuniorToContracts(
           idContract,
@@ -280,7 +282,10 @@ function RenderCardsFormStepper({
 
       setTimeout(()=>URL.revokeObjectURL(url), 4000);
 
-      setViewPdf(url);
+      const responseContract = await getDataContractByIdContract(idContract);
+      const responseContractJSON = await responseContract.json();
+
+      setDataContract(responseContractJSON?.data);
 
       pushActiveStep();
     } catch (err) {
@@ -502,8 +507,8 @@ function RenderCardsFormStepper({
           <Title1>Descarga el documento si es necesario</Title1>
           <p>En caso no haya empezado la descarga, descarga el documento</p>
           <ButtonDownloadWord
-              viewWord={viewPdf}
-              fileName='escritura_vehiculo'
+            dataContract={dataContract}
+            idContract={dataContract?.id}
           />
         </section>
       )
@@ -516,6 +521,7 @@ export default function Page() {
     <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
       <RenderCardsFormStepper
         dataSession={dataSession}
+        
       />
     </section>
   )

@@ -11,7 +11,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -67,7 +67,8 @@ function RenderApp({
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
-  const [viewPdf, setViewPdf] = useState(null);
+  const [dataContract, setDataContract] = useState(null);
+
   const [dataMinuta, setDataMinuta] = useState({
     minutaPdf : null,
     minutaWord : null,
@@ -82,18 +83,12 @@ function RenderApp({
   } = useContracts();
 
   const URL_GET_DATA_CLIENTES = process.env.NEXT_PUBLIC_URL_HOME + "/client";
-  const URL_GET_DATA_JUNIORS = process.env.NEXT_PUBLIC_URL_HOME+"/junior";
   const URL_GET_DATA_SENIORS = process.env.NEXT_PUBLIC_URL_HOME+'/senior';
 
   const {
     data : dataClientes,
     loading: loadingDataClientes,
   } = useFetch(URL_GET_DATA_CLIENTES);
-
-  const {
-    data : dataJuniors,
-    loading : loadingDataJuniors,
-  } = useFetch(URL_GET_DATA_JUNIORS);
 
   const {
     data : dataSeniors,
@@ -247,7 +242,11 @@ function RenderApp({
 
       setTimeout(() => URL.revokeObjectURL(url), 4000);
 
-      setViewPdf(url);
+      const responseContract = await getDataContractByIdContract(idContract);
+      const responseContractJSON = await responseContract.json();
+      
+      setDataContract(responseContractJSON?.data)
+
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -260,6 +259,7 @@ function RenderApp({
       setLoading(false);
     }
   }
+
 
   const handleChangeFojasDatas = (path, value) => {
     setDataSendMinuta(prev => {
@@ -433,9 +433,12 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <Title1>Descarga el documento si es necesario</Title1>
+            <Title1 className='text-xl'>Descarga el documento si es necesario</Title1>
             <p>En caso no haya empezado la descarga, descarga el documento</p>
-            
+            <ButtonDownloadWord
+              dataContract={dataContract}
+              idContract={dataContract?.id}
+            />
           </section>
         )
   }

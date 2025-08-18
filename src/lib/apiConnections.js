@@ -273,3 +273,4 @@ export async function fetchEscrituraWord(path) {
         body : JSON.stringify({path})
     })
 }
+
