@@ -89,7 +89,7 @@ function RenderPageContracts() {
          position : 'bottom-right'
        });
  
-       router.push(`/dashboard/contracts/inmueble/${idContract}`)
+       router.push(`/dashboard/contracts`)
      } catch (err) {
        toast("Surgio un error al generar la escritura",{
          type : 'error',

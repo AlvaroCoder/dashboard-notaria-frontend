@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import FramePdfWord from '../elements/FramePdfWord';
 import CardAviso from '../Cards/CardAviso';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
+import { Button } from '../ui/button';
 
 export default function View5ContractParteNotarial({
   idContract='',
