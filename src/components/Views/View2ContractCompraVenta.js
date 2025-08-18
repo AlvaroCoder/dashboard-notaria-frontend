@@ -7,14 +7,13 @@ import {camelCaseToTitle, cn} from '@/lib/utils';
 import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
-import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
-import { fetchEscrituraWord } from '@/lib/apiConnections';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
 const Title1 = dynamic(() => import('@/components/elements/Title1'));
+const FramePdfWord = dynamic(()=>import('@/components/elements/FramePdfWord'),{ssr : false})
 
 export default function View2ContractCompraVenta({
     idContract,
@@ -94,10 +93,17 @@ export default function View2ContractCompraVenta({
                 </div>
             </section> 
         </section>
-<ButtonDownloadWord
-    dataContract={dataContract}
-    idContract={idContract}
-/>
+        <ButtonDownloadWord
+            dataContract={dataContract}
+            idContract={idContract}
+        />
+        <section className='rounded-lg shadow p-4'>
+		<Title1>Escritura generada</Title1>
+		<FramePdfWord
+			directory={dataContract?.documentPaths?.escrituraPath}
+			
+		/>
+	</section>
     <Button
         className={"w-full my-4 "}
         onClick={checkViewEscritura}

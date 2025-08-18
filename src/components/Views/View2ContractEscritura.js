@@ -15,8 +15,8 @@ import { toast } from 'react-toastify';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
-const Title1 = dynamic(() => import('@/components/elements/Title1'));
-
+const Title1 = dynamic(() => import('@/components/elements/Title1'), {ssr : false});
+const FramePdfWord = dynamic(()=>import('@/components/elements/FramePdfWord'),{ssr : false})
 export default function View2ContractEscritura({
 	idContract,
 	dataContract,
@@ -107,6 +107,14 @@ export default function View2ContractEscritura({
 		dataContract={dataContract}
 		idContract={idContract}
 	/>
+
+	<section className='rounded-lg shadow p-4'>
+		<Title1>Escritura generada</Title1>
+		<FramePdfWord
+			directory={dataContract?.documentPaths?.escrituraPath}
+			
+		/>
+	</section>
 
 	<section className='w-full rounded-sm shadow p-4'>
 		<div className='w-full'>
