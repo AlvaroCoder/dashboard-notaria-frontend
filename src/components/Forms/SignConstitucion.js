@@ -95,7 +95,9 @@ export default function SignConstitucion({
           disabled={loading}
           onClick={() => onGenerateParteNotarial({
             ...data,
-            signedDocumentDate : dateNotarioSigned
+            signedDocumentDate : {
+              date : dateNotarioSigned
+            }
           })}
         >
          {loading? <Loader2 className='animate-spin' /> : <p> Generar Parte Notarial</p>}

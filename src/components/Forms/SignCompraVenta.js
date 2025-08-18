@@ -110,7 +110,9 @@ export default function SignCompraVenta({
           onClick={() => onGenerateParteNotarial(
             {
               ...data,
-              signedDocumentDate : dateNotarioSigned
+              signedDocumentDate : {
+                date : dateNotarioSigned
+              }
             }
           )}
           disabled={loading}

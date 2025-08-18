@@ -89,7 +89,7 @@ function RenderPageContracts() {
          position : 'bottom-right'
        });
  
-       router.refresh()
+       router.push(`/dashboard/contracts/inmueble/${idContract}`)
      } catch (err) {
        toast("Surgio un error al generar la escritura",{
          type : 'error',
@@ -167,6 +167,7 @@ function RenderPageContracts() {
           dataContract={dataContract}
           loadingDataClient={loadingDataClient}
           client={client}
+          slug={`/dashboard/contracts/inmueble/${idContract}`}
         />
       )
     case 6:

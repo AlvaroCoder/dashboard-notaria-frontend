@@ -21,6 +21,7 @@ export default function View4ContractParteNotarial({
     client=null,
     title="Detalles del contrato",
     description="Informacion del contrato",
+    slug=""
 
 }) {
     const router = useRouter();
@@ -47,15 +48,24 @@ export default function View4ContractParteNotarial({
             } else {
                 typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
             }
+            console.log(data);
             
             const response = ['asociacion', 'razonSocial', 'rs', 'scrl', 'sac'].includes(dataContract?.contractType?.toLowerCase()) 
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
-
+            if (!response.ok) {
+                toast("Error al generar la parte notarial",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                console.log(await response.json());
+                
+                return;
+            }
             //const responseBlob = await response.blob();
             // setViewParteNotarial(URL.createObjectURL(responseBlob));
 
-            router.refresh();
+            router.push(slug);
 
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
