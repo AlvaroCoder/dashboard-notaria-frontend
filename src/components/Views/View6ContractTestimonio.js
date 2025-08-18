@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { updateEscrituraWord } from '@/lib/apiConnections'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
+import ButtonDownloadWord from '../elements/ButtonDownloadWord'
 
 export default function View6ContractTestimonio({
     idContract='',
@@ -60,6 +61,12 @@ export default function View6ContractTestimonio({
               <p><b>Tipo de Contrato :</b> <span>{camelCaseToTitle(dataContract?.contractType)}</span></p>
               <p className='flex flex-row gap-2'><b>Cliente : </b> <User2/>{loadingDataClient ?<Loader2 className='animate-spin'/> : <span>{client?.userName}</span>}</p>
             </section>
+        <ButtonDownloadWord
+          dataContract={dataContract}
+          idContract={idContract}
+          title='Descarga el testimonio generado'
+          slugDownload={dataContract?.documentPaths?.testimonioPath}
+        />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
             <Title1>Testimonio Generado</Title1>
             <FramePdfWord
@@ -77,8 +84,7 @@ export default function View6ContractTestimonio({
 
           </div>
           <ButtonUploadWord
-            dataContract={dataContract}
-            idContract={idContract}
+            handleSetFile={handleChangeDocumentWord}
           />
           <Button
             disabled={!fileWord || loadingUpdateWord}

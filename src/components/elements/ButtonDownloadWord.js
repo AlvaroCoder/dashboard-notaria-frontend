@@ -6,12 +6,13 @@ import { fetchEscrituraWord } from '@/lib/apiConnections';
 export default function ButtonDownloadWord({
     dataContract=null,
     idContract="asdasd",
-    title="Escritura generada"
+    title="Escritura generada",
+    slugDownload=""
 }) {
     const handleDownload =async(e)=>{
         e.preventDefault();
         
-        const response = await fetchEscrituraWord(dataContract?.documentPaths?.escrituraPath);
+        const response = await fetchEscrituraWord(slugDownload === '' ? dataContract?.documentPaths?.escrituraPath : slugDownload);
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
 

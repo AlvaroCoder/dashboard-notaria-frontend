@@ -110,6 +110,7 @@ export default function View5ContractParteNotarial({
         <ButtonDownloadWord
             dataContract={dataContract}
             idContract={idContract}
+            slugDownload={dataContract?.documentPaths?.parteNotarialPath}
             title='Descarga la parte notarial'
         />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
