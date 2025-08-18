@@ -167,7 +167,7 @@ function RenderPageContracts() {
           dataContract={dataContract}
           loadingDataClient={loadingDataClient}
           client={client}
-          slug={`/dashboard/contracts/inmueble/${idContract}`}
+          slug={`/dashboard/contracts`}
         />
       )
     case 6:

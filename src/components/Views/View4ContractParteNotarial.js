@@ -4,7 +4,6 @@ import Title1 from '../elements/Title1';
 import CardDetailContract from '../Cards/CardDetailContract';
 import { Button } from '../ui/button';
 import { filtrarCampos } from '@/lib/formatterJSON';
-import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import { Loader2 } from 'lucide-react';
 import { generarParteNotarial, generarParteNotarialConstitucion } from '@/lib/apiConnections';
 import SignCompraVenta from '../Forms/SignCompraVenta';
@@ -21,8 +20,6 @@ export default function View4ContractParteNotarial({
     client=null,
     title="Detalles del contrato",
     description="Informacion del contrato",
-    slug=""
-
 }) {
     const router = useRouter();
 
@@ -53,19 +50,11 @@ export default function View4ContractParteNotarial({
             const response = ['asociacion', 'razonSocial', 'rs', 'scrl', 'sac'].includes(dataContract?.contractType?.toLowerCase()) 
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
-            if (!response.ok) {
-                toast("Error al generar la parte notarial",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                console.log(await response.json());
-                
-                return;
-            }
+
             //const responseBlob = await response.blob();
             // setViewParteNotarial(URL.createObjectURL(responseBlob));
 
-            router.push(slug);
+            router.push('/dashboard/contracts');
 
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
@@ -81,78 +70,65 @@ export default function View4ContractParteNotarial({
             setLoadingParteNotarial(false)
         }
     }
-    if (viewParteNotarial) {
-        return(
-            <section className='max-w-4xl mx-auto mt-8 h-screen w-ful p-4 rounded-lg shadow'>
-            <div className='p-4 w-full border-b border-b-gray-300 flex flex-row justify-between items-center'>
-                <Title1 className='text-xl'>PDF de la parte de notarial</Title1>
-                <p>Descargalo si es necesario</p>
-            </div>
-
-            
-        </section>
-        )
-    } else{
-        return (
-            <div className='w-full h-screen pb-24 p-8 space-y-6 overflow-y-auto'>
-                <section className='flex flex-row justify-between'>
-                    <div>
-                        <Title1 className='text-3xl'>{title}</Title1>
-                        <p>{description}</p>
-                    </div>
-                    
-                </section>
-                <Separator2/>
-                <CardDetailContract
-                    idContract={idContract}
-                    status={dataContract?.status}
-                    loadingDataClient={loadingDataClient}
-                    client={client}
-                    contractType={dataContract?.contractType}
+    return (
+        <div className='w-full h-screen pb-24 p-8 space-y-6 overflow-y-auto'>
+            <section className='flex flex-row justify-between'>
+                <div>
+                    <Title1 className='text-3xl'>{title}</Title1>
+                    <p>{description}</p>
+                </div>
+                
+            </section>
+            <Separator2/>
+            <CardDetailContract
+                idContract={idContract}
+                status={dataContract?.status}
+                loadingDataClient={loadingDataClient}
+                client={client}
+                contractType={dataContract?.contractType}
+            />
+            <section className='bg-white p-4 rounded-lg mt-4 shadow'>
+                <Title1 className='text-xl'>Escritura generada</Title1>
+                <FramePdfWord
+                    directory={dataContract?.documentPaths?.escrituraPath}
                 />
-                <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-                    <Title1 className='text-xl'>Escritura generada</Title1>
-                    <FramePdfWord
-                        directory={dataContract?.documentPaths?.escrituraPath}
-                    />
-                </section>
-                <section className='bg-white p-4 shadow rounded-lg mt-4'>
-                    <Title1 className='text-xl'>Firmas de la Parte Notarial</Title1>
-                    <Separator2/>
-                    {
-                        dataFormated ?
-                        (
-                            <section>
-                                {['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(dataContract.contractType?.toLowerCase()) ?
-                                <SignConstitucion
-                                    data={dataFormated}
-                                    loading={loadingParteNotarial}
-                                    onGenerateParteNotarial={handleSubmitParteNotarial}
-                                />: 
-                                <SignCompraVenta
-                                    data={dataFormated}
-                                    loading={loadingParteNotarial}
-                                    onGenerateParteNotarial={handleSubmitParteNotarial}
-                                />    
-                            }
-                            </section>
-                        ) :
-                        <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                            <p className='font-bold'>No se ha generado la parte notarial aún</p>
-                        </section>
-                    }
-                </section>
+            </section>
+            <section className='bg-white p-4 shadow rounded-lg mt-4'>
+                <Title1 className='text-xl'>Firmas de la Parte Notarial</Title1>
+                <Separator2/>
                 {
-                    !dataFormated && <Button
-                    onClick={handleChangeDataFormated}
-                        className={"w-full mt-4"}
-                        disabled={loadingParteNotarial}
-                    >
-                        {loadingParteNotarial ? <Loader2 className='animate-spin'/> : <p>Generar parte notarial</p>}
-                    </Button>
+                    dataFormated ?
+                    (
+                        <section>
+                            {['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(dataContract.contractType?.toLowerCase()) ?
+                            <SignConstitucion
+                                data={dataFormated}
+                                loading={loadingParteNotarial}
+                                onGenerateParteNotarial={handleSubmitParteNotarial}
+                            />: 
+                            <SignCompraVenta
+                                data={dataFormated}
+                                loading={loadingParteNotarial}
+                                onGenerateParteNotarial={handleSubmitParteNotarial}
+                            />    
+                        }
+                        </section>
+                    ) :
+                    <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
+                        <p className='font-bold'>No se ha generado la parte notarial aún</p>
+                    </section>
                 }
-            </div>
-          )
-    }
+            </section>
+            {
+                !dataFormated && <Button
+                onClick={handleChangeDataFormated}
+                    className={"w-full mt-4"}
+                    disabled={loadingParteNotarial}
+                >
+                    {loadingParteNotarial ? <Loader2 className='animate-spin'/> : <p>Generar parte notarial</p>}
+                </Button>
+            }
+        </div>
+      )
 
 }

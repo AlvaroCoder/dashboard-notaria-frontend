@@ -42,7 +42,7 @@ export default function View2ContractEscritura({
 			newFormData.append('file', fileWord);
 
 			await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
-			router.refresh();
+			router.push('/dashboard/contracts');
 			toast("Se actualizo la información de la escritura",{
 				type : 'info',
 				position : 'bottom-right'
