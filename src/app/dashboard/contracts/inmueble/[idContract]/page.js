@@ -89,7 +89,7 @@ function RenderPageContracts() {
          position : 'bottom-right'
        });
  
-       router.push("/dashboard/contracts");
+       router.refresh()
      } catch (err) {
        toast("Surgio un error al generar la escritura",{
          type : 'error',

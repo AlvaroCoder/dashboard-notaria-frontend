@@ -11,6 +11,8 @@ import SignCompraVenta from '../Forms/SignCompraVenta';
 import Separator2 from '../elements/Separator2';
 import { toast } from 'react-toastify';
 import SignConstitucion from '../Forms/SignConstitucion';
+import FramePdfWord from '../elements/FramePdfWord';
+import { useRouter } from 'next/navigation';
 
 export default function View4ContractParteNotarial({
     idContract="",
@@ -21,9 +23,8 @@ export default function View4ContractParteNotarial({
     description="Informacion del contrato",
 
 }) {
+    const router = useRouter();
     const [loadingParteNotarial, setLoadingParteNotarial] = useState(false);
-
-    const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
     const [viewParteNotarial, setViewParteNotarial] = useState(null);
     const [dataFormated, setDataFormated] = useState(null);
 
@@ -52,9 +53,8 @@ export default function View4ContractParteNotarial({
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
 
-            const responseBlob = await response.blob();
-            setViewParteNotarial(URL.createObjectURL(responseBlob));
-
+            router.refresh();
+            
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
                 position : 'bottom-right'
@@ -76,12 +76,7 @@ export default function View4ContractParteNotarial({
                 <Title1 className='text-xl'>PDF de la parte de notarial</Title1>
                 <p>Descargalo si es necesario</p>
             </div>
-            <embed
-                src={viewParteNotarial}
-                className='w-full h-screen border mt-4 rounded'
-                type='application/json'
-                title='Vista previa de PDF Parte Notarial'
-            />
+
             
         </section>
         )
@@ -105,22 +100,9 @@ export default function View4ContractParteNotarial({
                 />
                 <section className='bg-white p-4 rounded-lg mt-4 shadow'>
                     <Title1 className='text-xl'>Escritura generada</Title1>
-                    {
-                        loadingViewEscritura ?
-                        <div className='w-full rounded border border-dotted h-40 flex justify-center items-center'>
-                            <Loader2 className='animate-spin' />
-                        </div> : 
-                        (viewPdf ? 
-                            <embed
-                                src={viewPdf}
-                                className='w-full h-96 border mt-4 rounded'
-                                type='application/json'
-                                title='Vista previa de PDF'
-                            /> :
-                            <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                                <p className='font-bold'>No se pudo cargar el PDF :/</p>
-                            </section>)
-                    }
+                    <FramePdfWord
+                        directory={dataContract?.documentPaths?.escrituraPath}
+                    />
                 </section>
                 <section className='bg-white p-4 shadow rounded-lg mt-4'>
                     <Title1 className='text-xl'>Firmas de la Parte Notarial</Title1>
