@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {statusContracts} from '@/lib/commonJSON';
 import dynamic from 'next/dynamic';
 import {Button} from '../ui/button';
 import {camelCaseToTitle, cn} from '@/lib/utils';
 import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
-import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
+import ButtonUploadWord from '../elements/ButtonUploadWord';
+import CardAviso from '../Cards/CardAviso';
+import { updateEscrituraWord } from '@/lib/apiConnections';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -24,9 +28,36 @@ export default function View2ContractEscritura({
 	handleClickSubmit=()=>{},
 	checkViewEscritura =()=>{}
 }) {
-	
-	const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
-  return (
+	const router = useRouter();
+	const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
+	const [fileWord, setFileWord] = useState(null);
+	const handleChangeDocumentWord=(file)=>{
+		setFileWord(file);
+	}
+
+	const handleUpdateEscritura=async()=>{
+		try {
+			setLoadingUpdateWord(true);
+			const newFormData = new FormData();
+			newFormData.append('file', fileWord);
+
+			await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
+			router.refresh();
+			toast("Se actualizo la información de la escritura",{
+				type : 'info',
+				position : 'bottom-right'
+			});
+		} catch (err) {
+			toast("Ocurrio un error",{
+				type : 'error'	,
+				position : 'bottom-center'
+			})
+		}finally {
+			setLoadingUpdateWord(false);
+		}
+	}
+
+	return (
     <div className="h-screen pb-24 p-8 space-y-6 overflow-y-auto">
 	<section className="flex flex-row justify-between">
 	   <div>
@@ -76,6 +107,28 @@ export default function View2ContractEscritura({
 		dataContract={dataContract}
 		idContract={idContract}
 	/>
+
+	<section className='w-full rounded-sm shadow p-4'>
+		<div className='w-full'>
+			<Title1>Subir Escritura actualizada</Title1>
+			<div className='my-4'>
+				<CardAviso
+					advise='NO OLVIDAR DE AGREGAR EL CUERPO DE LA MINUTA'
+				/>
+			</div>
+		</div>
+		<ButtonUploadWord
+			handleSetFile={handleChangeDocumentWord}
+		/>
+		<Button
+			disabled={!fileWord || loadingUpdateWord}
+			className={"w-full mt-4"}
+			onClick={handleUpdateEscritura}
+		>
+			{loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
+		</Button>
+	</section>
+
 	<Button
 		className={"w-full my-4 "}
 		onClick={checkViewEscritura}
