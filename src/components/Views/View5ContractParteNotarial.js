@@ -12,6 +12,7 @@ import CardAviso from '../Cards/CardAviso';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
+import { useRouter } from 'next/navigation';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -22,7 +23,7 @@ export default function View5ContractParteNotarial({
   description="Información del contrato",
   
 }) {
-  const [viewPdfTestimonio, setViewPdfTestimonio] = useState(null);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fileWord, setFileWord] = useState(null);
   const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
@@ -37,7 +38,7 @@ export default function View5ContractParteNotarial({
       newFormData.append('file', fileWord);
 
       await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
-      router.refresh();
+      router.push("/dashboard/contracts")
       toast("Se actualizo la información de la escritura",{
         type : 'info',
         position : 'bottom-right'
@@ -75,9 +76,6 @@ export default function View5ContractParteNotarial({
       ? await setUpTestimonioConstitucion(newDataToSend, typeContract):
       await setUpTestimonioCompraVenta(newDataToSend, typeContract);
 
-      const blob = await response.blob();
-
-      setViewPdfTestimonio(URL.createObjectURL(blob));
       toast("Se genero el testimonio correctamente",{
         type : 'success',
         position : 'bottom-right'
