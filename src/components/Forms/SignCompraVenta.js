@@ -4,6 +4,7 @@ import { TextField, Card, CardContent,  } from "@mui/material";
 import Title1 from "../elements/Title1";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
+import { formatDateToYMD } from "@/lib/fechas";
 
 export default function SignCompraVenta({ 
   data: initialData, 
