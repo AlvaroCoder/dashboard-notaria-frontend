@@ -93,7 +93,7 @@ export default function FormPerson({
 
             <FormControl fullWidth>
               <InputLabel>Género</InputLabel>
-              <Select value={person?.gender} label="Genero" onChange={(e) => handleChange(idx, 'gender', e.target.value, personType)}>
+              <Select value={person?.gender} label="Genero" onChange={(e) => handleChange(idx, 'gender', e.target.value, personType)} required>
                 <MenuItem value="M">Masculino</MenuItem>
                 <MenuItem value="F">Femenino</MenuItem>
               </Select>
@@ -108,7 +108,8 @@ export default function FormPerson({
                 <Select
                   value={person?.maritalStatus?.civilStatus || ''}
                   label="Estado Civil"
-                  onChange={(e) => handleChange(idx, 'maritalStatus', e.target.value, personType, person?.bienesMancomunados)}
+                  onChange={(e) => handleChange(idx, 'maritalStatus', e.target.value, personType, person?.bienesMancomunados)} 
+                  required
                 >
                   {getMaritalOptions(person?.gender)?.map((option) => (
                     <MenuItem key={option} value={option}>

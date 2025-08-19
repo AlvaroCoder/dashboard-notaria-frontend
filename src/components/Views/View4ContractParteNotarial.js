@@ -46,13 +46,26 @@ export default function View4ContractParteNotarial({
                 typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
             }
             console.log(data);
+            console.log(typeContract);
             
+           
             const response = ['asociacion', 'razonSocial', 'rs', 'scrl', 'sac'].includes(dataContract?.contractType?.toLowerCase()) 
                 ? await generarParteNotarialConstitucion(data, typeContract) 
                 : await generarParteNotarial(data, typeContract);
+            
+            if (!response.ok || response.status == 404) {
+                toast("Error al generar la partida notarial",{
+                    type : 'error',
+                    position : 'bottom-right'
+                });
 
-            //const responseBlob = await response.blob();
-            // setViewParteNotarial(URL.createObjectURL(responseBlob));
+                console.log(await response.json());
+                
+                return;
+            }
+
+            const responseBlob = await response.blob();
+            setViewParteNotarial(URL.createObjectURL(responseBlob));
 
             router.push('/dashboard/contracts');
 

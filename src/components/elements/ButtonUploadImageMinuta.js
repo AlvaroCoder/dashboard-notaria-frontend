@@ -61,7 +61,7 @@ export default function ButtonUploadImageMinuta({
           <input
             id="uploadImage"
             type="file"
-            accept="image/*"
+            accept=".jpeg, .jpg, .png, image/jpeg, image/png"
             multiple
             className="hidden"
             onChange={handleImageUpload}
