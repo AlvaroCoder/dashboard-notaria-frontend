@@ -91,12 +91,23 @@ export default function FormPerson({
             <TextField label="Apellido" value={person.lastName} onChange={(e) => handleChange(idx, 'lastName', e.target.value, personType)} fullWidth required />
             <TextField label="DNI" type="number" value={person.dni} onChange={(e) => handleChange(idx, 'dni', e.target.value, personType)} fullWidth required />
 
-            <FormControl fullWidth>
+            <FormControl fullWidth required error={!person?.gender}>
               <InputLabel>Género</InputLabel>
-              <Select value={person?.gender} label="Genero" onChange={(e) => handleChange(idx, 'gender', e.target.value, personType)} required>
+              <Select
+                value={person?.gender || ""}
+                label="Género"
+                onChange={(e) =>
+                  handleChange(idx, "gender", e.target.value, personType)
+                }
+              >
                 <MenuItem value="M">Masculino</MenuItem>
                 <MenuItem value="F">Femenino</MenuItem>
               </Select>
+              {!person?.gender && (
+                <p style={{ color: "red", fontSize: "0.8rem" }}>
+                  Este campo es obligatorio
+                </p>
+              )}
             </FormControl>
 
             <TextField label="Nacionalidad" value={person.nationality} onChange={(e) => handleChange(idx, 'nationality', e.target.value, personType)} fullWidth required />

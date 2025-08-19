@@ -1,11 +1,9 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVenta';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial';
-import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { aceptarEscritura, generateScriptMarcaAguaCompraVenta, submitFirmarDocumento } from '@/lib/apiConnections';

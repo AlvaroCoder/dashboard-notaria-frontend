@@ -3,15 +3,34 @@ import { Suspense, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useFetch } from '@/hooks/useFetch'
 import { useContractDetails } from '@/hooks/useContractsDetails'
-import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion'
 import { toast } from 'react-toastify'
 import { aceptarEscritura, generateScriptMarcaAguaCompraVenta, submitFirmarDocumento } from '@/lib/apiConnections'
-import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVenta'
-import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma'
 import { formatDateToYMD } from '@/lib/fechas'
-import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial'
-import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial'
-import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio'
+import dynamic from 'next/dynamic'
+
+const View1ContractConstitucion = dynamic(()=>import('@/components/Views/View1ContractConstitucion'),{
+  ssr : false
+});
+
+const View2ContractCompraVenta = dynamic(()=>import('@/components/Views/View2ContractCompraVenta'),{
+  ssr : false
+});
+
+const View3ContractsConstitucionFirma = dynamic(()=>import('@/components/Views/View3ContractsConstitucionFirma'),{
+  ssr : false
+});
+
+const View4ContractParteNotarial = dynamic(()=>import('@/components/Views/View4ContractParteNotarial'),{
+  ssr : false
+});
+
+const View5ContractParteNotarial = dynamic(()=>import('@/components/Views/View5ContractParteNotarial'),{
+  ssr : false
+});
+
+const View6ContractTestimonio = dynamic(()=>import('@/components/Views/View6ContractTestimonio'),{
+  ssr : false
+});
 
 function RenderPageContracts() {
   const URL_CONTRACT_ID = process.env.NEXT_PUBLIC_URL_HOME_CONTRACT+"/contractId/?idContract=";

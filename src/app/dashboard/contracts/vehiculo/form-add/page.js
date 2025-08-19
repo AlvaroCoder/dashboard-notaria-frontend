@@ -7,7 +7,6 @@ import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract';
 import { cardDataVehiculos } from '@/data/CardData';
@@ -16,7 +15,6 @@ import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
-import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -90,7 +88,6 @@ function RenderCardsFormStepper({
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [viewPdf, setViewPdf] = useState(null);
   const [dataContract, setDataContract] = useState(null);
 
   const handleClickSelectClient=(client)=>{
@@ -115,8 +112,6 @@ function RenderCardsFormStepper({
   }
 
   const handleClickFormStepper=(compradores, vendedores)=>{
-    console.log(compradores);
-    console.log(vendedores);
     
     setDataSendMinuta({
       ...dataSendMinuta,

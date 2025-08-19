@@ -10,7 +10,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -128,7 +128,7 @@ function RenderApp({
         minuta : {
           minutaNumber : detailsMinuta?.number,
           creationDay : {
-            date : formatDateToYMD(new Date())
+            date : detailsMinuta?.creationDay
           },
           place : {
             name : detailsMinuta?.namePlace,
