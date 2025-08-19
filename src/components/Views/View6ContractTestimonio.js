@@ -70,6 +70,9 @@ export default function View6ContractTestimonio({
         />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
             <Title1>Testimonio Generado</Title1>
+            <CardAviso
+              advise='RELLENAR LOS ESPACIOS'
+            />
             <FramePdfWord
             directory={ dataContract?.documentPaths?.testimonioPath}
             /> 

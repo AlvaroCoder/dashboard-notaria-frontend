@@ -114,6 +114,9 @@ export default function View5ContractParteNotarial({
         />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
             <Title1>Partida Notarial Generada</Title1>
+            <CardAviso
+              advise='LA PRIMERA VEZ QUE SE GENERA LA PARTE NOTARIAL ELIMINAR LA SECCION DE FIRMAS'
+            />
             <FramePdfWord
               directory={ dataContract?.documentPaths?.parteNotarialPath}
             /> 

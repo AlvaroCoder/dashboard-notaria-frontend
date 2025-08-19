@@ -52,7 +52,15 @@ export default function FormHeaderInformation({
                 name="tomo"
                 value={data?.header?.tomo}
                 fullWidth
+                inputProps={{
+                    pattern: "[A-Za-z ]*"
+                  }}
                 required
+                onKeyPress={(e) => {
+                    if (!/[a-zA-Z\s]/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
             />
             <TextField
                 label="Kardex"
