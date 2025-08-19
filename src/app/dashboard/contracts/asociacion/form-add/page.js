@@ -314,7 +314,7 @@ function RenderApp({
             <section>
               <Button
                 className={'w-full py-4'}
-                onClick={()=>{}}
+                onClick={backActiveStep}
               >
                 Cambiar Cliente
               </Button>

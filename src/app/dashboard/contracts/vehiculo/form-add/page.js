@@ -49,6 +49,7 @@ function RenderCardsFormStepper({
     dataSelected,
     handleClickClient,
     pushActiveStep,
+    backActiveStep
   } = useContracts();
 
   const [imagesMinuta, setImagesMinuta] = useState([]);
@@ -353,7 +354,9 @@ function RenderCardsFormStepper({
     case 2:
       return (
         <FormStepper
+          tipoProceso={dataSendMinuta?.case}
           handleSaveData={handleClickFormStepper}
+          backActiveStep={backActiveStep}
         />
       )
     case 3:

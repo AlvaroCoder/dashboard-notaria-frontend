@@ -411,7 +411,9 @@ function RenderCardsFormStepper({
             );
         case 3:
             return (<FormStepper
+                tipoProceso={dataSendMinuta?.case}
                handleSaveData={handleClickFormStepper}
+               backActiveStep={backActiveStep}
             />);
         case 4:
             return (

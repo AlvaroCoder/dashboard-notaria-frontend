@@ -26,6 +26,7 @@ const mkPerson = () => ({
 export default function FormStepper({
   tipoProceso = 'compra',
   handleSaveData = () => {},
+  backActiveStep=()=>{}
 }) {
   const stepsCompra = useMemo(() => ['Comprador(es)', 'Vendedor(es)'], []);
   const stepsVenta = useMemo(() => ['Vendedor(es)', 'Comprador(es)'], []);
@@ -264,6 +265,15 @@ export default function FormStepper({
           {activeStep === steps.length - 1 ? 'Finalizar' : 'Siguiente'}
         </Button>
       </div>
+
+      <section>
+        <Button
+          className={'w-full mt-6'}
+          onClick={()=>backActiveStep()}
+        >
+          Retroceder a la pantalla anterior
+        </Button>
+      </section>
     </section>
   );
 }
