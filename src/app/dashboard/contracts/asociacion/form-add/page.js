@@ -1,4 +1,5 @@
 'use client';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
@@ -10,7 +11,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { generateScriptContract} from '@/lib/apiConnections';
+import { generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -64,7 +65,7 @@ function RenderApp({
   });
   
   const [notarioSelected, setNotarioSelected] = useState(null);
-  const [viewPdf, setViewPdf] = useState(null);
+  const [dataContract, setDataContract] = useState(null);
   const [dataMinuta, setDataMinuta] = useState({
     minutaPdf : null,
     minutaWord : null,
@@ -106,10 +107,16 @@ function RenderApp({
 
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async(detailsMinuta, minutaPdf)=>{
     try {
-      
-      if (!minutaWord || !minutaPdf) {
+      if (detailsMinuta?.number.trim() === '' || detailsMinuta?.districtPlace.trim() === '') {
+        toast("Complete el formulario",{
+          type: 'error',
+          position : 'bottom-center'
+        });
+        return;
+      }
+      if (!minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -120,7 +127,6 @@ function RenderApp({
 
       setDataMinuta({
         minutaPdf,
-        minutaWord,
       });
 
       setDataSendMinuta({
@@ -221,7 +227,20 @@ function RenderApp({
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
-      setViewPdf(url);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "escritura_asociacion.docx";
+      document.body.appendChild(a); 
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+      const responseContract = await getDataContractByIdContract(idContract);
+      const responseContractJSON = await responseContract.json();
+
+      setDataContract(responseContractJSON?.data);
+
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -414,9 +433,12 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <FormViewerPdfEscritura
-            viewerPdf={viewPdf}
-          />
+            <Title1 className='text-xl'>Descarga el documento si es necesario</Title1>
+            <p>En caso no haya empezado la descarga, descarga el documento</p>
+            <ButtonDownloadWord
+              dataContract={dataContract}
+              idContract={dataContract?.id}
+            />
           </section>
         )
   }

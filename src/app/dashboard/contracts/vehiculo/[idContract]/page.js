@@ -188,6 +188,7 @@ function RenderPageContracts() {
           dataContract={dataContract}
           loadingDataClient={loadingDataClient}
           client={client}
+          slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
           />
         )
   }

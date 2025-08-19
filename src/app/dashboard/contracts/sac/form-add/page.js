@@ -1,4 +1,5 @@
 'use client';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
@@ -10,7 +11,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract, processDataMinuta, sendDataMinuta, sendMinutaWord, submitDataPreMinuta } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -92,6 +93,8 @@ function RenderApp({
     loading : loadingDataSeniors,
   } = useFetch(URL_GET_DATA_SENIORS);
 
+  const [dataContract, setDataContract] = useState(null);
+
   const handleClickSelectClient=(client)=>{
     pushActiveStep();
     handleClickClient(client);
@@ -105,57 +108,11 @@ function RenderApp({
     });
   };
 
-  const handleClickSelectJunior=async(junior)=>{
-    try {
-      setLoading(true);
-      const responseJuniorAsigned = await asignJuniorToContracts(dataSendMinuta?.contractId, junior?.id);
-      if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
-        toast("El junior excede la cantidad maxima que puede manipular",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      }
 
-      toast("Se asigno el Junior correctamente",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      pushActiveStep();
-      
-    } catch (err) {
-      toast("Sucedio un error al asignar el junior",{
-        type : 'error',
-        position : 'bottom-center'
-      })
-    } finally{
-      setLoading(false);
-    }
-  }
-
-  // clientId : dataSelected?.client?.id,
-  // Se encarga de mandar la minuta y luego procesarla
-
-  /**
-   * 
-   *  const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
-        
-        if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 404) {
-          toast("No se puede agregar mas carga",{
-            type : 'error',
-            position : 'bottom-right'
-          });
-          return
-        }
-        toast("Se asigno el junior",{
-          type : 'info',
-          position : 'bottom-right'
-        });
-   */
-  const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
       
-      if (!minutaWord || !minutaPdf) {
+      if ( !minutaPdf) {
         toast("Subir minuta",{
           type : 'error',
           position : 'bottom-center'
@@ -166,7 +123,6 @@ function RenderApp({
 
       setDataMinuta({
         minutaPdf,
-        minutaWord,
       });
 
       setDataSendMinuta({
@@ -277,7 +233,20 @@ function RenderApp({
       const blobResponse = await response.blob();
       const url = URL.createObjectURL(blobResponse);
 
-      setViewPdf(url);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "escritura_sociedadanonimacerrada.docx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+      const responseContract = await getDataContractByIdContract(idContract);
+      const responseContractJSON = await responseContract.json();
+
+      setDataContract(responseContractJSON?.data);
+
       pushActiveStep();
     } catch (err) {
       console.log(err);
@@ -472,9 +441,12 @@ function RenderApp({
       case 5:
         return(
           <section className='p-4 w-full'>
-            <FormViewerPdfEscritura
-            viewerPdf={viewPdf}
-          />
+            <Title1>Descarga el documento si es necesario</Title1>
+            <p>En caso no haya empezado la descarga, descarga el documento</p>
+            <ButtonDownloadWord
+              dataContract={dataContract}
+              idContract={dataContract?.id}
+            />
           </section>
         )
   }

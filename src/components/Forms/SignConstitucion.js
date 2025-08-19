@@ -3,14 +3,15 @@ import { Button } from '../ui/button';
 import Title1 from '../elements/Title1';
 import { Card, CardContent, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
+import { formatDateToYMD } from '@/lib/fechas';
 
 export default function SignConstitucion({
     data : initialData,
     onGenerateParteNotarial=()=>{},
     loading = false
-}) {
+}) {  
     const [data, setData] = useState(initialData);
-
+    const [dateNotarioSigned, setDateNotarioSigned] = useState(formatDateToYMD(new Date()))
     const handleDateChange=(index, isSpouse, newDate)=>{
         setData((prev)=>{
         const updated = {...prev};
@@ -76,11 +77,28 @@ export default function SignConstitucion({
             )}
           </div>
         </section>
+        <section>
+          <Title1 className="my-2">Notario</Title1>
+          <TextField
+            label="Fecha de firma notario"
+            type='date'
+            value={dateNotarioSigned}
+            onChange={(e)=>setDateNotarioSigned(e.target.value)}
+            fullWidth
+            margin='normal'
+            InputLabelProps={{ shrink : true }}
+          />
+        </section>
         <div className="flex justify-end mt-6">
         <Button
           className={"w-full"}
           disabled={loading}
-          onClick={() => onGenerateParteNotarial(data)}
+          onClick={() => onGenerateParteNotarial({
+            ...data,
+            signedDocumentDate : {
+              date : dateNotarioSigned
+            }
+          })}
         >
          {loading? <Loader2 className='animate-spin' /> : <p> Generar Parte Notarial</p>}
         </Button>

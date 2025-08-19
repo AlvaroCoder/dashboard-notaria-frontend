@@ -12,7 +12,7 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, generateScriptCompraVenta, subirEvidencias } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -23,6 +23,7 @@ import FojasDataForm from '@/components/Forms/FojasDataForm';
 import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import CardAviso from '@/components/Cards/CardAviso';
 import CardNotarioSelected from '@/components/Cards/CardNotarioSelected';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 
 const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedUser'),{
     ssr : false,
@@ -97,8 +98,8 @@ function RenderCardsFormStepper({
         minutaWord : null,
     });
     const [notarioSelected, setNotarioSelected] = useState(null);
-    const [viewPdf, setViewPdf] = useState(null);
     const [imagesMinuta, setImagesMinuta] = useState([]);
+    const [dataContract, setDataContract] = useState(null);
 
     const handleClickSelectClient=(client)=>{
         handleClickClient(client);
@@ -116,7 +117,7 @@ function RenderCardsFormStepper({
         pushActiveStep();
     }
 
-    const handleUploadMinuta=async(minutaWord, detailsMinuta, minutaPdf)=>{
+    const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
         try {
             if (!minutaPdf) {
                 toast("Subir minuta",{
@@ -128,8 +129,7 @@ function RenderCardsFormStepper({
             setLoading(true);
             
             setDataMinuta({
-                minutaPdf : minutaPdf,
-                minutaWord : minutaWord
+                minutaPdf : minutaPdf
             });
 
             setDataSendMinuta({
@@ -240,11 +240,11 @@ function RenderCardsFormStepper({
                 dataSendMinuta?.case
             )
 
-            
             let newDataSendMinuta = {
                 ...dataSendMinuta,
                 contractId : idContract
             }
+
             if (imagesMinuta && imagesMinuta.length > 0) {
                 const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
                 newDataSendMinuta.paymentMethod = {
@@ -284,7 +284,20 @@ function RenderCardsFormStepper({
             const blobResponse = await response.blob();
             const url = URL.createObjectURL(blobResponse);
 
-            setViewPdf(url);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "escritura_inmueble.docx";
+            document.body.appendChild(a); 
+            a.click();
+            document.body.removeChild(a); 
+            
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+            const responseContract = await getDataContractByIdContract(idContract);
+            const responseContractJSON = await responseContract.json();
+
+            setDataContract(responseContractJSON?.data);
+
             pushActiveStep();
 
         } catch (err) {
@@ -353,12 +366,14 @@ function RenderCardsFormStepper({
                             cardDataInmuebles?.map((item, idx)=><CardRequirements key={idx} handleClick={handleClickSelectCard} {...item} />)
                         }
                     </section>
+                    <section className='w-full flex justify-center items-center'>
                     <Button
                         onClick={backActiveStep}
                         className={"max-w-4xl mx-auto w-full mt-8"}
                     >
                         Regresar
                     </Button>
+                    </section>
                 </div>
             );
 
@@ -477,9 +492,14 @@ function RenderCardsFormStepper({
                 </section>
             )
         case 7:
-            return (<FormViewerPdfEscritura
-                viewerPdf={viewPdf}
-            />);
+            return (<section className='p-4 w-full'>
+                <Title1>Descarga el documento si es necesario</Title1>
+                <p>En caso no haya empezado la descarga, descarga el documento</p>
+                <ButtonDownloadWord
+                    dataContract={dataContract}
+                    idContract={dataContract?.id}
+                />
+            </section>);
     }
 }
 

@@ -1,18 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {statusContracts} from '@/lib/commonJSON';
 import dynamic from 'next/dynamic';
 import {Button} from '../ui/button';
 import {camelCaseToTitle, cn} from '@/lib/utils';
 import {Loader2, User2} from 'lucide-react';
 import { TextField } from '@mui/material';
-import CardPersonFounder from '../Cards/CardPersonFounder';
-import { useFetchViewEscritura } from '@/hooks/useFetchViewEscrtirua';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
+import ButtonDownloadWord from '../elements/ButtonDownloadWord';
+import ButtonUploadWord from '../elements/ButtonUploadWord';
+import CardAviso from '../Cards/CardAviso';
+import { updateEscrituraWord } from '@/lib/apiConnections';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
-const Title1 = dynamic(() => import('@/components/elements/Title1'));
-
+const Title1 = dynamic(() => import('@/components/elements/Title1'), {ssr : false});
+const FramePdfWord = dynamic(()=>import('@/components/elements/FramePdfWord'),{ssr : false})
 export default function View2ContractEscritura({
 	idContract,
 	dataContract,
@@ -24,9 +28,36 @@ export default function View2ContractEscritura({
 	handleClickSubmit=()=>{},
 	checkViewEscritura =()=>{}
 }) {
-	
-	const {loading : loadingViewEscritura, viewPdf} = useFetchViewEscritura(dataContract);
-  return (
+	const router = useRouter();
+	const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
+	const [fileWord, setFileWord] = useState(null);
+	const handleChangeDocumentWord=(file)=>{
+		setFileWord(file);
+	}
+
+	const handleUpdateEscritura=async()=>{
+		try {
+			setLoadingUpdateWord(true);
+			const newFormData = new FormData();
+			newFormData.append('file', fileWord);
+
+			await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
+			router.push('/dashboard/contracts');
+			toast("Se actualizo la información de la escritura",{
+				type : 'info',
+				position : 'bottom-right'
+			});
+		} catch (err) {
+			toast("Ocurrio un error",{
+				type : 'error'	,
+				position : 'bottom-center'
+			})
+		}finally {
+			setLoadingUpdateWord(false);
+		}
+	}
+
+	return (
     <div className="h-screen pb-24 p-8 space-y-6 overflow-y-auto">
 	<section className="flex flex-row justify-between">
 	   <div>
@@ -71,49 +102,41 @@ export default function View2ContractEscritura({
 		</div>
 	</section>
 
-	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
-		<Title1 className='text-xl'>Escritura del cliente</Title1>
-		{
-			viewPdfEscrituraMarcaAgua ?
-			(
-				<embed
-					src={viewPdfEscrituraMarcaAgua}
-					className='w-full h-96 border rounded'
-					type='application/json'
-					title='Vista previa de PDF'
+
+	<ButtonDownloadWord
+		dataContract={dataContract}
+		idContract={idContract}
+	/>
+
+	<section className='rounded-lg shadow p-4'>
+		<Title1>Escritura generada</Title1>
+		<FramePdfWord
+			directory={dataContract?.documentPaths?.escrituraPath}
+			
+		/>
+	</section>
+
+	<section className='w-full rounded-sm shadow p-4'>
+		<div className='w-full'>
+			<Title1>Subir Escritura actualizada</Title1>
+			<div className='my-4'>
+				<CardAviso
+					advise='NO OLVIDAR DE AGREGAR EL CUERPO DE LA MINUTA'
 				/>
-			) :
-			<section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                <p className=' font-bold'>No se pudo cargar el PDF :/</p>
-            </section>
-		}
+			</div>
+		</div>
+		<ButtonUploadWord
+			handleSetFile={handleChangeDocumentWord}
+		/>
 		<Button
-			disabled={loading}
-			onClick={handleClickSubmit}
-			className={'w-full my-4'}
+			disabled={!fileWord || loadingUpdateWord}
+			className={"w-full mt-4"}
+			onClick={handleUpdateEscritura}
 		>
-			{loading ? <Loader2 className='animate-spin' /> : <p>Ver Escritura con marca de agua</p>}
+			{loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
 		</Button>
 	</section>
-	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
-		<Title1 className='text-xl'>Escritura generada</Title1>
-		{
-			loadingViewEscritura ?
-			<div className='w-full rounded border border-dotted h-40 flex justify-center items-center'>
-				<Loader2 className='animate-spin' />
-			</div> : 
-			(viewPdf ? 
-				<embed
-					src={viewPdf}
-					className='w-full h-96 border mt-4 rounded'
-					type='application/json'
-					title='Vista previa de PDF'
-				/> :
-				<section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-					<p className='font-bold'>No se pudo cargar el PDF :/</p>
-				</section>)
-		}
-	</section>
+
 	<Button
 		className={"w-full my-4 "}
 		onClick={checkViewEscritura}

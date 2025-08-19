@@ -1,10 +1,10 @@
 "use client";
-
 import React, { useState } from "react";
 import { TextField, Paper } from "@mui/material";
 import { FileText, User, CalendarDays, Building2, Loader2 } from "lucide-react";
 import Title1 from "../elements/Title1";
 import { Button } from "../ui/button";
+import { formatDateToYMD } from "@/lib/fechas";
 
 export default function TestimonyForm({
     generateTestimony =()=>{},
@@ -12,19 +12,19 @@ export default function TestimonyForm({
 }) {
   const [formData, setFormData] = useState({
     testimony: {
-      partida: "11310592",
-      asiento: "A0001",
+      partida: "",
+      asiento: "",
       sunarpSection: {
         name: "REGISTRO DE PERSONAS JURIDICAS DE PIURA",
         province: "Piura",
       },
       registrarData: {
-        registrar: "William Valencia Macalupu",
-        registryOffice: "ZONA REGISTRAL Nº I – SEDEPIURA",
+        registrar: "",
+        registryOffice: "",
         gender: "M",
       },
       registrationDate: {
-        date: "2025-07-12",
+        date: formatDateToYMD(new Date()),
       },
     },
   });

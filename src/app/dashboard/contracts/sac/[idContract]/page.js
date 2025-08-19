@@ -78,7 +78,7 @@ function RenderPageContracts() {
           position : 'bottom-right'
         });
         
-        router.push("/dashboard");
+        router.push("/dashboard/contracts");
 
       } catch (err) {
         toast("Surgio un error al firmar la escritura",{
@@ -185,6 +185,7 @@ function RenderPageContracts() {
         dataContract={dataContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
         />
       )
     case 8:
@@ -194,6 +195,7 @@ function RenderPageContracts() {
         idContract={idContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateTestimonio={dataContract?.documentPaths?.testimonioPath}
         />
       )
   }

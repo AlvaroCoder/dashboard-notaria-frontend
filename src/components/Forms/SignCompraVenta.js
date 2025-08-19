@@ -4,6 +4,7 @@ import { TextField, Card, CardContent,  } from "@mui/material";
 import Title1 from "../elements/Title1";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
+import { formatDateToYMD } from "@/lib/fechas";
 
 export default function SignCompraVenta({ 
   data: initialData, 
@@ -11,6 +12,7 @@ export default function SignCompraVenta({
   loading= false
 }) {
   const [data, setData] = useState(initialData);
+  const [dateNotarioSigned, setDateNotarioSigned] = useState(formatDateToYMD(new Date()))
 
   const handleDateChange = (role, index, isSpouse, newDate) => {
     setData((prev) => {
@@ -89,12 +91,30 @@ export default function SignCompraVenta({
           )}
         </div>
       </section>
-
+      <section>
+        <Title1 className="my-2">Notario</Title1>
+        <TextField
+          label="Fecha de firma notario"
+          type='date'
+          value={dateNotarioSigned}
+          onChange={(e)=>setDateNotarioSigned(e.target.value)}
+          fullWidth
+          margin='normal'
+          InputLabelProps={{ shrink : true }}
+        />
+      </section>
       {/* Botón de acción */}
       <div className="flex justify-end mt-6">
         <Button
           className={"w-full"}
-          onClick={() => onGenerateParteNotarial(data)}
+          onClick={() => onGenerateParteNotarial(
+            {
+              ...data,
+              signedDocumentDate : {
+                date : dateNotarioSigned
+              }
+            }
+          )}
           disabled={loading}
         >
           {loading ? <Loader2 className="animate-spin" /> : <p>Generar Parte Notarial</p>}

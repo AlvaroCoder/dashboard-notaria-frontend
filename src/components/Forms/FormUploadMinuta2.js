@@ -6,7 +6,6 @@ import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
-import ButtonUploadWord from '../elements/ButtonUploadWord';
 import CardAviso from '../Cards/CardAviso';
 import UploadMinuta from '../elements/ButtonUploadMinuta';
 
@@ -23,7 +22,6 @@ export default function FormUploadMinuta2({
         namePlace : 'Notaria Rojas',
         districtPlace : districtPlaceMinuta
     });
-    const [minuta, setMinuta] = useState(null);
     const [minutaPdf, setMinutaPdf] = useState(null);
     
     const handleChange=(e)=>{
@@ -77,26 +75,9 @@ export default function FormUploadMinuta2({
                     dataPreview={dataPreviewPdf}
                     handleSetFile={(data)=>setMinutaPdf(data)}
                 />
-            </section>
-            <section className='bg-white p-8 shadow rounded-sm'>
-                <Title1>Sube la minuta en WORD</Title1>
-                <p>Sube la minuta en formato .doc o .docx</p>
-                <div className='my-2 space-y-6'>
-                    <CardAviso
-                        advise='ANTES DE SUBIR LA MINUTA DEFINA EL TAMAÑO DE LA FUENTE Y EL COLOR DEL TEXTO EN EL WORD'
-                    />
-                    <CardAviso
-                        advise='EL WORD NO DEBE CONTENER LAS FIRMAS Y DEBE EMPEZAR POR SR NOTARIO'
-                    />
-                </div>
-                
-                <ButtonUploadWord
-                    dataPreview={dataPreviewWord}
-                    handleSetFile={(data)=>setMinuta(data)}
-                />
                 <Button
                     className='mt-4 w-full'
-                    onClick={()=>handleUploadMinuta(minuta, detailsMinuta, minutaPdf)}
+                    onClick={()=>handleUploadMinuta(detailsMinuta, minutaPdf)}
                 >
                     {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
                 </Button>
