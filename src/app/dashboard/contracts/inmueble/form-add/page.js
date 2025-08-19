@@ -238,13 +238,16 @@ function RenderCardsFormStepper({
                 dataSelected?.client?.id,
                 'propertyCompraVenta',
                 dataSendMinuta?.case
-            )
+            );
+            
 
             let newDataSendMinuta = {
                 ...dataSendMinuta,
                 contractId : idContract
             }
 
+            console.log(newDataSendMinuta);
+        
             if (imagesMinuta && imagesMinuta.length > 0) {
                 const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
                 newDataSendMinuta.paymentMethod = {

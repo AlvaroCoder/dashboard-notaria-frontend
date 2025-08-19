@@ -5,6 +5,7 @@ import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVent
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial';
+import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { aceptarEscritura, generateScriptMarcaAguaCompraVenta, submitFirmarDocumento } from '@/lib/apiConnections';
@@ -183,6 +184,16 @@ function RenderPageContracts() {
         )
       case 6:
         return(
+          <View5ContractParteNotarial
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
+          />
+        )
+      case 8:
+        return (
           <View5ContractParteNotarial
           idContract={idContract}
           dataContract={dataContract}

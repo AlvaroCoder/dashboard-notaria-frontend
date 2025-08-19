@@ -115,6 +115,9 @@ function RenderCardsFormStepper({
   }
 
   const handleClickFormStepper=(compradores, vendedores)=>{
+    console.log(compradores);
+    console.log(vendedores);
+    
     setDataSendMinuta({
       ...dataSendMinuta,
       sellers : {

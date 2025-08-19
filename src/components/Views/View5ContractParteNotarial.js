@@ -139,7 +139,7 @@ export default function View5ContractParteNotarial({
             className={"w-full mt-4"}
             onClick={handleUpdateEscritura}
           >
-            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
+            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Parte Notarial</p>}
           </Button>
         </section>
         {
