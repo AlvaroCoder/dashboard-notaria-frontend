@@ -75,6 +75,8 @@ export default function View4ContractParteNotarial({
             });
 
         } catch (err) {
+            console.log(err);
+            
             toast("Surgio un error de la API",{
                 type : 'error',
                 position : 'bottom-center'
