@@ -10,7 +10,7 @@ import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -212,6 +212,22 @@ function RenderApp({
         ...dataSendMinuta,
         contractId : idContract
       };
+
+      if (dataSession?.payload?.role === 'junior') {
+          const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+          if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+              toast("El junior excede la cantidad maxima que puede manipular",{
+              type : 'error',
+              position : 'bottom-center'
+              });
+              return
+          }
+
+          toast("Se asigno el Junior correctamente",{
+              type : 'success',
+              position : 'bottom-right'
+          });
+      }
 
       const response = await generateScriptContract('asociacion',newDataSendMinuta);
       
