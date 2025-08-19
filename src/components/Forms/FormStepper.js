@@ -170,7 +170,7 @@ export default function FormStepper({
     const validationErrors = checkEmptyFieldsFormCompra(dataToValidate);
     if (validationErrors.length > 0) {
       setErrores(validationErrors);
-      toast('Formulario incompleto', { type: 'error' });
+      toast('Formulario incompleto', { type: 'error', position : 'bottom-right' });
       return;
     }
     setErrores([]);
@@ -255,8 +255,8 @@ export default function FormStepper({
       <RenderStepper steps={steps} active={activeStep} />
       <section className="mt-8">{renderCurrentStepForm()}</section>
 
-      <div className={cn('mt-6', tipoProceso === 'compra' ? 'flex flex-row gap-4' : 'w-full')}>
-        {tipoProceso === 'compra' && (
+      <div className={cn('mt-6', (tipoProceso === 'compra' || tipoProceso == 'venta') ? 'flex flex-row gap-4' : 'w-full')}>
+        {(tipoProceso === 'compra' || tipoProceso == 'venta')  && (
           <Button className="flex-1" disabled={activeStep === 0} onClick={handleBack}>
             Atrás
           </Button>

@@ -63,9 +63,15 @@ export default function FormUploadMinuta2({
                     fullWidth
                     required
                 />
+                <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
+                <div className='mb-4'>
+                    <Title1>Fecha de la minuta</Title1>
+                    <p>Ingresa la fecha de creación de la minuta</p>
+                </div>
                 <TextField
                         label="Fecha de la minuta"
                         type='date'
+                        className='mt-6'
                         value={detailsMinuta?.creationDay}
                         onChange={handleChange}
                         name='creationDay'

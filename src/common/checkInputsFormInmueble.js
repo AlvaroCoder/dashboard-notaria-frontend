@@ -6,9 +6,19 @@ export function checkEmptyFieldsFormCompra(dataCompra) {
             if (typeof valor === 'object' && valor !== null && !Array.isArray(valor)) {
                 for (const j in valor){
                     if (valor[j] === '') {
+
                         listaErroresCompra[indice] = {
                             error : true,
                             value : 'Por favor completar el formulario'
+                        }
+                        
+                    
+                    }
+                    
+                    if (valor?.civilStatus == 'casado' && (!valor?.spouse?.gender || !valor?.spouse?.dni || !valor?.spouse?.firstName || !valor?.spouse?.lastName|| !valor?.spouse?.job || !valor?.spouse?.nationality)) {
+                        listaErroresCompra[indice] = {
+                            error : true,
+                        value : 'Por favor completar el formulario'
                         }
                     }
                 }
@@ -24,6 +34,7 @@ export function checkEmptyFieldsFormCompra(dataCompra) {
     }
     return listaErroresCompra;
 }
+
 
 export function checkEvidenceEmpty(data=[]) {
     return data?.length > 0 ? {error : false, value : "Evidencias subidas"} : {error : true, value : 'Suba las evidencia de pago'}
