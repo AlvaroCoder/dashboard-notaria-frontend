@@ -187,6 +187,7 @@ function RenderPageContracts() {
         idContract={idContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateTestimonio={dataContract?.documentPaths?.testimonioPath}
         />
       )
   }
