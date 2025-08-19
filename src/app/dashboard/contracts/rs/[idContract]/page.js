@@ -181,6 +181,7 @@ const handleClickSetFirma=async()=>{
         dataContract={dataContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
         />
       )
     case 8:
@@ -190,6 +191,7 @@ const handleClickSetFirma=async()=>{
         idContract={idContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateTestimonio={dataContract?.documentPaths?.testimonioPath}
         />
       )
   }

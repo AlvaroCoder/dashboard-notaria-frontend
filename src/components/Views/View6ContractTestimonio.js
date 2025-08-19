@@ -19,6 +19,7 @@ export default function View6ContractTestimonio({
     client=null,
     title="Detalles del Contrato",
     description="Información del contrato",  
+    slugUpdateTestimonio=""
 }) {
   const router = useRouter();
   const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
@@ -32,7 +33,7 @@ export default function View6ContractTestimonio({
       const newFormData = new FormData();
       newFormData.append('file', fileWord);
 
-      await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
+      await updateEscrituraWord(slugUpdateTestimonio, newFormData);
       router.push("/dashboard/contracts");
       toast("Se actualizo la información de la escritura",{
         type : 'info',

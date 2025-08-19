@@ -178,6 +178,7 @@ function RenderPageContracts() {
         dataContract={dataContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
         />
       )
     case 8:
@@ -187,6 +188,7 @@ function RenderPageContracts() {
         idContract={idContract}
         loadingDataClient={loadingDataClient}
         client={client}
+        slugUpdateTestimonio={dataContract?.documentPaths?.testimonioPath}
         />
       )
     

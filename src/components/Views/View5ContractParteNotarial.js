@@ -21,7 +21,7 @@ export default function View5ContractParteNotarial({
   client=null,
   title="Detalles del Contrato",
   description="Información del contrato",
-  
+  slugUpdateParteNotarial=""
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function View5ContractParteNotarial({
       const newFormData = new FormData();
       newFormData.append('file', fileWord);
 
-      await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
+      await updateEscrituraWord(slugUpdateParteNotarial, newFormData);
       router.push("/dashboard/contracts")
       toast("Se actualizo la información de la escritura",{
         type : 'info',
