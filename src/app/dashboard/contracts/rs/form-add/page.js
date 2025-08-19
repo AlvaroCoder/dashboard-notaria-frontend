@@ -130,7 +130,7 @@ function RenderApp({
         minuta : {
           minutaNumber : detailsMinuta?.number,
           creationDay : {
-            date : formatDateToYMD(new Date())
+            date : detailsMinuta?.creationDay
           },
           place : {
             name : detailsMinuta?.namePlace,
