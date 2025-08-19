@@ -13,6 +13,7 @@ import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import { useRouter } from 'next/navigation';
+import { hasEmptyFieldsTestimony } from '@/lib/commonFunction';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -56,6 +57,16 @@ export default function View5ContractParteNotarial({
   const handleClickTestimonio=async(testimony)=>{
     try {
       setLoading(true);
+
+      const validate = hasEmptyFieldsTestimony(testimony);
+      if (!validate) {
+        toast("Completar los campos del testimonio",{
+          type : 'error',
+          position : 'bottom-right'
+        });
+        return;
+      }
+
       const newDataToSend={
         ...testimony,
         contractId : idContract,
