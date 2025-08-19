@@ -13,7 +13,6 @@ export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
     loading=false,
     dataPreviewPdf=null,
-    dataPreviewWord=null,
     numberMinuta='',
     districtPlaceMinuta=''
 }) {
@@ -76,6 +75,7 @@ export default function FormUploadMinuta2({
                     handleSetFile={(data)=>setMinutaPdf(data)}
                 />
                 <Button
+                    disabled={loading || !minutaPdf}
                     className='mt-4 w-full'
                     onClick={()=>handleUploadMinuta(detailsMinuta, minutaPdf)}
                 >

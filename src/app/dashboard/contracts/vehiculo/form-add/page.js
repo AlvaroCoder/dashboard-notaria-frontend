@@ -176,9 +176,7 @@ function RenderCardsFormStepper({
 
   const handleClickEvidences=async(e)=>{
     e.preventDefault();
-    try {
-      console.log(imagesMinuta);
-      
+    try {      
       if (imagesMinuta.length === 0) {
         setDataSendMinuta({
             ...dataSendMinuta,
@@ -521,11 +519,16 @@ function RenderCardsFormStepper({
 export default function Page() {
   const {dataSession} = useSession();
   return (
-    <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-      <RenderCardsFormStepper
-        dataSession={dataSession}
-        
-      />
+    <section>
+      <section className='p-6 w-full'>
+          <Title1 className='text-3xl'>Nuevo Contrato de Compra y Venta de Vehiculo</Title1>
+          <p className='text-gray-600 text-sm'>Genera la escritura del contrato de compra venta de vehiculo</p>
+      </section>
+      <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
+        <RenderCardsFormStepper
+          dataSession={dataSession}
+        />
+      </section>
     </section>
   )
 };
