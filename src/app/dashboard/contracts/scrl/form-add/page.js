@@ -5,7 +5,6 @@ import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
@@ -133,7 +132,7 @@ function RenderApp({
         minuta : {
           minutaNumber : detailsMinuta?.number,
           creationDay : {
-            date : formatDateToYMD(new Date())
+            date : detailsMinuta?.creationDay
           },
           place : {
             name : detailsMinuta?.namePlace,

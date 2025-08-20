@@ -7,7 +7,6 @@ import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract';
 import { cardDataVehiculos } from '@/data/CardData';
@@ -16,7 +15,6 @@ import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
-import { funUploadDataMinutaCompraVenta } from '@/lib/functionUpload';
 import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -51,6 +49,7 @@ function RenderCardsFormStepper({
     dataSelected,
     handleClickClient,
     pushActiveStep,
+    backActiveStep
   } = useContracts();
 
   const [imagesMinuta, setImagesMinuta] = useState([]);
@@ -90,7 +89,6 @@ function RenderCardsFormStepper({
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [viewPdf, setViewPdf] = useState(null);
   const [dataContract, setDataContract] = useState(null);
 
   const handleClickSelectClient=(client)=>{
@@ -115,6 +113,7 @@ function RenderCardsFormStepper({
   }
 
   const handleClickFormStepper=(compradores, vendedores)=>{
+    
     setDataSendMinuta({
       ...dataSendMinuta,
       sellers : {
@@ -173,9 +172,7 @@ function RenderCardsFormStepper({
 
   const handleClickEvidences=async(e)=>{
     e.preventDefault();
-    try {
-      console.log(imagesMinuta);
-      
+    try {      
       if (imagesMinuta.length === 0) {
         setDataSendMinuta({
             ...dataSendMinuta,
@@ -357,7 +354,9 @@ function RenderCardsFormStepper({
     case 2:
       return (
         <FormStepper
+          tipoProceso={dataSendMinuta?.case}
           handleSaveData={handleClickFormStepper}
+          backActiveStep={backActiveStep}
         />
       )
     case 3:
@@ -518,11 +517,16 @@ function RenderCardsFormStepper({
 export default function Page() {
   const {dataSession} = useSession();
   return (
-    <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-      <RenderCardsFormStepper
-        dataSession={dataSession}
-        
-      />
+    <section>
+      <section className='p-6 w-full'>
+          <Title1 className='text-3xl'>Nuevo Contrato de Compra y Venta de Vehiculo</Title1>
+          <p className='text-gray-600 text-sm'>Genera la escritura del contrato de compra venta de vehiculo</p>
+      </section>
+      <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
+        <RenderCardsFormStepper
+          dataSession={dataSession}
+        />
+      </section>
     </section>
   )
 };

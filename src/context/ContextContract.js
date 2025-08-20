@@ -13,7 +13,8 @@ const Contracts = React.createContext({
     handleClickJunior : ()=>{},
     handleChangeFileLocation : ()=>{},
     pushActive2Step : ()=>{},
-    backActiveStep : ()=>{}
+    backActiveStep : ()=>{},
+    resetActiveStep : ()=>{}
 });
 
 
@@ -40,6 +41,10 @@ export default function ContractContext({
 
     const backActiveStep=()=>{
         setActiveStep(activeStep - 1);
+    }
+
+    const resetActiveStep=()=>{
+        setActiveStep(0);
     }
 
     const handleClickJunior=(junior)=>{
@@ -82,7 +87,8 @@ export default function ContractContext({
                 handleClickJunior,
                 handleChangeFileLocation,
                 pushActive2Step,
-                backActiveStep
+                backActiveStep,
+                resetActiveStep
             }}
         >
             {children}

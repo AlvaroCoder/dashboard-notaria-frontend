@@ -30,10 +30,6 @@ const TableSelectedUser = dynamic(()=>import('@/components/Tables/TableSelectedU
     loading : ()=><>Cargando Tabla ...</>
 });
 
-const FormViewerPdfEscritura = dynamic(()=>import('@/components/Forms/FormViewerPdfEscritura'),{
-    ssr : false
-});
-
 const CardRequirements = dynamic(()=>import('@/components/Cards/CardRequirements'),{
     ssr : false
 });
@@ -55,10 +51,10 @@ function RenderCardsFormStepper({
     const {
         activeStep,
         dataSelected,
-        fileLocation,
         handleClickClient,
         pushActiveStep,
         backActiveStep,
+        resetActiveStep
     } = useContracts();
 
     const [loading, setLoading] = useState(false);
@@ -137,7 +133,7 @@ function RenderCardsFormStepper({
                 minuta : {
                     minutaNumber : detailsMinuta?.number,
                     creationDay : {
-                        date : formatDateToYMD(new Date())
+                        date : detailsMinuta?.creationDay
                     },
                     place : {
                         name : detailsMinuta?.namePlace,
@@ -238,13 +234,13 @@ function RenderCardsFormStepper({
                 dataSelected?.client?.id,
                 'propertyCompraVenta',
                 dataSendMinuta?.case
-            )
-
+            );
+            
             let newDataSendMinuta = {
                 ...dataSendMinuta,
                 contractId : idContract
             }
-
+        
             if (imagesMinuta && imagesMinuta.length > 0) {
                 const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
                 newDataSendMinuta.paymentMethod = {
@@ -286,7 +282,7 @@ function RenderCardsFormStepper({
 
             const a = document.createElement('a');
             a.href = url;
-            a.download = "escritura_inmueble.docx";
+            a.download = `escritura_${idContract}.docx`;
             document.body.appendChild(a); 
             a.click();
             document.body.removeChild(a); 
@@ -380,27 +376,44 @@ function RenderCardsFormStepper({
         // Luegos se sube el formulario de la minuta
         case 2:
             return (
-              <main className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
-                <FormUploadMinuta2
-                    loading={loading}
-                    handleUploadMinuta={handleUploadMinuta}
-                    dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
-                    dataPreviewWord={dataMinuta?.minutaWord}
-                    numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
-                    districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
-                />
+              <main className='grid grid-cols-1 lg:grid-cols-3 gap-2'>
+                <div className='col-span-2'>
+                    <FormUploadMinuta2
+                        loading={loading}
+                        handleUploadMinuta={handleUploadMinuta}
+                        dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+                        numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
+                        districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
+                    />
+                    <Button 
+                        onClick={backActiveStep}
+                        className={'w-full mt-4'}
+                    >
+                        Regresar
+                    </Button>
+                </div>
                 <section className='hidden col-span-1 bg-white p-4 h-fit shadow rounded-sm lg:flex flex-col gap-4'>
                     <section>
                         <Title1>Cliente Seleccionado : </Title1>
                         <h1 className='text-sm'>Nombre : {dataSelected?.client?.firstName || '-'}</h1>
                         <h1 className='text-sm'>Usuario : {dataSelected?.client?.userName || '-'}</h1>
                     </section>
+                    <section>
+                        <Button
+                            className={"w-full py-4"}
+                            onClick={resetActiveStep}
+                        >
+                            Cambiar Cliente
+                        </Button>
+                    </section>
                 </section>
               </main>  
             );
         case 3:
             return (<FormStepper
+                tipoProceso={dataSendMinuta?.case}
                handleSaveData={handleClickFormStepper}
+               backActiveStep={backActiveStep}
             />);
         case 4:
             return (
@@ -420,7 +433,6 @@ function RenderCardsFormStepper({
                             <section className='my-4'>
                                 <CardAviso
                                     advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
-
                                 />
                             </section>
                             <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required/>
@@ -428,7 +440,7 @@ function RenderCardsFormStepper({
                     }
                     <Button
                         onClick={handleClickEvidences}
-                        
+                        disabled={loading}
                         className={"mt-4 w-full"}
                     >
                     {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
@@ -492,7 +504,8 @@ function RenderCardsFormStepper({
                 </section>
             )
         case 7:
-            return (<section className='p-4 w-full'>
+            return (
+            <section className='p-4 w-full'>
                 <Title1>Descarga el documento si es necesario</Title1>
                 <p>En caso no haya empezado la descarga, descarga el documento</p>
                 <ButtonDownloadWord
@@ -510,11 +523,17 @@ export default function Page() {
 
     const {dataSession} = useSession();
     return (
-        <section className='w-full h-screen overflow-y-auto pb-24 grid grid-cols-1 p-8 gap-2'>
-            {loadingProcess && <Loading isOpen={loadingProcess}/>}
-            <RenderCardsFormStepper
-                dataSession={dataSession}
-            />
+        <section>
+            <section className='p-6 w-full'>
+                <Title1 className='text-3xl'>Nuevo Contrato de Compra y Venta de Inmueble</Title1>
+                <p className='text-gray-600 text-sm'>Genera la escritura del contrato de compra venta de inmuebles</p>
+            </section>
+            <section className='w-full min-h-screen pb-24 grid grid-cols-1 p-8 gap-2'>
+                {loadingProcess && <Loading isOpen={loadingProcess}/>}
+                <RenderCardsFormStepper
+                    dataSession={dataSession}
+                />
+            </section>
         </section>
   )
 };

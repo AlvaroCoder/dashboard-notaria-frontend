@@ -1,5 +1,4 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import View1ContractConstitucion from '@/components/Views/View1ContractConstitucion';
 import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVenta';
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
@@ -183,6 +182,16 @@ function RenderPageContracts() {
         )
       case 6:
         return(
+          <View5ContractParteNotarial
+          idContract={idContract}
+          dataContract={dataContract}
+          loadingDataClient={loadingDataClient}
+          client={client}
+          slugUpdateParteNotarial={dataContract?.documentPaths?.parteNotarialPath}
+          />
+        )
+      case 8:
+        return (
           <View5ContractParteNotarial
           idContract={idContract}
           dataContract={dataContract}

@@ -20,7 +20,7 @@ export default function FormHeaderInformation({
                 required
             />
             <TextField
-                label="Nro Partida Registral"
+                label="Registro"
                 type='number'
                 onChange={handleChangeHeader}
                 name='numeroRegistroEscritura'

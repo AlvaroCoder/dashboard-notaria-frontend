@@ -13,6 +13,7 @@ import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import { useRouter } from 'next/navigation';
+import { hasEmptyFieldsTestimony } from '@/lib/commonFunction';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -56,6 +57,16 @@ export default function View5ContractParteNotarial({
   const handleClickTestimonio=async(testimony)=>{
     try {
       setLoading(true);
+
+      const validate = hasEmptyFieldsTestimony(testimony);
+      if (!validate) {
+        toast("Completar los campos del testimonio",{
+          type : 'error',
+          position : 'bottom-right'
+        });
+        return;
+      }
+
       const newDataToSend={
         ...testimony,
         contractId : idContract,
@@ -139,7 +150,7 @@ export default function View5ContractParteNotarial({
             className={"w-full mt-4"}
             onClick={handleUpdateEscritura}
           >
-            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
+            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Parte Notarial</p>}
           </Button>
         </section>
         {

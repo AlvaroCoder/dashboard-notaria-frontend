@@ -8,19 +8,20 @@ import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
 import CardAviso from '../Cards/CardAviso';
 import UploadMinuta from '../elements/ButtonUploadMinuta';
+import { formatDateToYMD } from '@/lib/fechas';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
     loading=false,
     dataPreviewPdf=null,
-    dataPreviewWord=null,
     numberMinuta='',
     districtPlaceMinuta=''
 }) {
     const [detailsMinuta, setDetailsMinuta] = useState({
         number : numberMinuta,
         namePlace : 'Notaria Rojas',
-        districtPlace : districtPlaceMinuta
+        districtPlace : districtPlaceMinuta,
+        creationDay : formatDateToYMD(new Date())
     });
     const [minutaPdf, setMinutaPdf] = useState(null);
     
@@ -62,6 +63,21 @@ export default function FormUploadMinuta2({
                     fullWidth
                     required
                 />
+                <Divider className='my-4' style={{marginTop : 10, marginBottom : 10}} />
+                <div className='mb-4'>
+                    <Title1>Fecha de la minuta</Title1>
+                    <p>Ingresa la fecha de creación de la minuta</p>
+                </div>
+                <TextField
+                        label="Fecha de la minuta"
+                        type='date'
+                        className='mt-6'
+                        value={detailsMinuta?.creationDay}
+                        onChange={handleChange}
+                        name='creationDay'
+                        fullWidth
+                        required
+                    />
             </section>
             <section className='bg-white p-8 shadow rounded-sm'>
                 <Title1>Sube la Minuta en PDF</Title1>
@@ -76,6 +92,7 @@ export default function FormUploadMinuta2({
                     handleSetFile={(data)=>setMinutaPdf(data)}
                 />
                 <Button
+                    disabled={loading || !minutaPdf}
                     className='mt-4 w-full'
                     onClick={()=>handleUploadMinuta(detailsMinuta, minutaPdf)}
                 >

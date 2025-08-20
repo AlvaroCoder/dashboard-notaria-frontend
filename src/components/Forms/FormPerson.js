@@ -21,12 +21,13 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
         <TextField label="Primer Nombre" value={person?.maritalStatus?.spouse?.firstName || ''} onChange={(e) => onChange(idx, 'spouse-firstName', e.target.value, personType, person?.bienesMancomunados)} required />
         <TextField label="Apellido" value={person?.maritalStatus?.spouse?.lastName || ''} onChange={(e) => onChange(idx, 'spouse-lastName', e.target.value, personType, person?.bienesMancomunados)} required />
         <TextField label="DNI" type="number" value={person?.maritalStatus?.spouse?.dni || ''} onChange={(e) => onChange(idx, 'spouse-dni', e.target.value, personType, person?.bienesMancomunados)} required />
-        <FormControl>
+        <FormControl required>
           <InputLabel>Género</InputLabel>
           <Select value={person?.maritalStatus?.spouse?.gender || ''} onChange={(e) => onChange(idx, 'spouse-gender', e.target.value, personType, person?.bienesMancomunados)} required>
             <MenuItem value="M">Masculino</MenuItem>
             <MenuItem value="F">Femenino</MenuItem>
           </Select>
+        
         </FormControl>
         <TextField label="Nacionalidad" value={person?.maritalStatus?.spouse?.nationality || ''} onChange={(e) => onChange(idx, 'spouse-nationality', e.target.value, personType, person?.bienesMancomunados)} required />
         <TextField label="Trabajo" className="col-span-2" value={person?.maritalStatus?.spouse?.job || ''} onChange={(e) => onChange(idx, 'spouse-job', e.target.value, personType, person?.bienesMancomunados)} required />
@@ -91,12 +92,23 @@ export default function FormPerson({
             <TextField label="Apellido" value={person.lastName} onChange={(e) => handleChange(idx, 'lastName', e.target.value, personType)} fullWidth required />
             <TextField label="DNI" type="number" value={person.dni} onChange={(e) => handleChange(idx, 'dni', e.target.value, personType)} fullWidth required />
 
-            <FormControl fullWidth>
+            <FormControl fullWidth required error={!person?.gender}>
               <InputLabel>Género</InputLabel>
-              <Select value={person?.gender} label="Genero" onChange={(e) => handleChange(idx, 'gender', e.target.value, personType)} required>
+              <Select
+                value={person?.gender || ""}
+                label="Género"
+                onChange={(e) =>
+                  handleChange(idx, "gender", e.target.value, personType)
+                }
+              >
                 <MenuItem value="M">Masculino</MenuItem>
                 <MenuItem value="F">Femenino</MenuItem>
               </Select>
+              {!person?.gender && (
+                <p style={{ color: "red", fontSize: "0.8rem" }}>
+                  Este campo es obligatorio
+                </p>
+              )}
             </FormControl>
 
             <TextField label="Nacionalidad" value={person.nationality} onChange={(e) => handleChange(idx, 'nationality', e.target.value, personType)} fullWidth required />

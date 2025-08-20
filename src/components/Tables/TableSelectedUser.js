@@ -111,11 +111,6 @@ export default function TableSelectedUser({
                                     
                                         <p>No se encontro informacion</p>
                                     </TableCell>
-                                    <Button
-                                        onClick={crearUsuario}
-                                    >
-                                        Crear entidad
-                                    </Button>
                                 </TableRow>
                             )
                         }

@@ -5,13 +5,12 @@ import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract'
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -134,7 +133,7 @@ function RenderApp({
         minuta : {
           minutaNumber : detailsMinuta?.number,
           creationDay : {
-            date : formatDateToYMD(new Date())
+            date : detailsMinuta?.creationDay
           },
           place : {
             name : detailsMinuta?.namePlace,
@@ -213,6 +212,22 @@ function RenderApp({
         ...dataSendMinuta,
         contractId : idContract
       };
+
+      if (dataSession?.payload?.role === 'junior') {
+          const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
+          if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
+              toast("El junior excede la cantidad maxima que puede manipular",{
+              type : 'error',
+              position : 'bottom-center'
+              });
+              return
+          }
+
+          toast("Se asigno el Junior correctamente",{
+              type : 'success',
+              position : 'bottom-right'
+          });
+      }
 
       const response = await generateScriptContract('asociacion',newDataSendMinuta);
       
@@ -315,7 +330,7 @@ function RenderApp({
             <section>
               <Button
                 className={'w-full py-4'}
-                onClick={()=>{}}
+                onClick={backActiveStep}
               >
                 Cambiar Cliente
               </Button>
