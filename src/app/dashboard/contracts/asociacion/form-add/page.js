@@ -108,7 +108,11 @@ function RenderApp({
   // Se encarga de mandar la minuta y luego procesarla
   const handleUploadMinuta=async(detailsMinuta, minutaPdf)=>{
     try {
-      if (detailsMinuta?.number.trim() === '' || detailsMinuta?.districtPlace.trim() === '') {
+      if (
+        detailsMinuta?.number.trim() === '' ||
+        detailsMinuta?.districtPlace.trim() === '' || 
+        detailsMinuta?.creationDay.trim() === ''
+      ) {
         toast("Complete el formulario",{
           type: 'error',
           position : 'bottom-center'
