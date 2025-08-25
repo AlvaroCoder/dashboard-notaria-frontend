@@ -115,13 +115,6 @@ function RenderCardsFormStepper({
 
     const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
         try {
-            if (!minutaPdf) {
-                toast("Subir minuta",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                return;
-            }
             setLoading(true);
             
             setDataMinuta({
@@ -495,7 +488,7 @@ function RenderCardsFormStepper({
                         )
                     }
                     <Button 
-                        disabled={!notarioSelected}
+                        disabled={!notarioSelected || loading}
                         onClick={handleSubmitData}
                         className={"w-full mt-4"}
                     >   

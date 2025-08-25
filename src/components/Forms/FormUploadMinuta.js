@@ -19,7 +19,6 @@ export default function FormUploadMinuta() {
         inicializarBloquesMinuta, 
         agregarBloqueMinuta, 
         handleChangeNumeroMinuta, 
-        handleChangeDataPreMinuta, 
         dataPreMinuta, 
         handleChangeDataPreMinutaFileLocation,
         handleChangePreMinutaDate

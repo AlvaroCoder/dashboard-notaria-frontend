@@ -5,30 +5,36 @@ import { Skeleton } from '@mui/material';
 import { toast } from 'react-toastify';
 
 export default function FramePdfWord({
-  directory,
-  handlePdf=null  
+  handlePdf=null,
+  path
 }) {
-      const URL_PDF = `${process.env.NEXT_PUBLIC_BASE_URL}/contracts/convertToPdf?dir=${directory}`;
+    const URL_PDF_DOCUMENT=`${process.env.NEXT_PUBLIC_BASE_URL}/home/pdfDocument`
       const [dataPdf, setDataPdf] = useState(null);
       const [loading, setLoading] = useState(false);
       useEffect(()=>{
         async function getData() {
           try {
             setLoading(true);
-            const data = await fetch(URL_PDF,{
+            const responsePdfDocument = await fetch(URL_PDF_DOCUMENT,{
               method : 'POST',
               mode : 'cors',
               headers : {
-                "Content-Type" : "application/json"
-            },
+                'Content-type' : 'application/json'
+              },
+              body : JSON.stringify({path})
             });
-            const blob = await data.blob();
+
+            
+            const blob = await responsePdfDocument.blob();
             const pdf = URL.createObjectURL(blob);       
             setDataPdf(pdf);
+            
             if (handlePdf) {
               handlePdf(blob);
           }
           } catch (err) {
+            console.log(err);
+            
               toast("Error con el servidor",{
                   type : 'error',
                   position : 'bottom-center'
@@ -40,7 +46,7 @@ export default function FramePdfWord({
         }
         getData();
 
-      },[]);
+      },[path]);
   if (loading) {
     return(
         <Card className="w-full h-32">

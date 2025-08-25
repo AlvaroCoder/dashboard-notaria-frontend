@@ -13,3 +13,7 @@ export function hasEmptyFieldsTestimony(obj) {
     
     return false; // número, boolean u otros valores están bien
   }
+
+  export function hasEmptyFieldsUploadMinuta(detailsMinuta) {
+    return  detailsMinuta?.number.trim() === '' || detailsMinuta?.districtPlace.trim() === '' || detailsMinuta?.creationDay.trim() === ''
+  }

@@ -24,6 +24,8 @@ export default function View5ContractParteNotarial({
   description="Información del contrato",
   slugUpdateParteNotarial=""
 }) {
+  console.log(dataContract);
+  
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fileWord, setFileWord] = useState(null);

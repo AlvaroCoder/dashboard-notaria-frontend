@@ -9,6 +9,8 @@ import { Loader2 } from 'lucide-react';
 import CardAviso from '../Cards/CardAviso';
 import UploadMinuta from '../elements/ButtonUploadMinuta';
 import { formatDateToYMD } from '@/lib/fechas';
+import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
+import { toast } from 'react-toastify';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
@@ -94,7 +96,27 @@ export default function FormUploadMinuta2({
                 <Button
                     disabled={loading || !minutaPdf}
                     className='mt-4 w-full'
-                    onClick={()=>handleUploadMinuta(detailsMinuta, minutaPdf)}
+                    onClick={()=>{
+                        const emptyFields = hasEmptyFieldsUploadMinuta(detailsMinuta);
+
+                        if (emptyFields) {
+                            toast("Debe completar los campos",{
+                                type : 'error',
+                                position : 'bottom-center'
+                            });
+                            return;
+                        }
+
+                        if (!minutaPdf) {
+                            toast("Debe subir la minuta",{
+                                type : 'error',
+                                position : 'bottom-center'
+                            });
+                            return;
+                        }
+                        
+                        handleUploadMinuta(detailsMinuta, minutaPdf)
+                    }}
                 >
                     {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
                 </Button>

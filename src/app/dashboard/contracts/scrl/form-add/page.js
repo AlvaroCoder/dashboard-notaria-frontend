@@ -77,7 +77,6 @@ function RenderApp({
     dataSelected,
     handleClickClient,
     pushActiveStep,
-    pushActive2Step,
     backActiveStep
   } = useContracts();
 
@@ -113,14 +112,6 @@ function RenderApp({
   // Se encarga de mandar la minuta y luego procesarla
   const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
-      
-      if (!minutaPdf ) {
-        toast("Subir minuta",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      };
       setLoading(true);
 
       setDataMinuta({

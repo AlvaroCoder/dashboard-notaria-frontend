@@ -492,7 +492,7 @@ function RenderCardsFormStepper({
             )
           }
           <Button 
-            disabled={!notarioSelected}
+            disabled={!notarioSelected || loading}
             onClick={handleSubmitData}
             className={"w-full mt-4"}
           >

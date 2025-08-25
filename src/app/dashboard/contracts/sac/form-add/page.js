@@ -109,14 +109,7 @@ function RenderApp({
 
   const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
-      
-      if ( !minutaPdf) {
-        toast("Subir minuta",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      };
+    
       setLoading(true);
 
       setDataMinuta({
