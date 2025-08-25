@@ -24,7 +24,6 @@ export default function View4ContractParteNotarial({
     const router = useRouter();
 
     const [loadingParteNotarial, setLoadingParteNotarial] = useState(false);
-    const [viewParteNotarial, setViewParteNotarial] = useState(null);
     const [dataFormated, setDataFormated] = useState(null);
 
     const handleChangeDataFormated =() => {
@@ -58,15 +57,8 @@ export default function View4ContractParteNotarial({
                     type : 'error',
                     position : 'bottom-right'
                 });
-
-                console.log(await response.json());
-                
                 return;
             }
-
-            const responseBlob = await response.blob();
-            setViewParteNotarial(URL.createObjectURL(responseBlob));
-
             router.push('/dashboard/contracts');
 
             toast("Se genero con exito la parte notarial",{
@@ -105,7 +97,7 @@ export default function View4ContractParteNotarial({
             <section className='bg-white p-4 rounded-lg mt-4 shadow'>
                 <Title1 className='text-xl'>Escritura generada</Title1>
                 <FramePdfWord
-                    directory={dataContract?.documentPaths?.escrituraPath}
+                    path={dataContract?.pdfDocumentPaths?.escrituraPath}
                 />
             </section>
             <section className='bg-white p-4 shadow rounded-lg mt-4'>
@@ -130,17 +122,18 @@ export default function View4ContractParteNotarial({
                         </section>
                     ) :
                     <section className='w-full border border-gray-200 border-dotted rounded-sm h-40 flex justify-center items-center'>
-                        <p className='font-bold'>No se ha generado la parte notarial aún</p>
+                        <p className='font-bold'>No se ha tomado las firmas aún</p>
                     </section>
                 }
             </section>
             {
-                !dataFormated && <Button
-                onClick={handleChangeDataFormated}
+                !dataFormated && 
+                <Button
+                    onClick={handleChangeDataFormated}
                     className={"w-full mt-4"}
                     disabled={loadingParteNotarial}
                 >
-                    {loadingParteNotarial ? <Loader2 className='animate-spin'/> : <p>Generar parte notarial</p>}
+                    {loadingParteNotarial ? <Loader2 className='animate-spin'/> : <p>Empezar parte notarial</p>}
                 </Button>
             }
         </div>

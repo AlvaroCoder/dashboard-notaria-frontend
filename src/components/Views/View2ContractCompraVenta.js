@@ -26,10 +26,7 @@ export default function View2ContractCompraVenta({
 	dataContract,
 	loadingDataClient,
 	client,
-	junior,
-	viewPdfEscrituraMarcaAgua=null,
 	loading=false,
-	handleClickSubmit=()=>{},
     checkViewEscritura =()=>{},
 }) {
         const router = useRouter();

@@ -27,15 +27,15 @@ export default function View6ContractTestimonio({
   const handleChangeDocumentWord=(file)=>{
     setFileWord(file);
   }
-  const handleUpdateEscritura=async()=>{
+  const handleUpdateTestimony=async()=>{
     try {
       setLoadingUpdateWord(true);
       const newFormData = new FormData();
       newFormData.append('file', fileWord);
 
-      await updateEscrituraWord(slugUpdateTestimonio, newFormData);
+      await updateEscrituraWord(slugUpdateTestimonio, newFormData, idContract);
       router.push("/dashboard/contracts");
-      toast("Se actualizo la información de la escritura",{
+      toast("Se actualizo la información del testimonio",{
         type : 'info',
         position : 'bottom-right'
       });
@@ -69,13 +69,21 @@ export default function View6ContractTestimonio({
           slugDownload={dataContract?.documentPaths?.testimonioPath}
         />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-            <Title1>Testimonio Generado</Title1>
+            <Title1>Testimonio Generado (PDF)</Title1>
             <CardAviso
               advise='RELLENAR LOS ESPACIOS'
             />
-            <FramePdfWord
-            directory={ dataContract?.documentPaths?.testimonioPath}
-            /> 
+            {
+              dataContract?.pdfDocumentPaths?.testimonioPath === '' ?
+              <div className='w-full mt-4'>
+                <CardAviso
+                  advise='ACTUALIZA EL TESTIMONIO EN WORD PARA PODER GENERARLO EN PDF'
+                />
+              </div>:
+              <FramePdfWord
+                path={dataContract?.pdfDocumentPaths?.testimonioPath}
+              /> 
+            }
         </section>
         <section className='w-full rounded-sm shadow p-4'>
           <div className='w-full'>
@@ -93,7 +101,7 @@ export default function View6ContractTestimonio({
           <Button
             disabled={!fileWord || loadingUpdateWord}
             className={"w-full mt-4"}
-            onClick={handleUpdateEscritura}
+            onClick={handleUpdateTestimony}
           >
             {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
           </Button>

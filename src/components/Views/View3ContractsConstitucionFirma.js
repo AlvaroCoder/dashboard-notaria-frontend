@@ -109,7 +109,7 @@ export default function View3ContractsConstitucionFirma({
         </div> 
             <p className='flex flex-row gap-4 p-2 rounded-sm bg-green-100 w-fit my-4'> <CircleCheckBig className='text-green-600' /> Escritura aceptada</p>
             <FramePdfWord
-                directory={dataContract?.documentPaths?.escrituraPath}
+                path={dataContract?.pdfDocumentPaths?.escrituraPath}
             />
             <Button 
                 disabled={loadingDataClient}
