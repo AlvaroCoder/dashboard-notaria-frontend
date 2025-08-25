@@ -156,7 +156,7 @@ export default function View2ContractEscritura({
 
 				</div> :
 				<FramePdfWord
-					
+				
 					path={dataContract?.pdfDocumentPaths?.escrituraPath}
 				/>
 			}
