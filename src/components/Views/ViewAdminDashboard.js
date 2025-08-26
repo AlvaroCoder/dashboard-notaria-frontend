@@ -44,7 +44,7 @@ export default function ViewAdminDashboard() {
           const json = await Promise.all(responses.map(res=>res.json()));
           
           const [inmuebles, vehiculos, asociacion, rs, sac, scrl] = json.map(j=>typeof(j?.data) === 'string'? [] : j?.data);
-  
+
           setData({inmuebles, vehiculos, asociacion, rs, sac, scrl});
   
           setIndicators([
