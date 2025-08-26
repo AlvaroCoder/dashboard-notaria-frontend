@@ -37,19 +37,31 @@ export default function View1ContractConstitucion({
           </section>
           <section>
             <Title1 className='text-xl'>Minuta del Contrato</Title1>
+            <section className='my-2 flex flex-col gap-4'>
+            <div>
+                <Title1 className=''>Accesos Rapidos</Title1>
+            </div>
+            <section className='flex flex-row gap-4 w-full'>
+              <Button
+                className={"flex-1 py-4"}
+                onClick={()=>router.push(`/dashboard/juniors/asign/?idContract=${idContract}`)}
+              >
+                Asignar un Junior
+              </Button>
+              <Button 
+                className={"flex-1 py-4"}
+                onClick={()=>router.push(`/dashboard/processContract/generateScript/?status=${dataContract?.status}&contractType=${dataContract?.contractType}&idContract=${idContract}`)}
+              >
+                  Generar Escritura
+              </Button>
+            </section>
+          </section>
             <Separator2/>
             <FramePdf
               directory={dataContract?.minutaDirectory}
             />
           </section>
-          <section className='my-4'>
-            <Button 
-              className={"w-full py-4"}
-              onClick={()=>router.push(`/dashboard/processContract/generateScript/?status=${dataContract?.status}&contractType=${dataContract?.contractType}&idContract=${idContract}`)}
-            >
-                Generar Escritura
-            </Button>
-          </section>
+
         </div>
       )
 }
