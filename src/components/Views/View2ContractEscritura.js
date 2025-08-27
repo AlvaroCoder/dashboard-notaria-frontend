@@ -10,7 +10,6 @@ import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
 import CardAviso from '../Cards/CardAviso';
 import { updateEscrituraWord } from '@/lib/apiConnections';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import Separator2 from '../elements/Separator2';
 
@@ -27,7 +26,6 @@ export default function View2ContractEscritura({
 	loading=false,
 	checkViewEscritura =()=>{}
 }) {
-	const router = useRouter();
 	const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
 	const [fileWord, setFileWord] = useState(null);
 	const handleChangeDocumentWord=(file)=>{

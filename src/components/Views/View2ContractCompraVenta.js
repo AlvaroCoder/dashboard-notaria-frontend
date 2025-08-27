@@ -9,7 +9,6 @@ import { TextField } from '@mui/material';
 import CardPersonBuyerSeller from '../Cards/CardPersonBuyerSeller';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
-import { useRouter } from 'next/navigation';
 import { updateEscrituraWord } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
 import CardAviso from '../Cards/CardAviso';
@@ -29,7 +28,6 @@ export default function View2ContractCompraVenta({
 	loading=false,
     checkViewEscritura =()=>{},
 }) {
-        const router = useRouter();
         const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)
         const [fileWord, setFileWord] = useState(null);
         const handleChangeDocumentWord=(file)=>{

@@ -18,7 +18,7 @@ export default function ButtonDownloadWord({
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = `escritura-${idContract}.docx`;
+        a.download = `documento.docx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

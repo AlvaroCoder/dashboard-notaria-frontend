@@ -11,7 +11,6 @@ import Separator2 from '../elements/Separator2';
 import { toast } from 'react-toastify';
 import SignConstitucion from '../Forms/SignConstitucion';
 import FramePdfWord from '../elements/FramePdfWord';
-import { useRouter } from 'next/navigation';
 
 export default function View4ContractParteNotarial({
     idContract="",
@@ -21,8 +20,6 @@ export default function View4ContractParteNotarial({
     title="Detalles del contrato",
     description="Informacion del contrato",
 }) {
-    const router = useRouter();
-
     const [loadingParteNotarial, setLoadingParteNotarial] = useState(false);
     const [dataFormated, setDataFormated] = useState(null);
 
@@ -44,9 +41,6 @@ export default function View4ContractParteNotarial({
             } else {
                 typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
             }
-            console.log(data);
-            console.log(typeContract);
-            
            
             const response = ['asociacion', 'razonSocial', 'rs', 'scrl', 'sac'].includes(dataContract?.contractType?.toLowerCase()) 
                 ? await generarParteNotarialConstitucion(data, typeContract) 
