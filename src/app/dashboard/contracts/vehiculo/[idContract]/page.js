@@ -4,6 +4,7 @@ import View2ContractCompraVenta from '@/components/Views/View2ContractCompraVent
 import View3ContractsConstitucionFirma from '@/components/Views/View3ContractsConstitucionFirma';
 import View4ContractParteNotarial from '@/components/Views/View4ContractParteNotarial';
 import View5ContractParteNotarial from '@/components/Views/View5ContractParteNotarial';
+import View6ContractTestimonio from '@/components/Views/View6ContractTestimonio';
 import { useContractDetails } from '@/hooks/useContractsDetails';
 import { useFetch } from '@/hooks/useFetch';
 import { aceptarEscritura, generateScriptMarcaAguaCompraVenta, submitFirmarDocumento } from '@/lib/apiConnections';
@@ -36,7 +37,9 @@ function RenderPageContracts() {
         type : 'success',
         position : 'bottom-right'
       });
-      router.push("/dashboard/contracts");
+      
+      window.location.reload();
+
     } catch (err) {      
       toast("Surgio un error al aceptar la escritura",{
         type : 'error',
@@ -87,7 +90,8 @@ function RenderPageContracts() {
            position : 'bottom-right'
          });
    
-         router.push("/dashboard/contracts")
+         window.location.reload();
+
        } catch (err) {
          toast("Surgio un error al generar la escritura",{
            type : 'error',

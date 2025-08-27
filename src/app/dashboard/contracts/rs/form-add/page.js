@@ -11,6 +11,7 @@ import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
+import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -111,14 +112,6 @@ function RenderApp({
   // Se encarga de mandar la minuta y luego procesarla
   const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
     try {
-      
-      if (!minutaPdf) {
-        toast("Subir minuta",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      };
       setLoading(true);
 
       setDataMinuta({

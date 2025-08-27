@@ -8,7 +8,7 @@ export function cn(...inputs) {
 }
 
 export function camelCaseToTitle(text) {
-  const withSpaces = text.replace(/([A-Z])/g, ' $1');
-  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1).trim();
+  const withSpaces = text?.replace(/([A-Z])/g, ' $1');
+  return withSpaces?.charAt(0).toUpperCase() + withSpaces?.slice(1).trim();
 }
 

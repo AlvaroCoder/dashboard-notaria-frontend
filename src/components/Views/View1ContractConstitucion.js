@@ -1,10 +1,11 @@
 import { statusContracts } from '@/lib/commonJSON';
 import dynamic from 'next/dynamic';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../ui/button';
 import { camelCaseToTitle, cn } from '@/lib/utils';
 import { Loader2, User2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getSession } from '@/authentication/lib';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -20,6 +21,16 @@ export default function View1ContractConstitucion({
     description="Información del contrato"
 }) {
   const router = useRouter();
+  const [role, setRole] = useState('');
+  
+  useEffect(()=>{
+    async function validarUsuario() {
+        const session = await getSession();
+        console.log();
+        setRole(session?.user?.payload?.role);
+    }
+    validarUsuario();
+  },[]);
 
     return (
         <div className='h-screen pb-24 p-8 space-y-6  overflow-y-auto'>
@@ -37,19 +48,37 @@ export default function View1ContractConstitucion({
           </section>
           <section>
             <Title1 className='text-xl'>Minuta del Contrato</Title1>
+            <section className='my-2 flex flex-col gap-4'>
+            {
+              role === 'admin' &&
+              <div>
+                <Title1 className=''>Accesos Rapidos</Title1>
+            </div>
+            }
+            <section className='flex flex-row gap-4 w-full'>
+              {
+                role === 'admin' &&
+                  <Button
+                  className={"flex-1 py-4"}
+                  onClick={()=>router.push(`/dashboard/juniors/asign/?idContract=${idContract}`)}
+                >
+                  Asignar un Junior
+                </Button>
+              }
+              <Button 
+                className={"flex-1 py-4"}
+                onClick={()=>router.push(`/dashboard/processContract/generateScript/?status=${dataContract?.status}&contractType=${dataContract?.contractType}&idContract=${idContract}`)}
+              >
+                  Generar Escritura
+              </Button>
+            </section>
+          </section>
             <Separator2/>
             <FramePdf
               directory={dataContract?.minutaDirectory}
             />
           </section>
-          <section className='my-4'>
-            <Button 
-              className={"w-full py-4"}
-              onClick={()=>router.push(`/dashboard/processContract/generateScript/?status=${dataContract?.status}&contractType=${dataContract?.contractType}&idContract=${idContract}`)}
-            >
-                Generar Escritura
-            </Button>
-          </section>
+
         </div>
       )
 }

@@ -117,7 +117,7 @@ export default function SignCompraVenta({
           )}
           disabled={loading}
         >
-          {loading ? <Loader2 className="animate-spin" /> : <p>Generar Parte Notarial</p>}
+          {loading ? <Loader2 className="animate-spin" /> : <p>Establecer las fechas de firmas</p>}
         </Button>
       </div>
 

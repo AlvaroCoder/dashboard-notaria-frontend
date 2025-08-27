@@ -12,6 +12,7 @@ import CardAviso from '../Cards/CardAviso';
 import { updateEscrituraWord } from '@/lib/apiConnections';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import Separator2 from '../elements/Separator2';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -23,9 +24,7 @@ export default function View2ContractEscritura({
 	loadingDataClient,
 	client,
 	junior,
-	viewPdfEscrituraMarcaAgua=null,
 	loading=false,
-	handleClickSubmit=()=>{},
 	checkViewEscritura =()=>{}
 }) {
 	const router = useRouter();
@@ -41,15 +40,18 @@ export default function View2ContractEscritura({
 			const newFormData = new FormData();
 			newFormData.append('file', fileWord);
 
-			await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
-			router.push('/dashboard/contracts');
+			await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData, idContract);
+			
 			toast("Se actualizo la información de la escritura",{
 				type : 'info',
 				position : 'bottom-right'
 			});
+			
+			window.location.reload();
+
 		} catch (err) {
 			toast("Ocurrio un error",{
-				type : 'error'	,
+				type : 'error',
 				position : 'bottom-center'
 			})
 		}finally {
@@ -62,7 +64,7 @@ export default function View2ContractEscritura({
 	<section className="flex flex-row justify-between">
 	   <div>
 	    <Title1 className="text-3xl">Contrato Generado</Title1>
-	    <p>Informacion del de la escritura generada</p>
+	    <p>Informacion general de la escritura generada</p>
 	  </div>
 	</section>
 	<section>
@@ -81,7 +83,9 @@ export default function View2ContractEscritura({
 			<TextField label="Fecha creacion" value={dataContract?.minuta?.creationDay?.date} disabled fullWidth />
 			
 		</div>
+		<Separator2/>
 		<div className='mt-4'>
+			<Title1>Minuta Subida</Title1>
 			<FramePdf
 				directory={dataContract?.minutaDirectory}
 				
@@ -109,11 +113,57 @@ export default function View2ContractEscritura({
 	/>
 
 	<section className='rounded-lg shadow p-4'>
-		<Title1>Escritura generada</Title1>
-		<FramePdfWord
-			directory={dataContract?.documentPaths?.escrituraPath}
-			
-		/>
+		<div>
+			<Title1 className='text-2xl'>Información de la escritura</Title1>
+			<div className=''>
+				<Title1>Información de las Fojas</Title1>
+				<div className='flex flex-col gap-4'>
+					<Title1>Inicio</Title1>
+					<section className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+						<TextField
+							disabled
+							value={dataContract?.fojasData?.start?.number}
+						/>
+						<TextField
+							disabled
+							value={dataContract?.fojasData?.start?.serie}
+						/>
+					</section>
+				</div>
+				<div className='flex flex-col gap-4'>
+					<Title1>Final</Title1>
+					<section className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+						<TextField
+							disabled
+							value={dataContract?.fojasData?.end?.number}
+						/>
+						<TextField
+							disabled
+							value={dataContract?.fojasData?.end?.serie}
+						/>
+					</section>
+				</div>
+			</div>
+		</div>
+
+		<Separator2/>
+		<div>
+
+			<Title1 className='text-2xl'>Escritura generada</Title1>
+			{
+				dataContract?.pdfDocumentPaths?.escrituraPath === '' ?
+				<div className='w-full p-4 rounded-sm'>
+					<CardAviso
+						advise='Aun no se genera el PDF de la escritura, actualiza la escritura para generar el PDF'
+					/>
+
+				</div> :
+				<FramePdfWord
+				
+					path={dataContract?.pdfDocumentPaths?.escrituraPath}
+				/>
+			}
+		</div>
 	</section>
 
 	<section className='w-full rounded-sm shadow p-4'>

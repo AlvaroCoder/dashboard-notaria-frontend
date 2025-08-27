@@ -48,8 +48,6 @@ function RenderPageContracts() {
   const [loading, setLoading] = useState(false);
   const [viewPdf, setViewPdf] = useState(null);  
 
-  const router = useRouter();
-
   const handleSubmitEscritura=async()=>{
     try {
       setLoading(true);
@@ -87,7 +85,7 @@ function RenderPageContracts() {
           type : 'success',
           position : 'bottom-right'
         });
-        router.push("/dashboard/contracts");
+        window.location.reload();
       } catch (err) {
         toast("Surgio un error al aceptar la escritura",{
           type : 'error',
@@ -109,7 +107,7 @@ function RenderPageContracts() {
         position : 'bottom-right'
       });
 
-      router.push("/dashboard/contracts")
+      window.location.reload();
     } catch (err) {
       toast("Surgio un error al generar la escritura",{
         type : 'error',

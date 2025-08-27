@@ -9,6 +9,7 @@ import { statusContracts } from '@/lib/commonJSON'
 import { formatearFecha } from '@/lib/fechas'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import TableCellJunior from './TableCells/TableCellJunior'
 
 const TableCellClient = dynamic(()=>import('@/components/Tables/TableCells/TableCellClient'),{
     ssr : false,
@@ -87,7 +88,7 @@ export default function TableManageDocuments({
                                     data?.map((documento, idx) => (
                                         <TableRow key={idx}>
                                             {
-                                                headers?.map((header, idxHeader) =>{
+                                                headers?.map((header, idxHeader) =>{                                                    
                                                     if (Array.isArray(header.head)) {
                                                         return (
                                                             <TableCell key={idxHeader}>
@@ -101,8 +102,9 @@ export default function TableManageDocuments({
                                                         return (
                                                             <TableCell key={idxHeader}>
                                                                 <ButtonDownloadPdf
-                                                                    minutaDirectory={documento[header?.head]}
-                                                                />
+                                                                        minutaDirectory={documento[header?.head]}
+                                                                    />
+                                                                
                                                             </TableCell>
                                                         )
                                                     }
@@ -143,6 +145,14 @@ export default function TableManageDocuments({
                                                                     <p className=''>{camelCaseToTitle(documento[header?.head]) || '-'}</p>
                                                                 </Link>
                                                             </TableCell>
+                                                        )
+                                                    }
+                                                    else if(header?.head === 'juniorId'){
+                                                        return(
+                                                            <TableCellJunior
+                                                                key={idxHeader}
+                                                                juniorId={documento[header?.head]}
+                                                            />
                                                         )
                                                     }
                                                     else{

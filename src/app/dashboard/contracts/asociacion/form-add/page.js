@@ -108,20 +108,6 @@ function RenderApp({
   // Se encarga de mandar la minuta y luego procesarla
   const handleUploadMinuta=async(detailsMinuta, minutaPdf)=>{
     try {
-      if (detailsMinuta?.number.trim() === '' || detailsMinuta?.districtPlace.trim() === '') {
-        toast("Complete el formulario",{
-          type: 'error',
-          position : 'bottom-center'
-        });
-        return;
-      }
-      if (!minutaPdf) {
-        toast("Subir minuta",{
-          type : 'error',
-          position : 'bottom-center'
-        });
-        return
-      };
       setLoading(true);
 
       setDataMinuta({
@@ -282,6 +268,13 @@ function RenderApp({
       return updated;
     });
   };
+
+  const handlePushRestoInformacion=(evt)=>{
+    evt.preventDefault();
+    
+    
+    pushActiveStep();
+  }
   switch (activeStep) {
     case 0:
       // Primer paso definir el cliente que va a realizar el proceso
@@ -383,7 +376,7 @@ function RenderApp({
                 Regresar
               </Button>
               <Button 
-                onClick={()=>pushActiveStep()}
+                onClick={handlePushRestoInformacion}
                 className={'flex-1 mt-4'}>
                 Continuar
               </Button>

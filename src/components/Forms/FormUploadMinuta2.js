@@ -9,6 +9,8 @@ import { Loader2 } from 'lucide-react';
 import CardAviso from '../Cards/CardAviso';
 import UploadMinuta from '../elements/ButtonUploadMinuta';
 import { formatDateToYMD } from '@/lib/fechas';
+import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
+import { toast } from 'react-toastify';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
@@ -79,27 +81,53 @@ export default function FormUploadMinuta2({
                         required
                     />
             </section>
-            <section className='bg-white p-8 shadow rounded-sm'>
-                <Title1>Sube la Minuta en PDF</Title1>
-                <p>Sube la minuta en formato .pdf</p>
-                <div className='my-2 space-y-6'>
-                    <CardAviso
-                        advise='LA MINUTA ES DEL CLIENTE, SE GUARDARÁ TAL CUAL EN LA BASE DE DATOS'
+            {
+                dataPreviewPdf ?
+                <div className='bg-white p-8 shadow rounded-sm'>
+                    <Title1>Minuta del cliente</Title1>
+                    <p>Subr la minuta en formato .pdf</p>
+                </div> :
+                <section className='bg-white p-8 shadow rounded-sm'>
+                    <Title1>Sube la Minuta en PDF</Title1>
+                        <p>Sube la minuta en formato .pdf</p>
+                        <div className='my-2 space-y-6'>
+                            <CardAviso
+                                advise='LA MINUTA ES DEL CLIENTE, SE GUARDARÁ TAL CUAL EN LA BASE DE DATOS'
+                            />
+                        </div>
+                    <UploadMinuta
+                        dataPreview={dataPreviewPdf}
+                        handleSetFile={(data)=>setMinutaPdf(data)}
                     />
-                </div>
-                <UploadMinuta
-                    dataPreview={dataPreviewPdf}
-                    handleSetFile={(data)=>setMinutaPdf(data)}
-                />
-                <Button
-                    disabled={loading || !minutaPdf}
-                    className='mt-4 w-full'
-                    onClick={()=>handleUploadMinuta(detailsMinuta, minutaPdf)}
-                >
-                    {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
-                </Button>
-            </section>
+                    <Button
+                        disabled={loading || !minutaPdf}
+                        className='mt-4 w-full'
+                        onClick={()=>{
+                            const emptyFields = hasEmptyFieldsUploadMinuta(detailsMinuta);
+            
+                            if (emptyFields) {
+                                toast("Debe completar los campos",{
+                                    type : 'error',
+                                    position : 'bottom-center'
+                                });
+                                return;
+                            }
+            
+                            if (!minutaPdf) {
+                                toast("Debe subir la minuta",{
+                                    type : 'error',
+                                    position : 'bottom-center'
+                                });
+                                return;
+                            }
 
+                            handleUploadMinuta(detailsMinuta, minutaPdf)
+                        }}
+                    >
+                        {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
+                    </Button>
+                </section>
+            }
         </section>
     </div>
   )

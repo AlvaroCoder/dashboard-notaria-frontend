@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { updateEscrituraWord } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
 import CardAviso from '../Cards/CardAviso';
+import Separator2 from '../elements/Separator2';
 
 
 // ✅ Dynamic imports
@@ -25,10 +26,7 @@ export default function View2ContractCompraVenta({
 	dataContract,
 	loadingDataClient,
 	client,
-	junior,
-	viewPdfEscrituraMarcaAgua=null,
 	loading=false,
-	handleClickSubmit=()=>{},
     checkViewEscritura =()=>{},
 }) {
         const router = useRouter();
@@ -43,12 +41,14 @@ export default function View2ContractCompraVenta({
                 const newFormData = new FormData();
                 newFormData.append('file', fileWord);
     
-                await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData);
-                router.push('/dashboard/contracts');
+                await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData, idContract);
+                
                 toast("Se actualizo la información de la escritura",{
                     type : 'info',
                     position : 'bottom-right'
                 });
+
+                window.location.reload();
             } catch (err) {
                 toast("Ocurrio un error",{
                     type : 'error'	,
@@ -63,7 +63,7 @@ export default function View2ContractCompraVenta({
         <section className="flex flex-row justify-between">
         <div>
             <Title1 className="text-3xl">Contrato Generado</Title1>
-            <p>Informacion del de la escritura generada</p>
+            <p>Informacion general de la escritura generada</p>
         </div>
         </section>
         <section>
@@ -81,9 +81,10 @@ export default function View2ContractCompraVenta({
                     <TextField label="Lugar" value={dataContract?.minuta?.place?.name} disabled fullWidth />
                     <TextField label="Distrito" value={dataContract?.minuta?.place?.district} disabled fullWidth />
                     <TextField label="Fecha creacion" value={dataContract?.minuta?.creationDay?.date} disabled fullWidth />
-                    
                 </div>
+                <Separator2/>
                 <div className='mt-4'>
+                    <Title1>Minuta Subida</Title1>
                     <FramePdf
                         directory={dataContract?.minutaDirectory}
                         
@@ -123,17 +124,104 @@ export default function View2ContractCompraVenta({
                 </div>
             </section> 
         </section>
-        <ButtonDownloadWord
-            dataContract={dataContract}
-            idContract={idContract}
-        />
-    <section className='rounded-lg shadow p-4'>
-		<Title1>Escritura generada</Title1>
-        <FramePdfWord
-            directory={dataContract?.documentPaths?.escrituraPath}
+
+    <section className='rounded-lg shadow p-4 '>
+        <div>
+            <Title1 className='text-2xl'>Información de la escritura</Title1>
+            <div className=''>
+                <Title1>Información de las Fojas</Title1>
+                <div className='flex flex-col gap-2'>
+                    <Title1>Inicio</Title1>
+                    <section className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+                        <TextField
+                            label="Numero de inicio"
+                            disabled
+                            value={dataContract?.fojasData?.start?.number}
+                        />
+                        <TextField
+                            label="Serie de inicio"
+                            disabled
+                            value={dataContract?.fojasData?.start?.serie}
+                        />
+                    </section>
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <Title1>Final</Title1>
+                    <section className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+                        <TextField
+                            label="Numero final"
+                            disabled
+                            value={dataContract?.fojasData?.end?.number}
+                        />
+                        <TextField
+                            label="Serie final"
+                            disabled
+                            value={dataContract?.fojasData?.end?.serie}
+                        />
+                    </section>
+                </div>
+            </div>
+            <div className='flex flex-col gap-4 mt-4'>
+                <Title1 className=''>Informacion de la cabecera</Title1>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
+                    <TextField
+                        disabled
+                        label="Numero Documento Notarial"
+                        value={dataContract?.header?.numeroDocumentoNotarial}
+                    />
+                    <TextField
+                        disabled
+                        label="Registro"
+                        value={dataContract?.header?.numeroRegistroEscritura}
+                    />
+                    <TextField
+                        label="Año"
+                        value={dataContract?.header?.year}
+                        disabled
+                    />
+                    <TextField
+                        label="Folio"
+                        value={dataContract?.header?.folio}
+                        disabled
+                    />
+                    <TextField
+                        label="Tomo"
+                        value={dataContract?.header?.tomo}
+                        disabled
+                    />
+                    <TextField
+                        label="Kardex"
+                        value={dataContract?.header?.kardex}
+                        disabled
+                    />
+                </div>
+            </div>
+        </div>         
+        <Separator2 />
+        <div>
+
+            <Title1 className='text-2xl'>Escritura generada</Title1>
+            <ButtonDownloadWord
+                title='Documento generado'
                 
-        />
-	</section>
+                dataContract={dataContract}
+                idContract={idContract}
+            />
+            <section>
+                {
+                    dataContract?.pdfDocumentPaths?.escrituraPath === '' ? 
+                    <div className='w-full p-4 rounded-sm'>
+                        <CardAviso
+                            advise='Aun no se genera el PDF de la escritura, actualiza la escritura para generar el PDF'
+                        />
+                    </div> :
+                    <FramePdfWord
+                        path={dataContract?.pdfDocumentPaths?.escrituraPath}
+                    />
+                }
+            </section>
+        </div>
+    </section>
     <section className='w-full rounded-sm shadow p-4'>
         <div className='w-full'>
             <Title1>Subir Escritura actualizada</Title1>

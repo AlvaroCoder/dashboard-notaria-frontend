@@ -274,8 +274,8 @@ export async function fetchEscrituraWord(path) {
     })
 }
 
-export async function updateEscrituraWord(pathWord, fileWord) {
-    return fetch(`${URL_BASE}/update/updateContractWord?dir=${pathWord}`,{
+export async function updateEscrituraWord(pathWord, fileWord, contractId) {
+    return fetch(`${URL_BASE}/update/updateContractWord?dir=${pathWord}&contractId=${contractId}`,{
         method : 'PUT',
         body : fileWord,
         mode : 'cors'

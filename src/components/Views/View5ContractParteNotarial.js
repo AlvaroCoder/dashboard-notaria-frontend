@@ -13,7 +13,6 @@ import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import { useRouter } from 'next/navigation';
-import { hasEmptyFieldsTestimony } from '@/lib/commonFunction';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -23,7 +22,7 @@ export default function View5ContractParteNotarial({
   title="Detalles del Contrato",
   description="Información del contrato",
   slugUpdateParteNotarial=""
-}) {
+}) {  
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fileWord, setFileWord] = useState(null);
@@ -38,8 +37,10 @@ export default function View5ContractParteNotarial({
       const newFormData = new FormData();
       newFormData.append('file', fileWord);
 
-      await updateEscrituraWord(slugUpdateParteNotarial, newFormData);
-      router.push("/dashboard/contracts")
+      await updateEscrituraWord(slugUpdateParteNotarial, newFormData, idContract);
+      
+      window.location.reload();
+
       toast("Se actualizo la información de la escritura",{
         type : 'info',
         position : 'bottom-right'
@@ -57,13 +58,11 @@ export default function View5ContractParteNotarial({
   const handleClickTestimonio=async(testimony)=>{
     try {
       setLoading(true);
-
-      const validate = hasEmptyFieldsTestimony(testimony);
-      if (!validate) {
-        toast("Completar los campos del testimonio",{
-          type : 'error',
-          position : 'bottom-right'
-        });
+      if (dataContract?.pdfDocumentPaths?.parteNotarialPath === '') {
+        toast("Actualiza la parte notarial primero",{
+          type : 'warning',
+          position : 'bottom-center'
+        })
         return;
       }
 
@@ -83,7 +82,7 @@ export default function View5ContractParteNotarial({
           typeContract = dataContract?.contractType.toLowerCase() === 'rs' ? 'razonSocial' : dataContract?.contractType?.toLowerCase();
       }
 
-      const response = ['asociacion','razonSocial','rs','scrl','sac'].includes(dataContract?.contractType?.toLowerCase())
+      ['asociacion','razonSocial','rs','scrl','sac'].includes(dataContract?.contractType?.toLowerCase())
       ? await setUpTestimonioConstitucion(newDataToSend, typeContract):
       await setUpTestimonioCompraVenta(newDataToSend, typeContract);
 
@@ -91,14 +90,14 @@ export default function View5ContractParteNotarial({
         type : 'success',
         position : 'bottom-right'
       });
-      router.push("/dashboard/contracts");
+      
+      window.location.reload();
+
     } catch (err) {
       toast("Se genero el testimonio correctamente",{
         type : 'error',
         position : 'bottom-center'
-      });
-      console.log(err);
-      
+      });      
     } finally {
       setLoading(false)
     }
@@ -124,14 +123,21 @@ export default function View5ContractParteNotarial({
             title='Descarga la parte notarial'
         />
         <section className='bg-white p-4 rounded-lg mt-4 shadow'>
-            <Title1>Partida Notarial Generada</Title1>
+            <Title1>Partida Notarial Generada (PDF)</Title1>
             <CardAviso
               advise='LA PRIMERA VEZ QUE SE GENERA LA PARTE NOTARIAL ELIMINAR LA SECCION DE FIRMAS'
             />
-            <FramePdfWord
-              directory={ dataContract?.documentPaths?.parteNotarialPath}
-            /> 
-
+            {
+              dataContract?.pdfDocumentPaths?.parteNotarialPath === '' ?
+              <div className='w-full rounded-sm mt-4'>
+                <CardAviso
+                  advise='ACTUALIZA EL WORD DE LA PARTIDA NOTARIAL PARA PODER VISUALIZARLO EN PDF'
+                />
+              </div> : 
+              <FramePdfWord
+                path={dataContract?.pdfDocumentPaths?.parteNotarialPath}
+              /> 
+            }
         </section>
         <section className='w-full rounded-sm shadow p-4'>
           <div className='w-full'>

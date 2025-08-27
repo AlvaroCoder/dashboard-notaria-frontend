@@ -9,7 +9,6 @@ import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { Button } from '@/components/ui/button';
 import EditorView from '@/components/Views/EditorView';
 import { useEditorContext } from '@/context/ConextEditor';
-import { useContratoContext } from '@/context/ContratosContext';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, getMinutaFile, processDataMinuta, subirEvidencias } from '@/lib/apiConnections';
