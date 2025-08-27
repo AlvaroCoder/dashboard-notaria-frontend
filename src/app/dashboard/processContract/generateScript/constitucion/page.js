@@ -179,7 +179,6 @@ function RenderPageScript() {
             const responseContractJSON = await responseContract.json();
 
             setDataContractDownload(responseContractJSON?.data);
-
             pushActiveStep();
 
         } catch (err) {

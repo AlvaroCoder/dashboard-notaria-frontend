@@ -498,7 +498,7 @@ function RenderCardsFormStepper({
             )
         case 7:
             return (
-            <section className='p-4 w-full'>
+            <section className='p-6 w-full'>
                 <Title1>Descarga el documento si es necesario</Title1>
                 <p>En caso no haya empezado la descarga, descarga el documento</p>
                 <ButtonDownloadWord
