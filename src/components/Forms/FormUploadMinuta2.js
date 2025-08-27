@@ -11,13 +11,16 @@ import UploadMinuta from '../elements/ButtonUploadMinuta';
 import { formatDateToYMD } from '@/lib/fechas';
 import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
 import { toast } from 'react-toastify';
+import FramePdf from '../elements/FramePdf';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
+    handleContinue=()=>{},
     loading=false,
     dataPreviewPdf=null,
     numberMinuta='',
-    districtPlaceMinuta=''
+    districtPlaceMinuta='',
+    minutaDir=''
 }) {
     const [detailsMinuta, setDetailsMinuta] = useState({
         number : numberMinuta,
@@ -82,10 +85,29 @@ export default function FormUploadMinuta2({
                     />
             </section>
             {
-                dataPreviewPdf ?
+                minutaDir!='' ?
                 <div className='bg-white p-8 shadow rounded-sm'>
                     <Title1>Minuta del cliente</Title1>
-                    <p>Subr la minuta en formato .pdf</p>
+                    <p>Minuta subida por el cliente</p>
+                    <FramePdf
+                        directory={minutaDir}
+                    />
+                    <Button 
+                        onClick={()=>{
+                            const emptyFields = hasEmptyFieldsUploadMinuta(detailsMinuta);
+                
+                            if (emptyFields) {
+                                toast("Debe completar los campos",{
+                                    type : 'error',
+                                    position : 'bottom-center'
+                                });
+                                return;
+                            }
+                            handleContinue(detailsMinuta);
+                        }}
+                    className={"w-full my-4"}>
+                        Continuar
+                    </Button>
                 </div> :
                 <section className='bg-white p-8 shadow rounded-sm'>
                     <Title1>Sube la Minuta en PDF</Title1>

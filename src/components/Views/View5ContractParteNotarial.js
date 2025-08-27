@@ -12,7 +12,6 @@ import CardAviso from '../Cards/CardAviso';
 import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
-import { useRouter } from 'next/navigation';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -23,7 +22,6 @@ export default function View5ContractParteNotarial({
   description="Información del contrato",
   slugUpdateParteNotarial=""
 }) {  
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fileWord, setFileWord] = useState(null);
   const [loadingUpdateWord, setLoadingUpdateWord] = useState(false)

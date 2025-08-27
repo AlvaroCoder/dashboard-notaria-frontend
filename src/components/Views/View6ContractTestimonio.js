@@ -6,7 +6,6 @@ import { Loader2, User2 } from 'lucide-react'
 import FramePdfWord from '../elements/FramePdfWord'
 import CardAviso from '../Cards/CardAviso'
 import ButtonUploadWord from '../elements/ButtonUploadWord'
-import { useRouter } from 'next/navigation'
 import { updateEscrituraWord } from '@/lib/apiConnections'
 import { toast } from 'react-toastify'
 import { Button } from '../ui/button'
@@ -104,7 +103,7 @@ export default function View6ContractTestimonio({
             className={"w-full mt-4"}
             onClick={handleUpdateTestimony}
           >
-            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Escritura</p>}
+            {loadingUpdateWord ? <Loader2 className='animate-spin'/> : <p>Actualizar Testimonio</p>}
           </Button>
         </section>
     </div>
