@@ -1,21 +1,23 @@
 'use client';
-import { parseTextoToJSON } from '@/common/parserText';
+import { getSession } from '@/authentication/lib';
+import CardAviso from '@/components/Cards/CardAviso';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import Title1 from '@/components/elements/Title1';
+import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
+import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { Button } from '@/components/ui/button';
-import EditorView from '@/components/Views/EditorView';
-import { useEditorContext } from '@/context/ConextEditor';
+import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
-import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, getMinutaFile, processDataMinuta, subirEvidencias } from '@/lib/apiConnections';
+import { generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { Suspense, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -34,18 +36,16 @@ function RenderPageScript() {
         loading : loadingDataSeniors
     } = useFetch(URL_GET_DATA_SENIORS);
 
+    const {
+        activeStep,
+        pushActiveStep,
+        backActiveStep
+    } = useContracts();
     const [loading, setLoading] = useState(true);
 
     const searchParams = useSearchParams();
     const idContract = searchParams.get("idContract");
-    
-    const [activeStep, setActiveStep] = useState(0);
-    
-    const pushActiveStep=()=>{
-        setActiveStep(activeStep+1);
-    }
 
-    const {agregarBloques, parserData} = useEditorContext();
     const [seniorSelected, setSeniorSelected] = useState(null);
     const [dataSendMinuta, setDataSendMinuta] = useState({
         header : {
@@ -67,40 +67,37 @@ function RenderPageScript() {
             }
         }
     });
-
-    const [viewPdf, setViewPdf] = useState(null);
+    const router = useRouter();
     const [imagesMinuta, setImagesMinuta] = useState([]);
     const [fileLocation, setFileLocation] = useState(null);
+    const [dataContract, setDataContract] = useState(null);
+    const [dataSession, setDataSession] = useState(null);
+    const [dataContractDownload, setDataContractDownload] = useState(null);
 
     useEffect(()=>{
         async function getDataMinutaFile() {
             try {
-                const responseContract = await getDataContractByIdContract(idContract);                
+                setLoading(true);
+                const session = await getSession();
+                setDataSession(session?.user);
+
+                const responseContract = await getDataContractByIdContract(idContract);
+                
                 const responseContractJSON = await responseContract.json();
+                setDataContract(responseContractJSON?.data);
                 console.log(responseContractJSON);
                 
-                setDataSendMinuta({...dataSendMinuta, responseContractJSON});
-                setFileLocation(responseContractJSON?.data?.directory);
-
-                const contractDirectory = responseContractJSON?.data?.minutaDirectory;
-                const minuta = await getMinutaFile(contractDirectory);
-                const blob = await minuta.blob();
-
-                const newFormData = new FormData();
-                newFormData.append('minutaFile', blob)
-
-                const dataProcess = await processDataMinuta(newFormData);
-                const dataProcessJSON = await dataProcess.json();
-                
-                const parserText = parseTextoToJSON(dataProcessJSON?.minuta_content);
-                agregarBloques(parserText?.data);
-                toast("Minuta procesada",{
-                    type : 'success',
-                    position : 'bottom-right'
-                });
+                if (responseContractJSON?.data?.juniorId === '' || !responseContractJSON?.data?.hasOwnProperty('juniorId')) {
+                    toast("Asigne primero al junior",{
+                        type : 'warning',
+                        position : 'bottom-center'
+                    });
+                    
+                    router.push(`/dashboard/juniors/asign/?idContract=${idContract}`)
+                    return;
+                }
 
             } catch (err) {
-                console.log(err);
                 toast("Erro con la vista de minuta",{
                     type :'error',
                     position : 'bottom-center'
@@ -112,52 +109,7 @@ function RenderPageScript() {
         getDataMinutaFile();
     },[idContract]);
 
-    const handleClickEditor=async()=>{
-        const dataParseada = parserData();
-        setDataSendMinuta((prev)=>({
-            ...dataSendMinuta,
-            minuta : {
-                ...prev?.minuta,
-                minutaContent : {
-                    data : dataParseada,
-                }
-            }
-        }))
-        pushActiveStep()
-    }
 
-    const handleClickSelectJunior=async(junior)=>{
-        try {
-            setLoading(true);
-            const responseJuniorAsigned = await asignJuniorToContracts(idContract, junior?.id);
-            if (!responseJuniorAsigned.ok) {
-                console.log(await responseJuniorAsigned.json());
-                
-                toast("El junior excede la cantidad maxima que puede manipular",{
-                    type : 'error',
-                    position : 'bottom-center'
-                });
-                return;
-            }
-
-            toast("Se asigno el junior correctamente",{
-                type : 'success',
-                position : 'bottom-center'
-            });
-            pushActiveStep();
-            
-        } catch (err) {
-            console.log(err);
-            toast("Error al seleccionar el Junior",{
-                type : 'error',
-                position : 'bottom-center'
-            });
-            
-        } finally{
-            setLoading(false);
-        }
-    }
-    
     const handleClickFormStepper=async(compradores, vendedores)=>{
         setDataSendMinuta({
             ...dataSendMinuta,
@@ -192,23 +144,19 @@ function RenderPageScript() {
         e.preventDefault();
         try {
             setLoading(true);
-            const response = await subirEvidencias(imagesMinuta, fileLocation?.split("/")[1]);
-            setDataSendMinuta((prev)=>({
-                ...dataSendMinuta,
-                paymentMethod : {
-                    ...prev?.paymentMethod,
-                    evidences : response 
-                }
-            }));
+            if (imagesMinuta.length === 0) {
+                setDataSendMinuta({
+                    ...dataSendMinuta,
+                    paymentMethod : null
+                })
+                pushActiveStep();
+                return
+            }
 
-            toast("Imagenes subidas correctamente",{
-                type : 'success',
-                position : 'bottom-right'
-            });
+            
             pushActiveStep();
 
         } catch (err) {
-            console.log(err);
             
         } finally {
             setLoading(false);
@@ -244,22 +192,85 @@ function RenderPageScript() {
             }
         }));
     }
+
+    const handleContinue=(detailsMinuta)=>{
+        try {
+            setDataSendMinuta({
+                ...dataSendMinuta,
+                minuta : {
+                    minutaNumber : detailsMinuta?.number,
+                    creationDay : {
+                        date : detailsMinuta?.creationDay
+                    },
+                    place : {
+                        name : detailsMinuta?.namePlace,
+                        district : detailsMinuta?.districtPlace
+                    }
+                }
+            });
+            toast("Informacion de la minuta guardada",{
+                type : 'info',
+                position : 'bottom-center'
+            })
+            pushActiveStep();
+        } catch (err) {
+            console.log(err);
+            
+            toast("Error en la UI",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+        }
+    }
+
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
-            const response = await generateScriptCompraVenta('inmueble', dataSendMinuta)
+            
+            let newDataSendMinuta = {
+                ...dataSendMinuta,
+                contractId : idContract
+            };
 
+            if (imagesMinuta && imagesMinuta.length > 0) {
+                const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
+                newDataSendMinuta.paymentMethod = {
+                    ...dataSendMinuta?.paymentMethod,
+                    evidences : responseEvidencias
+                };
+
+            } else {
+                newDataSendMinuta.paymentMethod = null;
+            }
+
+            const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta)
+
+            if (!response.ok) {
+                toast("Sucedio un error al generar la escritura",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
+                return;
+            }
             const blobResponse = await response.blob();
             const url = URL.createObjectURL(blobResponse);
-            
-            setViewPdf(url);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "escritura-scrl.docx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+            const responseContract = await getDataContractByIdContract(idContract);
+            const responseContractJSON = await responseContract.json();
+
+            setDataContractDownload(responseContractJSON?.data);
             pushActiveStep();
-            toast("Escritura generada correctamente",{
-                type : 'success',
-                position : 'bottom-right'
-            });
+            
         } catch (err) {
-            console.log(err);
             toast("Error al enviar los datos",{
                 type : 'error',
                 position : 'bottom-center'
@@ -269,6 +280,20 @@ function RenderPageScript() {
             setLoading(false);
         }
     }
+    const handleChangeFojasDatas = (path, value) => {
+        setDataSendMinuta(prev => {
+          const updated = { ...prev };
+          const keys = path.split(".");
+          let current = updated;
+      
+          for (let i = 0; i < keys.length - 1; i++) {
+            current = current[keys[i]];
+          }
+      
+          current[keys[keys.length - 1]] = value;
+          return updated;
+        });
+    };
     const handleChangeImageMinuta=(files)=>{
         setImagesMinuta([
             ...imagesMinuta,
@@ -285,40 +310,24 @@ function RenderPageScript() {
     }
     switch (activeStep) {
         case 0:
-            return(
-                <main className='relative w-full h-screen overflow-y-auto'>
-                    <EditorView/>
-                    <div className='p-4 w-full'>
-                        <Button
-                            onClick={handleClickEditor}
-                            disabled={loading}
-                            className={"w-full mt-4"}
-                        >
-                            {loading ? <Loader2 className='animate-spin' /> : <p>Continuar</p>}
-                        </Button>
-                    </div>
+            return (
+                <main className='p-6 grid grid-cols-1 gap-2'>
+                    <FormUploadMinuta2
+                        minutaDir={dataContract?.minutaDirectory}
+                        handleContinue={handleContinue}
+                    />
                 </main>
             )
         case 1:
             return(
-                <main className='relative w-full h=screen overflow-y-auto'>
-                    <TableSelectedUser
-                        title='Selecciona un Junior'
-                        descripcion='Selecciona el Junior que se encargara de la escritura'
-                        headers={headersTableroCliente}
-                        data={dataJuniors?.data}
-                        slugCrear={'/dashboard/juniors/form-add'}
-                        handleClickSelect={handleClickSelectJunior}               
+                <section className='w-full p-6 shadow'>
+                    <FormStepper
+                        handleSaveData={handleClickFormStepper}
+                        backActiveStep={backActiveStep}
                     />
-                </main>
+                </section>
             )
         case 2:
-            return(
-                <FormStepper
-                    handleSaveData={handleClickFormStepper}
-                />
-            )
-        case 3:
             return(
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
@@ -332,31 +341,38 @@ function RenderPageScript() {
                     {
                         imagesMinuta?.length > 0 &&
                         <div className='w-full mt-8'>
-                            <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required />
+                            <Title1>Ejemplo de lo que debes de subir </Title1>
+                            <section className='my-4'>
+                                <CardAviso
+                                    advise='CHEQUES DE GERENCIA EMITIDOS POR EL BANCO BBVA'
+                                />
+                            </section>
+                            <TextField className='w-full' onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, paymentMethod : {...prev?.paymentMethod, caption : e.target.value}}))} label="Indique el medio de pago" fullWidth required/>
                         </div>
                     }
                     <Button 
                         onClick={handleClickEvidences}
-                        disabled={imagesMinuta?.length === 0 || loading}
+                        disabled={loading}
                         className={"w-full mt-4"}
                     >   
                         {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
                     </Button>   
                 </section>
             )
-        case 4:
+        case 3:
             return (
                 <main className='w-full flex justify-center items-center'>
                     <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
                         <section>
                             <Title1 className='text-3xl'>Información Restante</Title1>
-                            <p>Ingresa la información Restante para generar</p>
+                            <p>Ingresa la información Restante para generar la escritura</p>
                         </section>
-                        <section className='flex flex-col gap-4'>
-                            <Title1>Información de la minuta</Title1>
-                            <TextField label="Numero de la mintuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, minutaNumber : e.target.value}}))} fullWidth required />
-                            <TextField label="Lugar de la minuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, place : {...prev?.minuta?.place , name : e.target.value}}}))} fullWidth required />
-                            <TextField label="Distrito de la minuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, place : {...prev?.minuta?.place, district : e.target.value}}}))} fullWidth required />
+                        <section>
+                            <Title1 className='text-2xl'>Informacion de Fojas</Title1>
+                            <FojasDataForm
+                                fojasData={dataSendMinuta.fojasData}
+                                handleChangeFojasDatas={handleChangeFojasDatas}
+                            />
                         </section>
                         <FormHeaderInformation
                             handleChangeHeader={handleChangeHeader}
@@ -371,7 +387,7 @@ function RenderPageScript() {
                     </div>
                 </main>
             )
-        case 5:
+        case 4:
             return (
                 <main className='w-full h-screen overflow-y-auto p-8 flex flex-col gap-4'>
                     <TableSelectedUser
@@ -381,6 +397,7 @@ function RenderPageScript() {
                         data={dataSeniors?.data}
                         slugCrear={'/dashboard/seniors/form-add'}
                         handleClickSelect={handleClickSelectSenior}
+                        showAddButton={dataSession?.payload?.role === 'admin'}
                     />
                     {
                         seniorSelected && 
@@ -404,21 +421,16 @@ function RenderPageScript() {
                     </Button>
                 </main>
             )
-            case 6:
+            case 5:
                 return(
-                    <main className='w-full'>
-                        <FormViewerPdfEscritura
-                            viewerPdf={viewPdf}
-                        />
-                            <div className='w-full p-6 '>
-                            <Button
-                                className={"w-full"}
-                                onClick={()=>router.push("/dashboard/contracts/")}
-                            >
-                                Regresar al inicio
-                            </Button>
-                          </div>
-                        </main>
+                    <main className='p-6 w-full'>
+                        <Title1>Descarga el documento si es necesario</Title1>
+                        <p>En caso no haya empezado la descarga, descarga el documento</p>
+                        <ButtonDownloadWord
+                            dataContract={dataContractDownload}
+                            idContract={dataContractDownload?.id}
+                        />  
+                    </main>
                 )
         }
 }

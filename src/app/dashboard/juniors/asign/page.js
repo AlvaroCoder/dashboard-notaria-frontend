@@ -39,9 +39,7 @@ function RenderPage() {
         try {
             setLoading(true);
             const responseJuniorAsigned = await asignJuniorToContracts(idContract, junior?.id);
-            if (!responseJuniorAsigned.ok) {
-                console.log(await responseJuniorAsigned.json());
-                
+            if (!responseJuniorAsigned.ok) {                
                 toast("El junior excede la cantidad maxima que puede manipular",{
                     type : 'error',
                     position : 'bottom-center'
@@ -54,7 +52,7 @@ function RenderPage() {
                 position : 'bottom-center'
             });
             
-            router.push("/dashboard/contracts")
+            router.back();
             
         } catch (err) {
             console.log(err);
