@@ -1,10 +1,11 @@
 'use client'
+import { getSession } from '@/authentication/lib';
+import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import Title1 from '@/components/elements/Title1';
 import FojasDataForm from '@/components/Forms/FojasDataForm';
 import FormFounders from '@/components/Forms/FormFounders';
 import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
-import FormViewerPdfEscritura from '@/components/Forms/FormViewerPdfEscritura';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
@@ -63,16 +64,24 @@ function RenderPageScript() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [seniorSelected, setSeniorSelected] = useState(null);
-    const [viewPdf, setViewPdf] = useState(null);
-    
+    const [dataContract, setDataContract] = useState(null);
+    const [dataSession, setDataSession] = useState(null);
+    const [dataContractDownload, setDataContractDownload] = useState(null);
+
     useEffect(()=>{ 
         async function getData() {
             try {
                 setLoading(true);
+                const session = await getSession();
+                setDataSession(session?.user);
+
+                // Traemos la informacion del contrato
                 const responseContract = await getDataContractByIdContract(idContract);
 
                 const responseContractJSON = await responseContract.json();
-                
+                setDataContract(responseContractJSON?.data);
+            
+                // Validamos si existe un junior asignado a este contrato
                 if (responseContractJSON?.data?.juniorId === '') {
                     toast("Asigne primero al junior",{
                         type : 'warning',
@@ -82,10 +91,7 @@ function RenderPageScript() {
                     return;
                 }
 
-                
-
             } catch (err) {
-                console.log(err);
                 
                 toast("Se produjo un error",{
                     position : 'bottom-center',
@@ -107,7 +113,7 @@ function RenderPageScript() {
                 people : dataFounder
             }
         });
-        setActiveStep(activeStep+1)
+        pushActiveStep();
     }
 
     const handleChangeHeader=(e)=>{
@@ -144,27 +150,39 @@ function RenderPageScript() {
         }))
     }
 
- 
-
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
 
             const response = await generateScriptContract(contractType === 'RS'?'razonSocial':contractType?.toLowerCase(), dataSendMinuta);
             if (!response.ok) {
-                console.log(await response.json());
-                console.log(dataSendMinuta);
+                toast("Sucedio un error",{
+                    type : 'error',
+                    position : 'bottom-center'
+                });
                 return
             }
             
             const blobResponse = await response.blob();
             const url = URL.createObjectURL(blobResponse);
 
-            setViewPdf(url);
-            pushActiveStep()
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "escritura-scrl.docx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+            const responseContract = await getDataContractByIdContract(idContract);
+            const responseContractJSON = await responseContract.json();
+
+            setDataContractDownload(responseContractJSON?.data);
+
+            pushActiveStep();
 
         } catch (err) {
-            console.log(err);
             toast("Surgio un error",{
                 type : 'error',
                 position : 'bottom-center'
@@ -187,8 +205,39 @@ function RenderPageScript() {
           current[keys[keys.length - 1]] = value;
           return updated;
         });
-      };
+    };
+    
+    const handleContinue=(detailsMinuta)=>{
+        
+        try {
+            setDataSendMinuta({
+                ...dataSendMinuta,
+                minuta : {
+                    minutaNumber : detailsMinuta?.number,
+                    creationDay : {
+                        date : detailsMinuta?.creationDay
+                    },
+                    place : {
+                        name : detailsMinuta?.namePlace,
+                        district : detailsMinuta?.districtPlace
+                    }
+                }
+            });
+            toast("Informacion de la minuta guardada",{
+                type : 'info',
+                position : 'bottom-center'
+            })
+            pushActiveStep();
+        } catch (err) {
+            console.log(err);
+            
+            toast("Error en la UI",{
+                type : 'error',
+                position : 'bottom-center'
+            });
+        }
 
+    }
     if (loading || loadingDataSeniors) {
         return <p>Cargando ...</p>
     }
@@ -197,8 +246,8 @@ function RenderPageScript() {
             return (
                 <main className='p-6 grid grid-cols-1 gap-2'>
                     <FormUploadMinuta2
-                        loading={loading}
-
+                        minutaDir={dataContract?.minutaDirectory}
+                        handleContinue={handleContinue}
                     />
                 </main>
             )
@@ -207,6 +256,7 @@ function RenderPageScript() {
                 <main className='w-full flex justify-center items-center'>
                     <div className='max-w-5xl p-4 lg:p-0 w-full'>
                         <FormFounders
+                            handleClickBack={backActiveStep}
                             handleSendFounder={handleSubmitFormStepperPerson}
                         />
                     </div>
@@ -214,7 +264,7 @@ function RenderPageScript() {
             )
         case 2:
             return(
-                <main className='w-full flex justify-center items-center'>
+                <main className='w-full flex justify-center items-center my-4'>
                     <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
                         <section>
                             <Title1 className='text-3xl'>Información Restante</Title1>
@@ -231,19 +281,13 @@ function RenderPageScript() {
                             <Title1>Información de la asociación</Title1>
                             <TextField label="Coporacion" onChange={(e)=>setDataSendMinuta({...dataSendMinuta, corporation : e.target.value})} fullWidth required />
                         </section>
-                        <section className='flex flex-col gap-4'>
-                            <Title1>Informacion de la minuta</Title1>
-                            <TextField label="Numero de la minuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, minutaNumber : e.target.value}}))} fullWidth required />
-                            <TextField label="Lugar de la minuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, place : {...prev.minuta.place, name : e.target.value}}}))} fullWidth required />
-                            <TextField label="Distrito de la minuta" onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, minuta : {...prev?.minuta, place : {...prev.minuta.place, district : e.target.value}}}))} fullWidth required />
-                        </section>
                         
                         <FormHeaderInformation
                             handleChangeHeader={handleChangeHeader}
                             data={dataSendMinuta}
                         />
                         <Button
-                            onClick={()=>setActiveStep(activeStep + 1)}
+                            onClick={()=>pushActiveStep()}
                             className={"w-full mt-4"}
                         >
                             Continuar
@@ -261,6 +305,7 @@ function RenderPageScript() {
                         data={dataSeniors?.data}
                         slugCrear={'/dashboard/seniors/form-add'}
                         handleClickSelect={handleClickSenior}
+                        showAddButton={dataSession?.payload?.role === 'admin'}
                     />
                     {
                         seniorSelected && 
@@ -286,19 +331,14 @@ function RenderPageScript() {
             )
         case 3:
             return (
-                <main className='w-full'>
-                    <FormViewerPdfEscritura
-                        viewerPdf={viewPdf}
-                    />
-                    <div className='w-full p-6 '>
-                    <Button
-                        className={"w-full"}
-                        onClick={()=>router.push("/dashboard/contracts/")}
-                    >
-                        Regresar al inicio
-                    </Button>
-                    </div>
-                </main>
+            <section className='p-4 w-full'>
+                <Title1>Descarga el documento si es necesario</Title1>
+                <p>En caso no haya empezado la descarga, descarga el documento</p>
+                <ButtonDownloadWord
+                    dataContract={dataContractDownload}
+                    idContract={dataContractDownload?.id}
+                />   
+            </section>
             )
     }
 }

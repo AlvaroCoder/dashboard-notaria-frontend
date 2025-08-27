@@ -225,7 +225,7 @@ function RenderApp({
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = "escritura_scrl.docx";
+      a.download = "escritura-scrl.docx";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -340,7 +340,7 @@ function RenderApp({
           <div className='max-w-5xl w-full bg-white p-6 rounded-lg shadow mt-8'>
             <section>
               <Title1 className='text-3xl'>Informacion Restante</Title1>
-              <p>Ingresa la informócion restante para generar la escritura</p>
+              <p>Ingresa la información restante para generar la escritura</p>
             </section>
             <section>
               <Title1 className='text-2xl'>Información de Fojas</Title1>
