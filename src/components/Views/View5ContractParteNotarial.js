@@ -39,7 +39,7 @@ export default function View5ContractParteNotarial({
 
       await updateEscrituraWord(slugUpdateParteNotarial, newFormData, idContract);
       
-      window.location.reload()
+      window.location.reload();
 
       toast("Se actualizo la información de la escritura",{
         type : 'info',
