@@ -22,7 +22,6 @@ function RenderPageContracts() {
     loading : loadingDataContract,
     error : errorDataContract
   } = useFetch(URL_CONTRACT_ID+idContract);
-  console.log(dataResponseContract);
   
   const {loadingDataClient, client} = useContractDetails(dataResponseContract);
   
@@ -72,7 +71,7 @@ const handleClickSetFirma=async()=>{
         position : 'bottom-right'
       });
       
-      router.push("/dashboard/contracts");
+      window.location.reload();
     } catch (err) {
       toast("Surgio un error al generar la escritura",{
         type : 'error',
@@ -86,18 +85,15 @@ const handleClickSetFirma=async()=>{
    const handleCheckViewEscritura=async()=>{
       try {
         setLoading(true);
-        const response = await aceptarEscritura(idContract);
-        const responseJSON = await response.json();
-        console.log(responseJSON);
+        await aceptarEscritura(idContract);
         toast("La escritura fue aceptada",{
           type : 'success',
           position : 'bottom-right'
         });
-        router.push("/dashboard/contracts");
-  
+        
+        window.location.reload();
   
       } catch (err) {
-        console.log(err);
         
         toast("Surgio un error al aceptar la escritura",{
           type : 'error',

@@ -13,7 +13,6 @@ import ButtonUploadWord from '../elements/ButtonUploadWord';
 import { Button } from '../ui/button';
 import ButtonDownloadWord from '../elements/ButtonDownloadWord';
 import { useRouter } from 'next/navigation';
-import { hasEmptyFieldsTestimony } from '@/lib/commonFunction';
 
 export default function View5ContractParteNotarial({
   idContract='',
@@ -39,7 +38,8 @@ export default function View5ContractParteNotarial({
       newFormData.append('file', fileWord);
 
       await updateEscrituraWord(slugUpdateParteNotarial, newFormData, idContract);
-      router.push("/dashboard/contracts");
+      
+      window.location.reload()
 
       toast("Se actualizo la información de la escritura",{
         type : 'info',
@@ -90,14 +90,14 @@ export default function View5ContractParteNotarial({
         type : 'success',
         position : 'bottom-right'
       });
-      router.push("/dashboard/contracts");
+      
+      window.location.reload();
+
     } catch (err) {
       toast("Se genero el testimonio correctamente",{
         type : 'error',
         position : 'bottom-center'
-      });
-      console.log(err);
-      
+      });      
     } finally {
       setLoading(false)
     }

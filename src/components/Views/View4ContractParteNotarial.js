@@ -59,7 +59,8 @@ export default function View4ContractParteNotarial({
                 });
                 return;
             }
-            router.push('/dashboard/contracts');
+            
+            window.location.reload();
 
             toast("Se genero con exito la parte notarial",{
                 type : 'success',
@@ -67,8 +68,6 @@ export default function View4ContractParteNotarial({
             });
 
         } catch (err) {
-            console.log(err);
-            
             toast("Surgio un error de la API",{
                 type : 'error',
                 position : 'bottom-center'

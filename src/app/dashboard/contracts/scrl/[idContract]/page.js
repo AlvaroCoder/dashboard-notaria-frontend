@@ -50,7 +50,6 @@ function RenderPageContracts() {
           });
           
         } catch (error) {
-          console.log(error);
           toast("Surgio un error al enviar la marca de agua",{
             type : 'error',
             position : 'bottom-center'
@@ -72,7 +71,7 @@ function RenderPageContracts() {
           position : 'bottom-right'
         });
         
-        router.push("/dashboard/contracts");
+        window.location.reload();
 
       } catch (err) {
         toast("Surgio un error al firmar la escritura",{
@@ -92,8 +91,9 @@ function RenderPageContracts() {
             type : 'success',
             position : 'bottom-right'
           });
-          router.push("/dashboard/contracts");
-    
+          
+          window.location.reload();
+
         } catch (err) {          
           toast("Surgio un error al aceptar la escritura",{
             type : 'error',

@@ -26,7 +26,6 @@ function RenderPageContracts() {
 
     const {loadingDataClient, client}  = useContractDetails(dataResponseContract);
     const dataContract = dataResponseContract?.data || null;
-    console.log(dataContract);
 
     const router = useRouter();
 
@@ -77,7 +76,7 @@ function RenderPageContracts() {
           position : 'bottom-right'
         });
         
-        router.push("/dashboard/contracts");
+        window.location.reload();
 
       } catch (err) {
         toast("Surgio un error al firmar la escritura",{
@@ -97,7 +96,9 @@ function RenderPageContracts() {
             type : 'success',
             position : 'bottom-right'
           });
-          router.push("/dashboard/contracts");
+          
+          window.location.reload();
+
         } catch (err) {          
           toast("Surgio un error al aceptar la escritura",{
             type : 'error',

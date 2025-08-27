@@ -299,7 +299,6 @@ function RenderApp({
             loading={loading}
             handleUploadMinuta={handleUploadMinuta}
             dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
-            dataPreviewWord={dataMinuta?.minutaWord}
             numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
             districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
           />

@@ -42,11 +42,13 @@ export default function View2ContractCompraVenta({
                 newFormData.append('file', fileWord);
     
                 await updateEscrituraWord(dataContract?.documentPaths?.escrituraPath, newFormData, idContract);
-                router.push('/dashboard/contracts');
+                
                 toast("Se actualizo la información de la escritura",{
                     type : 'info',
                     position : 'bottom-right'
                 });
+
+                window.location.reload();
             } catch (err) {
                 toast("Ocurrio un error",{
                     type : 'error'	,
@@ -79,7 +81,6 @@ export default function View2ContractCompraVenta({
                     <TextField label="Lugar" value={dataContract?.minuta?.place?.name} disabled fullWidth />
                     <TextField label="Distrito" value={dataContract?.minuta?.place?.district} disabled fullWidth />
                     <TextField label="Fecha creacion" value={dataContract?.minuta?.creationDay?.date} disabled fullWidth />
-                    
                 </div>
                 <Separator2/>
                 <div className='mt-4'>
