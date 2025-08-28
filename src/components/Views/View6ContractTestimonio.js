@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react'
 import Title1 from '../elements/Title1'
 import { camelCaseToTitle, cn } from '@/lib/utils'

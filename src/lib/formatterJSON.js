@@ -26,113 +26,62 @@ export function transformarJSON(jsonOriginal) {
     return datos
   }
 
-export function filtrarCampos(obj) {
-  if (['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'].includes(obj.contractType?.toLowerCase())) {
-    const foundersPeople = obj?.founders?.people?.map((found)=>{
-      const { dni, maritalStatus, firstName, lastName  } = found || {};
-      const base = {
-        dni,
-        firstName, 
-        lastName,
-        signedDate: { date: formatDateToYMD(new Date()) },
-        maritalStatus: {
-          civilStatus: maritalStatus?.civilStatus
-        }
-      };
-      const isCasadoMancomunado =
-      maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
-      maritalStatus?.marriageType?.type === 2;
+  export function filtrarCampos(obj) {
+    const formatDate = formatDateToYMD(new Date());
   
-    if (isCasadoMancomunado) {
-      base.maritalStatus.spouse = {
-        firstName : maritalStatus?.spouse?.firstName,
-          lastName : maritalStatus?.spouse?.lastName,
-        dni: maritalStatus?.spouse?.dni,
-        signedDate: { date: formatDateToYMD(new Date()) }
-      };
-    }
-    return base;
-    })
-    return {
-      contractId : obj?.id,
-      founders : {
-        people : foundersPeople
-      },
-      signedDocumentDate : {
-        date : formatDateToYMD(new Date())
-      }
-    }
-  }
-  else {
-    const buyersPeople = obj?.buyers?.people?.map((buyer)=>{
-      const { dni, maritalStatus, firstName, lastName  } = buyer || {};
-      const base = {
-        dni,
-        firstName, 
-        lastName,
-        signedDate: { date: formatDateToYMD(new Date()) },
-        maritalStatus: {
-          civilStatus: maritalStatus?.civilStatus
-        }
-      };
-      const isCasadoMancomunado =
-      maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
-      maritalStatus?.marriageType?.type === 2;
+    // Helper: determina si es casado/a con bienes mancomunados (type === 2)
+    const esCasadoMancomunado = (ms) => {
+      const status = (ms?.civilStatus ?? '').toString().trim().toLowerCase();
+      // acepta "casado" o "casada"
+      const casadoOA = /^casad[oa]$/.test(status);
+      const tipo = Number.parseInt(ms?.marriageType?.type, 10);
+      return casadoOA && tipo === 2;
+    };
   
-    if (isCasadoMancomunado) {
-      base.maritalStatus.spouse = {
-        firstName : maritalStatus?.spouse?.firstName,
-          lastName : maritalStatus?.spouse?.lastName,
-        dni: maritalStatus?.spouse?.dni,
-        signedDate: { date: formatDateToYMD(new Date()) }
-      };
-    }
+    const mapPeople = (people = []) =>
+      people.map((person = {}) => {
+        const { dni, maritalStatus, firstName, lastName } = person || {};
   
-    return base;
-    });
-
-    const sellersPeople = obj?.sellers?.people?.map((seller) => {
-      const { dni, maritalStatus, firstName, lastName } = seller || {};
-      const base = {
-        dni,
-        firstName, 
-        lastName,
-        signedDate: { date: formatDateToYMD(new Date()) },
-        maritalStatus: {
-          civilStatus: maritalStatus?.civilStatus
-        }
-      };
-    
-      const isCasadoMancomunado =
-        maritalStatus?.civilStatus?.toLowerCase() === 'casado' &&
-        maritalStatus?.marriageType?.type === 2;
-    
-      if (isCasadoMancomunado) {
-        base.maritalStatus.spouse = {
-          firstName : maritalStatus?.spouse?.firstName,
-          lastName : maritalStatus?.spouse?.lastName,
-          dni: maritalStatus?.spouse?.dni,
-          signedDate: { date: formatDateToYMD(new Date()) }
+        const base = {
+          dni,
+          firstName,
+          lastName,
+          signedDate: { date: formatDate },
+          maritalStatus: {
+            civilStatus: maritalStatus?.civilStatus ?? ''
+          }
         };
-      }
-    
-      return base;
-    });
-    
+  
+        if (esCasadoMancomunado(maritalStatus) && maritalStatus?.spouse) {
+          const s = maritalStatus.spouse || {};
+          base.maritalStatus.spouse = {
+            firstName: s.firstName ?? '',
+            lastName: s.lastName ?? '',
+            dni: s.dni ?? '',
+            signedDate: { date: formatDate }
+          };
+        }
+  
+        return base;
+      });
+  
+    const tiposFundadores = ['asociacion', 'sac', 'razonsocial', 'rs', 'scrl'];
+  
+    if (tiposFundadores.includes(obj.contractType?.toLowerCase?.())) {
+      return {
+        contractId: obj?.id,
+        founders: { people: mapPeople(obj?.founders?.people || []) },
+        signedDocumentDate: { date: formatDate }
+      };
+    }
+  
     return {
-      contractId: obj.id,
-      sellers: {
-        people : sellersPeople
-      },
-      buyers: {
-        people : buyersPeople
-      },
-      signedDocumentDate: {
-        date : formatDateToYMD(new Date())
-      }
+      contractId: obj?.id,
+      buyers: { people: mapPeople(obj?.buyers?.people || []) },
+      sellers: { people: mapPeople(obj?.sellers?.people || []) },
+      signedDocumentDate: { date: formatDate }
     };
   }
-}
 
 export function reducCompraVentaJSON(data) {
   const {contractId, signedDocumentDate} = data;
