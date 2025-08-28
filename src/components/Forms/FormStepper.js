@@ -162,11 +162,13 @@ export default function FormStepper({
 
   const handleNext = useCallback((e) => {
     e.preventDefault();
+    
+    
     const dataToValidate =
       tipoProceso === 'compra'
         ? activeStep === 0 ? compradores : vendedores
         : activeStep === 0 ? vendedores : compradores;
-
+        console.log(dataToValidate);
     const validationErrors = checkEmptyFieldsFormCompra(dataToValidate);
     if (validationErrors.length > 0) {
       setErrores(validationErrors);

@@ -1,39 +1,69 @@
 export function checkEmptyFieldsFormCompra(dataCompra) {
     let listaErroresCompra = [];
-    for (const indice in dataCompra ){
-        for (const key in dataCompra[indice]){
-            const valor = dataCompra[indice][key];
-            if (typeof valor === 'object' && valor !== null && !Array.isArray(valor)) {
-                for (const j in valor){
-                    if (valor[j] === '') {
-
-                        listaErroresCompra[indice] = {
-                            error : true,
-                            value : 'Por favor completar el formulario'
-                        }
-                        
-                    
-                    }
-                    
-                    if (valor?.civilStatus == 'casado' && (!valor?.spouse?.gender || !valor?.spouse?.dni || !valor?.spouse?.firstName || !valor?.spouse?.lastName|| !valor?.spouse?.job || !valor?.spouse?.nationality)) {
-                        listaErroresCompra[indice] = {
-                            error : true,
-                        value : 'Por favor completar el formulario'
-                        }
-                    }
-                }
-            }else {
-                if (valor === '') {
-                    listaErroresCompra[indice] = {
-                        error : true,
-                        value : 'Por favor completar el formulario'
-                    }
-                }
-            }
+  
+    for (let i = 0; i < dataCompra.length; i++) {
+      const person = dataCompra[i];
+      let hasError = false;
+  
+      // Validar campos planos principales
+      const camposObligatorios = ['firstName', 'lastName', 'dni', 'gender', 'nationality', 'age', 'job'];
+      for (const campo of camposObligatorios) {
+        if (!person[campo] || String(person[campo]).trim() === '') {
+          hasError = true;
         }
+      }
+  
+      // Validar dirección
+      if (person.address) {
+        const camposDireccion = ['name', 'district', 'province', 'department'];
+        for (const campo of camposDireccion) {
+          if (!person.address[campo] || String(person.address[campo]).trim() === '') {
+            hasError = true;
+          }
+        }
+      } else {
+        hasError = true; // address no debería ser nulo
+      }
+  
+      // Validar estado civil
+      const civil = person.maritalStatus?.civilStatus || '';
+      const isCasado = civil === 'casado' || civil === 'casada';
+  
+      if (isCasado) {
+        if (person.bienesMancomunados) {
+          // Bienes mancomunados => validar spouse completo
+          const spouse = person.maritalStatus?.spouse;
+          if (
+            !spouse ||
+            !spouse.firstName || !spouse.lastName ||
+            !spouse.dni || !spouse.gender ||
+            !spouse.job || !spouse.nationality
+          ) {
+            hasError = true;
+          }
+        } else {
+          // Bienes separados => validar marriageType
+          const marriageType = person.maritalStatus?.marriageType;
+          if (
+            !marriageType ||
+            !marriageType.partidaRegistralNumber ||
+            !marriageType.province
+          ) {
+            hasError = true;
+          }
+        }
+      }
+  
+      if (hasError) {
+        listaErroresCompra[i] = {
+          error: true,
+          value: 'Por favor completar el formulario'
+        };
+      }
     }
+  
     return listaErroresCompra;
-}
+  }
 
 
 export function checkEvidenceEmpty(data=[]) {
