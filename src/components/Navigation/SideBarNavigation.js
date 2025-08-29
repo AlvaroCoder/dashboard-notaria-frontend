@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils';
 
 export default function SideBarNavigation() {
   const URL_IMG_LOGO_NOTARIA = 'https://res.cloudinary.com/dabyqnijl/image/upload/v1750349721/ImagesNotariaRojas/z2znxywil3jx4r6htzra.png';
-  const pathname = usePathname();
 
   const routes = [
     {
@@ -61,7 +60,7 @@ export default function SideBarNavigation() {
       if (role === 'junior') {
         // Filtrar rutas para que no aparezcan Juniors y Seniors
         const filteredRoutes = routes.filter(
-          route => route.routeName !== "Juniors" && route.routeName !== "Seniors"
+          route => route.routeName !== "Juniors" && route.routeName !== "Seniors" && route?.routeName !== "Inicio"
         );
         setDataRoutes(filteredRoutes);
       } else {

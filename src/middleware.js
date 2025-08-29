@@ -12,11 +12,11 @@ export async function middleware(request = NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (request.nextUrl.pathname.startsWith("/juniors") || request.nextUrl.pathname.startsWith("/seniors")) {
+    if (request.nextUrl.pathname.startsWith("/juniors") || request.nextUrl.pathname.startsWith("/seniors") || request.nextUrl.pathname === "/dashboard") {
         const role = session?.user?.payload?.role;
     
         if (role == "junior") {
-          return NextResponse.redirect(new URL("/dashboard", request.url));
+          return NextResponse.redirect(new URL("/dashboard/contracts", request.url));
         }
     }
 

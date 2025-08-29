@@ -297,7 +297,6 @@ function RenderCardsFormStepper({
     }
   };
   const handleChangePaymentForm = (field, value) => {
-    // notifica al padre
     setDataSendMinuta((prev)=>({
       ...dataSendMinuta,
       payment : {
@@ -427,7 +426,6 @@ function RenderCardsFormStepper({
                 <TextField
                   label="Monto"
                   type="number"
-
                   value={dataSendMinuta?.payment.amount}
                   onChange={(e) => handleChangePaymentForm("amount", parseFloat(e.target.value) || 0)}
                   fullWidth

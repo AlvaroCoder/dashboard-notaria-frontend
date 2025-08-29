@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Title1 from '../elements/Title1';
 import Separator2 from '../elements/Separator2';
 import { fetchImageEvidence } from '@/lib/apiConnectionsEvidences';
-import Image from 'next/image';
 import { toast } from 'react-toastify';
 import ImageSlider from '../elements/ImageSlider';
 import CardAviso from './CardAviso';
@@ -27,7 +26,6 @@ function CardDni({ data = [] }) {
             advise={item?.maritalStatus?.civilStatus}
           />
           </div>
-          {/* Imágenes de la persona */}
           <div className="flex gap-2 flex-wrap">
             <ImageSlider
                 images={item?.person}
@@ -41,7 +39,6 @@ function CardDni({ data = [] }) {
                <p className='p-2 rounded-sm text-sm bg-amber-50'>Bienes separados</p>
             </div>
           }
-          {/* Si hay cónyuge */}
           {(item.spouse && item?.maritalStatus?.marriageType?.type == 2) && (
             <>
               <p className="mt-2 text-sm text-gray-700 font-semibold">Cónyuge:</p>
@@ -52,22 +49,19 @@ function CardDni({ data = [] }) {
               </div>
             </>
           )}
-
-
         </div>
       ))}
     </div>
   );
 }
 
-// ✅ Componente principal
 export default function CardShowDnisPerson({ buyersData = [], sellersData = [] }) {
   const [loading, setLoading] = useState(false);
   const [dnisBuyers, setDnisBuyers] = useState([]);
   const [dnisSellers, setDnisSellers] = useState([]);
 
   useEffect(() => {
-    let objectUrls = []; // Para cleanup
+    let objectUrls = []; 
 
     async function getDataImagesDnis() {
       try {

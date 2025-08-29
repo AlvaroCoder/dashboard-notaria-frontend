@@ -2,15 +2,20 @@
 import { getSession } from '@/authentication/lib';
 import CardAviso from '@/components/Cards/CardAviso';
 import CardShowDnisPerson from '@/components/Cards/CardShowDnisPerson';
+import CardShowVehicleData from '@/components/Cards/CardShowVehicleData';
 import ButtonDownloadWord from '@/components/elements/ButtonDownloadWord';
 import ButtonUploadImageMinuta from '@/components/elements/ButtonUploadImageMinuta';
 import Title1 from '@/components/elements/Title1';
+import FojasDataForm from '@/components/Forms/FojasDataForm';
+import FormHeaderInformation from '@/components/Forms/FormHeaderInformation';
 import FormStepper from '@/components/Forms/FormStepper';
+import TableSelectedUser from '@/components/Tables/TableSelectedUser';
 import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { getDataContractByIdContract } from '@/lib/apiConnections';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -37,23 +42,34 @@ function RenderPageScript() {
     const [seniorSelected, setSeniorSelected] = useState(null);
     const [dataSendMinuta, setDataSendMinuta] = useState({
         header : {
-            numeroDocumentoNotarial : '',
+            numeroDocumentoNotarial : "",
             numeroRegistroEscritura : '',
             year : '',
-            folio :'',
-            tomo :'',
+            folio : '',
+            tomo : '',
             kardex : ''
-          },
-          fojasData:{
-            start:{
-              number:"1123",
-              serie:"C"
+        },
+        fojasData : {
+            start : {
+                number : "1123",
+                serie : "C",
             },
-            end:{
-              number:"1125V",
-              serie:"C"
+            end : {
+                number : '1125V',
+                serie : "C"
             }
-        }
+        },
+        vehicleData : {
+          numberPlate : "",
+          propertyRecord : {
+            number : "",
+            place : ""
+          }
+        },
+        payment : {
+          unit : 'dollar',
+          amount : ''
+        },
     });
 
     const router = useRouter();
@@ -73,7 +89,8 @@ function RenderPageScript() {
                 const responseContract = await getDataContractByIdContract(idContract);
                 const responseContractJSON = await responseContract.json();
                 setDataContract(responseContractJSON?.data);
-
+                console.log(responseContractJSON?.data);
+                
                 if (responseContractJSON?.data?.juniorId === '' || !responseContractJSON?.data?.hasOwnProperty('juniorId')) {
                     toast("Asigne primero al junior",{
                         type : 'warning',
@@ -284,6 +301,16 @@ function RenderPageScript() {
         ]);
     };
 
+    const handleChangePaymentForm = (field, value) => {
+        setDataSendMinuta((prev)=>({
+          ...dataSendMinuta,
+          payment : {
+            ...prev.payment,
+            [field] : value
+          }
+        }))
+      };
+
     const handleChangeDeleteImageMinuta=(idx)=>{
         const newDataImage = imagesMinuta?.filter((_, index)=>index!== idx);
         setImagesMinuta(newDataImage);
@@ -345,81 +372,86 @@ function RenderPageScript() {
             )
         case 2:
             return(
-                <section className='w-full flex justify-center'>
-                <div className='w-full bg-white px-6 rounded-lg shadow mt-8 pb-4'>
-                  <section>
-                    <Title1 className='text-3xl'>Información Restante</Title1>
-                    <p>Ingresa la información restantes para generar la escritura</p>
-                  </section>
-                  <section>
-                    <Title1 className='text-2xl'>Información de las fojas</Title1>
-                    <FojasDataForm
-                      fojasData={dataSendMinuta.fojasData}
-                      handleChangeFojasDatas={handleChangeFojasDatas}
-                    />
-                  </section>
-                  <section className='my-2'>
-                    <Title1>Información del pago</Title1>
-                    <div className='flex flex-row gap-4 w-full'>
-                      <FormControl  className="w-[400px]">
-                        <InputLabel>Moneda</InputLabel>
-                        <Select
-                          value={dataSendMinuta?.payment.unit}
-                          onChange={(e) => handleChangePaymentForm("unit", e.target.value)}
-                        >
-                          <MenuItem value="soles">Soles</MenuItem>
-                          <MenuItem value="dollar">Dólares</MenuItem>
-                        </Select>
-                      </FormControl>
-      
-                      {/* Input de Monto */}
-                      <TextField
-                        label="Monto"
-                        type="number"
-      
-                        value={dataSendMinuta?.payment.amount}
-                        onChange={(e) => handleChangePaymentForm("amount", parseFloat(e.target.value) || 0)}
-                        fullWidth
-                      />
-                    </div>
-                  </section>
-                  <section className='my-2'>
-                    <Title1 className=''>Información del Vehiculo</Title1>
-                    <TextField
-                        label="Nro de Placa"
-                        type='text'
-                        onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData:{...prev?.vehicleData, numberPlate : e.target.value}}))}
-                        fullWidth
-                        required
-                      />
-                    <section className='grid grid-cols-1 lg:grid-cols-2 gap-4 my-4'>
-                      <TextField
-                        label="Nro de propiedad"
-                        type='number'
-                        onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData : {...prev.vehicleData, propertyRecord : {...prev.vehicleData.propertyRecord, number : e.target.value}}}))}
-                        required
-                      />
-                      <TextField
-                        label="Lugar"
-                        type='text'
-                        onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData : {...prev.vehicleData, propertyRecord : {...prev.vehicleData.propertyRecord, place : e.target.value}}}))}
-                        required
-                      />  
+                <main className='w-full grid grid-cols-3 gap-4 '>
+                    <section className='flex justify-center col-span-2 p-6'>
+                    <div className='w-full bg-white px-6 rounded-lg shadow mt-8 pb-4'>
+                    <section>
+                        <Title1 className='text-3xl'>Información Restante</Title1>
+                        <p>Ingresa la información restantes para generar la escritura</p>
                     </section>
-                  </section>
-                  
-                  <FormHeaderInformation
-                    data={dataSendMinuta}
-                    handleChangeHeader={handleChangeHeader}
-                  />
-                  <Button
-                    onClick={()=>pushActiveStep()}
-                    className={"w-full mt-4"}
-                  >
-                    Continuar
-                  </Button>
-                </div>
-              </section>
+                    <section>
+                        <Title1 className='text-2xl'>Información de las fojas</Title1>
+                        <FojasDataForm
+                        fojasData={dataSendMinuta.fojasData}
+                        handleChangeFojasDatas={handleChangeFojasDatas}
+                        />
+                    </section>
+                    <section className='my-2'>
+                        <Title1>Información del pago</Title1>
+                        <div className='flex flex-row gap-4 w-full'>
+                        <FormControl  className="w-[400px]">
+                            <InputLabel>Moneda</InputLabel>
+                            <Select
+                            value={dataSendMinuta?.payment.unit}
+                            onChange={(e) => handleChangePaymentForm("unit", e.target.value)}
+                            >
+                            <MenuItem value="soles">Soles</MenuItem>
+                            <MenuItem value="dollar">Dólares</MenuItem>
+                            </Select>
+                        </FormControl>
+        
+                        <TextField
+                            label="Monto"
+                            type="number"
+                            value={dataSendMinuta?.payment.amount}
+                            onChange={(e) => handleChangePaymentForm("amount", parseFloat(e.target.value) || 0)}
+                            fullWidth
+                        />
+                        </div>
+                    </section>
+                    <section className='my-2'>
+                        <Title1 className=''>Información del Vehiculo</Title1>
+                        <TextField
+                            label="Nro de Placa"
+                            type='text'
+                            onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData:{...prev?.vehicleData, numberPlate : e.target.value}}))}
+                            fullWidth
+                            required
+                        />
+                        <section className='grid grid-cols-1 lg:grid-cols-2 gap-4 my-4'>
+                        <TextField
+                            label="Nro de propiedad"
+                            type='number'
+                            onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData : {...prev.vehicleData, propertyRecord : {...prev.vehicleData.propertyRecord, number : e.target.value}}}))}
+                            required
+                        />
+                        <TextField
+                            label="Lugar"
+                            type='text'
+                            onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData : {...prev.vehicleData, propertyRecord : {...prev.vehicleData.propertyRecord, place : e.target.value}}}))}
+                            required
+                        />  
+                        </section>
+                    </section>
+                    
+                    <FormHeaderInformation
+                        data={dataSendMinuta}
+                        handleChangeHeader={handleChangeHeader}
+                    />
+                    <Button
+                        onClick={()=>pushActiveStep()}
+                        className={"w-full mt-4"}
+                    >
+                        Continuar
+                    </Button>
+                    </div>
+                    </section>
+                    <section className='col-span-1'>
+                        <CardShowVehicleData
+                            cardData={dataContract?.carData}
+                        />
+                    </section>
+                </main>
             )
         case 3:
             return(
