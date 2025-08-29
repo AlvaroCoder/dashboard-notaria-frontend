@@ -8,9 +8,7 @@ import { toast } from 'react-toastify';
 import ImageSlider from '../elements/ImageSlider';
 import CardAviso from './CardAviso';
 
-// ✅ Componente para mostrar los DNIs
 function CardDni({ data = [] }) {
-  console.log(data);
   
   if (!data || data.length === 0) {
     return <p className="text-gray-500">No hay imágenes para mostrar.</p>;
@@ -48,17 +46,9 @@ function CardDni({ data = [] }) {
             <>
               <p className="mt-2 text-sm text-gray-700 font-semibold">Cónyuge:</p>
               <div className="flex gap-2 flex-wrap">
-                {item.spouse?.map((img, i) => (
-                  <Image
-                    key={`spouse-${idx}-${i}`}
-                    src={img}
-                    alt="DNI cónyuge"
-                    width={100}
-                    height={80}
-                    className="rounded border"
-                    unoptimized
-                  />
-                ))}
+                <ImageSlider
+                  images={item?.spouse}
+                />
               </div>
             </>
           )}
