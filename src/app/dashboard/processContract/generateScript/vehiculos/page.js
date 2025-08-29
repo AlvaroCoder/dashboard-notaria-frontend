@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button';
 import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
-import { getDataContractByIdContract } from '@/lib/apiConnections';
+import { generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
+import { formatDateToYMD } from '@/lib/fechas';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { Loader2 } from 'lucide-react';
@@ -192,36 +193,6 @@ function RenderPageScript() {
         }));
     }
 
-    const handleContinue=(detailsMinuta)=>{
-        try {
-            setDataSendMinuta({
-                ...dataSendMinuta,
-                minuta : {
-                    minutaNumber : detailsMinuta?.number,
-                    creationDay : {
-                        date : detailsMinuta?.creationDay
-                    },
-                    place : {
-                        name : detailsMinuta?.namePlace,
-                        district : detailsMinuta?.districtPlace
-                    }
-                }
-            });
-            toast("Informacion de la minuta guardada",{
-                type : 'info',
-                position : 'bottom-center'
-            })
-            pushActiveStep();
-        } catch (err) {
-            console.log(err);
-            
-            toast("Error en la UI",{
-                type : 'error',
-                position : 'bottom-center'
-            });
-        }
-    };
-
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
@@ -242,7 +213,7 @@ function RenderPageScript() {
                 newDataSendMinuta.paymentMethod = null;
             }
 
-            const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta)
+            const response = await generateScriptCompraVenta('vehiculo', newDataSendMinuta)
 
             if (!response.ok) {
                 toast("Sucedio un error al generar la escritura",{
@@ -256,7 +227,7 @@ function RenderPageScript() {
 
             const a = document.createElement('a');
             a.href = url;
-            a.download = "escritura-scrl.docx";
+            a.download = "escritura-vehiculo.docx";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -340,7 +311,8 @@ function RenderPageScript() {
             )
         case 1:
             return (
-                <main className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
+                <main className='p-6 w-full'>
+                    <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
                         <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
                         <p className='text-center text-gray-600 text-sm'>Subr lo comprobantes de pago</p>
@@ -368,13 +340,14 @@ function RenderPageScript() {
                     >   
                         {loading ? <Loader2 className='animate-spin'/> : <p>Continuar</p>}
                     </Button>   
+                </section>
                 </main>
             )
         case 2:
             return(
                 <main className='w-full grid grid-cols-3 gap-4 '>
                     <section className='flex justify-center col-span-2 p-6'>
-                    <div className='w-full bg-white px-6 rounded-lg shadow mt-8 pb-4'>
+                    <div className='w-full bg-white p-6 rounded-lg shadow mt-8 pb-4'>
                     <section>
                         <Title1 className='text-3xl'>Información Restante</Title1>
                         <p>Ingresa la información restantes para generar la escritura</p>

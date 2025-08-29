@@ -36,7 +36,7 @@ export default function CardShowVehicleData({ cardData = "" }) {
     }, [cardData]);
 
     return (
-        <section className="w-full p-6 bg-slate-100">
+        <section className="w-full p-6 bg-slate-100 h-full">
             <div className="p-4 shadow bg-white rounded-lg">
                 <Title1 className="text-lg w-full text-center">Información del Vehículo del Cliente</Title1>
                 <Separator2 />
