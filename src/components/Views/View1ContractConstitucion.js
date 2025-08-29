@@ -74,9 +74,12 @@ export default function View1ContractConstitucion({
             </section>
           </section>
             <Separator2/>
-            <FramePdf
+            {
+              dataContract?.contractType !== 'compraVentaVehiculo' && 
+              <FramePdf
               directory={dataContract?.minutaDirectory}
             />
+            }
           </section>
 
         </div>

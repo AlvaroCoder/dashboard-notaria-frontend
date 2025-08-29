@@ -28,6 +28,11 @@ export async function middleware(request = NextRequest) {
             return NextResponse.redirect(url);
         }
 
+        if (contractType === 'compraVentaVehiculo') {
+            url.pathname = '/dashboard/processContract/generateScript/vehiculos';
+            return NextResponse.redirect(url);
+        }
+
         if (['asociacion', 'RS', 'SCRL', 'SAC'].includes(contractType ?? '')) {
             url.pathname = '/dashboard/processContract/generateScript/constitucion';
             return NextResponse.redirect(url);
