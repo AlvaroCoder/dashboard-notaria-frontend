@@ -15,6 +15,7 @@ import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
+import { fetchImageEvidence } from '@/lib/apiConnectionsEvidences';
 import { formatDateToYMD } from '@/lib/fechas';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -91,7 +92,20 @@ function RenderPageScript() {
                 const responseContractJSON = await responseContract.json();
                 const obj = responseContractJSON?.data;
                 if ("evidences" in obj && Array.isArray(obj.evidences)) {
-                    setImagesMinuta(obj.evidences);
+
+                    try {
+                        const promiseImages = obj?.evidences.map(async (image) => {
+                            const responseImage = await fetchImageEvidence(image);
+                            const blob = await responseImage.blob();
+                            return URL.createObjectURL(blob);
+                        });
+                
+                        const images = await Promise.all(promiseImages);
+                        setImagesMinuta(images);
+                        } catch (error) {
+                        console.error("Error cargando imágenes:", error);
+                        }
+                    
                 }
                 setDataContract(obj);
                 

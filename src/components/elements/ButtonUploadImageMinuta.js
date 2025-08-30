@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
+import { fetchImageEvidence } from "@/lib/apiConnectionsEvidences";
 
 export default function ButtonUploadImageMinuta({ 
     handleChangeImage,
@@ -10,11 +11,26 @@ export default function ButtonUploadImageMinuta({
   }) {
   const [imagesPreview, setImagesPreview] = useState([]);
   
-  useEffect(()=>{
+  useEffect(() => {
     if (prewiesImages.length > 0) {
-      setImagesPreview(prewiesImages)
+      const loadImages = async () => {
+        try {
+          const promiseImages = prewiesImages.map(async (image) => {
+            const responseImage = await fetchImageEvidence(image);
+            const blob = await responseImage.blob();
+            return URL.createObjectURL(blob);
+          });
+  
+          const images = await Promise.all(promiseImages);
+          setImagesPreview(images);
+        } catch (error) {
+          console.error("Error cargando imágenes:", error);
+        }
+      };
+  
+      loadImages();
     }
-  },[prewiesImages])
+  }, [prewiesImages]);
 
   const handleImageUpload = (e) => {
     const files = e.target.files;
