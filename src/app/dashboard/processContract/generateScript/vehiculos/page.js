@@ -81,53 +81,71 @@ function RenderPageScript() {
     const [dataSession, setDataSession] = useState(null);
     const [dataContractDownload, setDataContractDownload] = useState(null);
     
-    useEffect(()=>{
+    useEffect(() => {
+        let isMounted = true;
+        let imageUrls = [];
+      
         async function getDataMinutaFile() {
-            try {
-                setLoading(true);
-                const session = await getSession();
-                setDataSession(session?.user);
-
-                const responseContract = await getDataContractByIdContract(idContract);
-                const responseContractJSON = await responseContract.json();
-                const obj = responseContractJSON?.data;
-                if ("evidences" in obj && Array.isArray(obj.evidences)) {
-
-                    try {
-                        const promiseImages = obj?.evidences.map(async (image) => {
-                            const responseImage = await fetchImageEvidence(image);
-                            const blob = await responseImage.blob();
-                            return URL.createObjectURL(blob);
-                        });
-                
-                        const images = await Promise.all(promiseImages);
-                        setImagesMinuta(images);
-                        } catch (error) {
-                        console.error("Error cargando imágenes:", error);
-                        }
-                    
-                }
-                setDataContract(obj);
-                
-                if (obj?.juniorId === '' || !obj?.hasOwnProperty('juniorId')) {
-                    toast("Asigne primero al junior",{
-                        type : 'warning',
-                        position : 'bottom-center'
-                    });
-                    router.push(`/dashboard/juniors/asign/?idContract=${idContract}`)
-                    return;
-                }
-            } catch (err) {
-                toast("Error con la vista de minuta",{
-                    type : 'error',
-                    position : 'bottom-center'
+          try {
+            setLoading(true);
+      
+            const session = await getSession();
+            if (!isMounted) return;
+            setDataSession(session?.user);
+      
+            const responseContract = await getDataContractByIdContract(idContract);
+            const { data: obj } = await responseContract.json();
+      
+            if (!isMounted) return;
+      
+            if (obj && Array.isArray(obj.evidences)) {
+              try {
+                const promiseImages = obj.evidences.map(async (image) => {
+                  const responseImage = await fetchImageEvidence(image);
+                  const blob = await responseImage.blob();
+                  const url = URL.createObjectURL(blob);
+                  imageUrls.push(url);
+                  return url;
                 });
-            } finally {
-                setLoading(false);
+      
+                const images = await Promise.all(promiseImages);
+                if (isMounted) setImagesMinuta(images);
+              } catch (error) {
+                console.error("Error cargando imágenes:", error);
+              }
             }
+      
+            setDataContract(obj);
+      
+            if (!obj?.juniorId) {
+              toast("Asigne primero al junior", {
+                type: "warning",
+                position: "bottom-center",
+              });
+              router.push(`/dashboard/juniors/asign/?idContract=${idContract}`);
+              return;
+            }
+          } catch (err) {
+            if (isMounted) {
+              toast("Error con la vista de minuta", {
+                type: "error",
+                position: "bottom-center",
+              });
+            }
+          } finally {
+            if (isMounted) setLoading(false);
+          }
         }
-        getDataMinutaFile();
-    },[idContract]);
+      
+        if (idContract) {
+          getDataMinutaFile();
+        }
+      
+        return () => {
+          isMounted = false;
+          imageUrls.forEach((url) => URL.revokeObjectURL(url));
+        };
+      }, [idContract]);
 
     const handleClickFormStepper=async(compradores, vendedores)=>{
         setDataSendMinuta({
