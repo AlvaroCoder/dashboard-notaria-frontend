@@ -328,7 +328,7 @@ function RenderPageScript() {
                     </Button>
                 </main>
             )
-        case 3:
+        case 4:
             return (
             <section className='p-4 w-full'>
                 <Title1>Descarga el documento si es necesario</Title1>

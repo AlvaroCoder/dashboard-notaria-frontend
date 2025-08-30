@@ -1,14 +1,21 @@
 'use state'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
 
 export default function ButtonUploadImageMinuta({ 
     handleChangeImage,
-    handleDeleteImageMinuta
+    handleDeleteImageMinuta,
+    prewiesImages=[]
   }) {
   const [imagesPreview, setImagesPreview] = useState([]);
   
+  useEffect(()=>{
+    if (prewiesImages.length > 0) {
+      setImagesPreview(prewiesImages)
+    }
+  },[prewiesImages])
+
   const handleImageUpload = (e) => {
     const files = e.target.files;
     if (!files) return;

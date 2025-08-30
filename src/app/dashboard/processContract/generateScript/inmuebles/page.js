@@ -77,9 +77,13 @@ function RenderPageScript() {
                 const responseContract = await getDataContractByIdContract(idContract);
                 
                 const responseContractJSON = await responseContract.json();
-                setDataContract(responseContractJSON?.data);
+                const obj = responseContractJSON?.data;
+                if ("evidences" in obj && Array.isArray(obj.evidences)) {
+                    setImagesMinuta(obj.evidences);
+                }
+                setDataContract(obj);
                 
-                if (responseContractJSON?.data?.juniorId === '' || !responseContractJSON?.data?.hasOwnProperty('juniorId')) {
+                if (obj.juniorId === '' || !obj.hasOwnProperty('juniorId')) {
                     toast("Asigne primero al junior",{
                         type : 'warning',
                         position : 'bottom-center'
@@ -327,6 +331,7 @@ function RenderPageScript() {
                     <ButtonUploadImageMinuta
                         handleChangeImage={handleChangeImageMinuta}
                         handleDeleteImageMinuta={handleChangeDeleteImageMinuta}
+                        prewiesImages={dataContract?.evidences ?? []}
                     />
                     {
                         imagesMinuta?.length > 0 &&
