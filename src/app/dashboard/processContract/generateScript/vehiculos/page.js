@@ -90,7 +90,6 @@ function RenderPageScript() {
                 const responseContract = await getDataContractByIdContract(idContract);
                 const responseContractJSON = await responseContract.json();
                 setDataContract(responseContractJSON?.data);
-                console.log(responseContractJSON?.data);
                 
                 if (responseContractJSON?.data?.juniorId === '' || !responseContractJSON?.data?.hasOwnProperty('juniorId')) {
                     toast("Asigne primero al junior",{

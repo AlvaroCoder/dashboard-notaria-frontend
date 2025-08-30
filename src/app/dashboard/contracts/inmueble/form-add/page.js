@@ -403,11 +403,15 @@ function RenderCardsFormStepper({
               </main>  
             );
         case 3:
-            return (<FormStepper
-                tipoProceso={dataSendMinuta?.case}
-               handleSaveData={handleClickFormStepper}
-               backActiveStep={backActiveStep}
-            />);
+            return (
+                <section className='w-full p-6'>
+                    <FormStepper
+                        tipoProceso={dataSendMinuta?.case}
+                        handleSaveData={handleClickFormStepper}
+                        backActiveStep={backActiveStep}
+                    />
+                </section>
+            );
         case 4:
             return (
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
