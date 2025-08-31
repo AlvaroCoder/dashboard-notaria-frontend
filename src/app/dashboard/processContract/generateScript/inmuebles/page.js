@@ -14,6 +14,7 @@ import { useContracts } from '@/context/ContextContract';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
+import { fetchImageEvidence } from '@/lib/apiConnectionsEvidences';
 import { formatDateToYMD } from '@/lib/fechas';
 import { TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';
@@ -62,48 +63,81 @@ function RenderPageScript() {
     });
     const router = useRouter();
     const [imagesMinuta, setImagesMinuta] = useState([]);
-    const [fileLocation, setFileLocation] = useState(null);
     const [dataContract, setDataContract] = useState(null);
     const [dataSession, setDataSession] = useState(null);
     const [dataContractDownload, setDataContractDownload] = useState(null);
 
-    useEffect(()=>{
-        async function getDataMinutaFile() {
+      useEffect(() => {
+          let isMounted = true;
+          let imageUrls = [];
+        
+          async function getDataMinutaFile() {
             try {
-                setLoading(true);
-                const session = await getSession();
-                setDataSession(session?.user);
-
-                const responseContract = await getDataContractByIdContract(idContract);
-                
-                const responseContractJSON = await responseContract.json();
-                const obj = responseContractJSON?.data;
-                if ("evidences" in obj && Array.isArray(obj.evidences)) {
-                    setImagesMinuta(obj.evidences);
-                }
-                setDataContract(obj);
-                
-                if (obj.juniorId === '' || !obj.hasOwnProperty('juniorId')) {
-                    toast("Asigne primero al junior",{
-                        type : 'warning',
-                        position : 'bottom-center'
-                    });
+              setLoading(true);
+        
+              const session = await getSession();
+              if (!isMounted) return;
+              setDataSession(session?.user);
+        
+              const responseContract = await getDataContractByIdContract(idContract);
+              const { data: obj } = await responseContract.json();
+        
+              if (!isMounted) return;
+        
+              if (obj && Array.isArray(obj.evidences)) {
+                try {
+                    console.log(obj.evidences);
                     
-                    router.push(`/dashboard/juniors/asign/?idContract=${idContract}`)
-                    return;
-                }
+                  const promiseImages = obj.evidences.map(async (image) => {
+                    const responseImage = await fetchImageEvidence(image);
+                    const blob = await responseImage.blob();
+                    const url = URL.createObjectURL(blob);
+                    imageUrls.push(url);
 
+                    return blob;
+                  });
+                  console.log(imageUrls);
+                  
+                  const images = await Promise.all(promiseImages);
+                  console.log(images);
+                  
+                  setImagesMinuta(images);
+                } catch (error) {
+                  console.error("Error cargando imágenes:", error);
+                }
+              }
+        
+              setDataContract(obj);
+        
+              if (!obj?.juniorId) {
+                toast("Asigne primero al junior", {
+                  type: "warning",
+                  position: "bottom-center",
+                });
+                router.push(`/dashboard/juniors/asign/?idContract=${idContract}`);
+                return;
+              }
             } catch (err) {
-                toast("Error con la vista de minuta",{
-                    type :'error',
-                    position : 'bottom-center'
-                })
-            } finally{
-                setLoading(false);
+              if (isMounted) {
+                toast("Error con la vista de minuta", {
+                  type: "error",
+                  position: "bottom-center",
+                });
+              }
+            } finally {
+              if (isMounted) setLoading(false);
             }
-        };   
-        getDataMinutaFile();
-    },[idContract]);
+          }
+        
+          if (idContract) {
+            getDataMinutaFile();
+          }
+        
+          return () => {
+            isMounted = false;
+            imageUrls.forEach((url) => URL.revokeObjectURL(url));
+          };
+        }, [idContract]);
 
 
     const handleClickFormStepper=async(compradores, vendedores)=>{
@@ -225,13 +259,24 @@ function RenderPageScript() {
                 ...dataSendMinuta,
                 contractId : idContract
             };
-
-            if (imagesMinuta && imagesMinuta.length > 0) {
-                const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
-                newDataSendMinuta.paymentMethod = {
-                    ...dataSendMinuta?.paymentMethod,
-                    evidences : responseEvidencias
-                };
+            console.log(imagesMinuta);
+            
+            if (imagesMinuta && imagesMinuta.length > 0) {                
+                if (Array.isArray(dataContract?.evidences) && dataContract?.evidences?.length > 0) {
+                    newDataSendMinuta.paymentMethod = {
+                        ...dataSendMinuta?.paymentMethod,
+                        evidences : dataContract?.evidences
+                    }
+                } else {
+                    const directoryRoute = dataContract?.directory?.split("/")[1];
+                    const responseEvidencias = await subirEvidencias(imagesMinuta, directoryRoute);
+                    
+                    newDataSendMinuta.paymentMethod = {
+                        ...dataSendMinuta?.paymentMethod,
+                        evidences : responseEvidencias
+                    };
+                }
+                
 
             } else {
                 newDataSendMinuta.paymentMethod = null;

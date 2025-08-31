@@ -13,7 +13,7 @@ import { cardDataVehiculos } from '@/data/CardData';
 import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
-import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { Divider, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Loader2 } from 'lucide-react';

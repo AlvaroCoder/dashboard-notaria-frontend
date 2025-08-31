@@ -134,6 +134,8 @@ export async function subirEvidencias(evidencias=[], directory='') {
         });
 
         const responseJSON = await response.json();
+        console.log(responseJSON);
+        
         const file = responseJSON?.fileLocation;
 
         return `DB_evidences/${file?.directory}/${file?.fileNames[0]}`

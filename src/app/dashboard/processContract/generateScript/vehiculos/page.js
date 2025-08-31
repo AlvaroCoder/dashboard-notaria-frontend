@@ -76,7 +76,6 @@ function RenderPageScript() {
 
     const router = useRouter();
     const [imagesMinuta, setImagesMinuta] = useState([]);
-    const [fileLocation, setFileLocation] = useState(null);
     const [dataContract, setDataContract] = useState(null);
     const [dataSession, setDataSession] = useState(null);
     const [dataContractDownload, setDataContractDownload] = useState(null);
@@ -105,7 +104,7 @@ function RenderPageScript() {
                   const blob = await responseImage.blob();
                   const url = URL.createObjectURL(blob);
                   imageUrls.push(url);
-                  return url;
+                  return blob;
                 });
       
                 const images = await Promise.all(promiseImages);
@@ -237,12 +236,24 @@ function RenderPageScript() {
                 contractId : idContract
             };
 
-            if (imagesMinuta && imagesMinuta.length > 0) {
-                const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
-                newDataSendMinuta.paymentMethod = {
-                    ...dataSendMinuta?.paymentMethod,
-                    evidences : responseEvidencias
-                };
+            if (imagesMinuta && imagesMinuta.length > 0) {                
+                if (Array.isArray(dataContract?.evidences) && dataContract?.evidences?.length > 0) {
+                    newDataSendMinuta.paymentMethod = {
+                        ...dataSendMinuta?.paymentMethod,
+                        evidences : dataContract?.evidences
+                    }
+                } else {
+                    const directoryRoute = dataContract?.directory?.split("/")[1];
+                    console.log(directoryRoute);
+                    
+                    const responseEvidencias = await subirEvidencias(imagesMinuta, directoryRoute);
+                    
+                    newDataSendMinuta.paymentMethod = {
+                        ...dataSendMinuta?.paymentMethod,
+                        evidences : responseEvidencias
+                    };
+                }
+                
 
             } else {
                 newDataSendMinuta.paymentMethod = null;
