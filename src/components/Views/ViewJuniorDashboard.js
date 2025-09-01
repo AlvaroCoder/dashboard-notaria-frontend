@@ -17,7 +17,7 @@ export default function ViewJuniorDashboard({
     const {
       data : dataContractsJunior
     } = useFetch(process.env.NEXT_PUBLIC_URL_ID_CONTRATOS_JUNIOR+idJunior)
-      
+    
     const dataButtons =[
       {
         title : "Agregar Inmueble",

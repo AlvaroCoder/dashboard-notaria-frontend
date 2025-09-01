@@ -194,7 +194,6 @@ export default function TableManageDocuments({
                                         statusContracts?.filter(({id})=>id === documento?.status).map((item, key)=><p key={key} className={cn('px-2 py-1 w-fit rounded-sm text-sm', item.bgColor)}>{item.title}</p>)
                                     }
                                     <section className='mt-2 py-2'>
-                                        <p className='text-sm'>Pago : {documento?.processPayment}</p>
                                         <p className='text-sm'>Tipo :<b> {documento?.case}</b></p>
                                         <p className='text-sm'>Fecha : <b>{formatearFecha(documento?.datesDocument?.processInitiate)}</b></p>
                                         

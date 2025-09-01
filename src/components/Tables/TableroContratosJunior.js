@@ -19,20 +19,17 @@ export default function TableroContratosJunior({
     const [filterStatus, setFilterStatus] = useState("");
     const [filterDate, setFilterDate] = useState("");
 
-    // Extraer tipos únicos de contratos
     const contractTypes = useMemo(() => {
         const types = [...new Set(dataContracts.map(c => c.contractType).filter(Boolean))];
         return types;
     }, [dataContracts]);
 
     
-    // Filtrar datos
     const filteredContracts = useMemo(() => {
         return dataContracts.filter(contract => {
           const matchType = filterType ? contract.contractType === filterType : true;
           const matchStatus = filterStatus ? String(contract.status) === String(filterStatus) : true;
       
-          // 🔹 Normalizamos ambas fechas al mismo formato YYYY-MM-DD
           const contractDate = contract?.datesDocument?.processInitiate
             ? new Date(contract.datesDocument.processInitiate).toISOString().split("T")[0]
             : null;
@@ -181,7 +178,7 @@ export default function TableroContratosJunior({
                                     ))
                                 }
                                 <section className='mt-2 py-2'>
-                                    <p>Pago : {documento?.processPayment}</p>
+                                    <p>Pago : S/.{(documento?.processPayment?.amount)/100}</p>
                                     <p>Tipo : <b>{documento?.contractType}</b></p>
                                     <p>Fecha <b>{formatearFecha(documento?.datesDocument?.processInitiate)}</b></p>
                                 </section>
