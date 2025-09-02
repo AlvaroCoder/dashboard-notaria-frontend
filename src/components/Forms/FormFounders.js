@@ -38,50 +38,77 @@ export default function FormFounders({
   };
 
   const [founders, setFounders] = React.useState(initialFounder ? initialFounder : [initialDataFounder]);
+  console.log(founders);
   
   const handleChangeFounder = (index, field, value) => {
     const list = [...founders];
+    const founder = list[index];
   
     if (field === 'bienesMancomunados') {
-      list[index].bienesMancomunados = value;
-    }
-    // resto de la lógica igual que antes...
-    
-    else if (field?.startsWith("spouse-")) {
-      const fieldForm = field.split("-")[1];
-      if (!list[index].maritalStatus.spouse) {
-        list[index].maritalStatus.spouse = null;
+      founder.bienesMancomunados = value;
+  
+      if (value) {
+        founder.maritalStatus.spouse = {};
+        founder.maritalStatus.marriageType = { type: 2 }; // bienes mancomunados
+      } else {
+        founder.maritalStatus.spouse = null;
+        founder.maritalStatus.marriageType = {
+          type: 2,
+          partidaRegistralNumber: "",
+          province: ""
+        };
       }
-      list[index].maritalStatus.spouse[fieldForm] = value;
-    }
-    else if (field?.startsWith('marriageType-')) {
-      const fieldForm = field.split("-")[1];
-      list[index].maritalStatus.marriageType[fieldForm] = value;
-      list[index].maritalStatus.spouse = null;
-    }
-    else if (field === 'address') {
-      list[index].address.name = value;
-    }
-    else if (["district", "province", "department"].includes(field)) {
-      list[index].address[field] = value;
-    }
-    else if (field === 'maritalStatus') {
-      list[index].maritalStatus.civilStatus = value?.toLowerCase();
-      const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
-      if (isCasado) {
-        list[index].maritalStatus.marriageType = { type : list[index].bienesMancomunados ? 1 : 2};
-        if (list[index].bienesMancomunados) {
-          list[index].maritalStatus.spouse = {
-            age : 19
-          };
-        }
-        
-      }
-    }
-    else {
-      list[index][field] = value;
     }
   
+    else if (field?.startsWith("spouse-")) {
+      const fieldForm = field.split("-")[1];
+      if (!founder.maritalStatus.spouse) {
+        founder.maritalStatus.spouse = {};
+      }
+      founder.maritalStatus.spouse[fieldForm] = value;
+    }
+  
+    else if (field?.startsWith('marriageType-')) {
+      const fieldForm = field.split("-")[1];
+      if (!founder.maritalStatus.marriageType) {
+        founder.maritalStatus.marriageType = { type: founder.bienesMancomunados ? 2 : 1 };
+      }
+      founder.maritalStatus.marriageType[fieldForm] = value;
+    }
+  
+    else if (field === 'address') {
+      founder.address.name = value;
+    }
+  
+    else if (["district", "province", "department"].includes(field)) {
+      founder.address[field] = value;
+    }
+  
+    else if (field === 'maritalStatus') {
+      founder.maritalStatus.civilStatus = value?.toLowerCase();
+      const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
+  
+      if (isCasado) {
+        founder.maritalStatus.marriageType = {
+          type: founder.bienesMancomunados ? 1 : 2
+        };
+  
+        if (founder.bienesMancomunados) {
+          founder.maritalStatus.spouse = {};
+        } else {
+          founder.maritalStatus.spouse = null;
+        }
+      } else {
+        founder.maritalStatus.spouse = null;
+        founder.maritalStatus.marriageType = null;
+      }
+    }
+  
+    else {
+      founder[field] = value;
+    }
+  
+    list[index] = founder;
     setFounders(list);
   };
 
