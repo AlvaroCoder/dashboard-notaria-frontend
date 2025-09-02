@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, FileText } from "lucide-react";
 import ButtonDownloadPdf from './ButtonDownloadPdf';
+import CardJuniorPerson from '../Cards/CardJuniorPerson';
 
 export default function CardContract({
     contract
@@ -15,7 +16,8 @@ export default function CardContract({
       paymentMethod,
       case: caseType,
       minutaDirectory,
-      datesDocument
+      datesDocument,
+      juniorId
     } = contract;
   
     const toggleOpen = () => setIsOpen(!isOpen);
@@ -42,14 +44,18 @@ export default function CardContract({
         {isOpen && (
           <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-2 text-sm text-gray-700">
             <div>
-              <strong>Vendedores:</strong> {sellers?.people?.length}
+            <p className='flex flex-row items-center gap-4 mt-4'>
+            <span>Junior asignado : </span>
+           {
+              juniorId ?
+                <CardJuniorPerson
+                juniorId={juniorId}
+              /> :
+              <span>--</span>
+            }
+          </p>
             </div>
-            <div>
-              <strong>Compradores:</strong> {buyers?.people?.length}
-            </div>
-            <div>
-              <strong>Método de pago:</strong> {paymentMethod?.caption || "No especificado"}
-            </div>
+            
             <div className="flex items-center gap-2">
               <strong>Minuta:</strong>
               {minutaDirectory ? (

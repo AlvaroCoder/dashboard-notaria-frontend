@@ -20,6 +20,7 @@ export default function TableroContratos({
   baseSlugIdContract='/dashboard/contracts/inmueble/',
   slugCreateProcess='/dashboard/contracts/inmueble/form-add',
   showAddButton=true,
+  showMinuta=true
 }) {
   const [vista, setVista] = useState("tabla"); // "tabla" o "canvas"
   const router = useRouter();
@@ -68,8 +69,12 @@ export default function TableroContratos({
                 <TableHead>Número</TableHead>
                 <TableHead>Tipo de Contrato</TableHead>
                 <TableHead>Junior Asignado</TableHead>
-                <TableHead>Minuta</TableHead>
+                {
+                  showMinuta &&
+                  <TableHead>Minuta</TableHead>
+                }
                 <TableHead>Estado</TableHead>
+                
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -84,11 +89,14 @@ export default function TableroContratos({
                   <TableCellJunior
                     juniorId={contrato?.juniorId}
                   />
-                  <TableCell>
+                  {
+                    showMinuta &&
+                    <TableCell>
                     <ButtonDownloadPdf
                       minutaDirectory={contrato?.minutaDirectory}
                     />
                   </TableCell>
+                  }
                   <TableCell>
                     {estadosContrato?.filter((_, idx)=>contrato.status === idx+1).map((item)=>(
                       <p key={idx} className={cn(item.bgColor, 'w-32 p-1 rounded-sm text-wrap text-center')}>{item?.title}</p>

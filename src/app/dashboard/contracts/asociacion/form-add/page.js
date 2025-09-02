@@ -230,7 +230,7 @@ function RenderApp({
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "escritura_asociacion.docx";
+      a.download = `escritura-${idContract}.docx`;
       document.body.appendChild(a); 
       a.click();
       document.body.removeChild(a);

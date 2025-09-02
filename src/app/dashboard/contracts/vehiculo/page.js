@@ -27,6 +27,7 @@ export default function Page() {
                     slugCreateProcess='/dashboard/contracts/vehiculo/form-add'
                     baseSlugIdContract='/dashboard/contracts/vehiculo/'
                     dataContracts={typeof(dataResponseVehicles?.data) ==='string'?[]: dataResponseVehicles?.data }
+                    showMinuta={false}
                 />
         </div>
     </div>

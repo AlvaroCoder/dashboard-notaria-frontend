@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { TextField, Paper } from "@mui/material";
+import { TextField, Paper, FormControl, Select, InputLabel, MenuItem } from "@mui/material";
 import { FileText, User, CalendarDays, Building2, Loader2 } from "lucide-react";
 import Title1 from "../elements/Title1";
 import { Button } from "../ui/button";
@@ -156,14 +156,19 @@ export default function TestimonyForm({
           error={hasError("testimony.registrarData.registrar")}
           helperText={hasError("testimony.registrarData.registrar") ? "Este campo es obligatorio" : ""}
         />
-        <TextField
-          label="Género"
-          fullWidth
+      <FormControl fullWidth error={hasError("testimony.registrarData.gender")}>
+        <InputLabel>Género</InputLabel>
+        <Select
           value={formData.testimony.registrarData.gender}
           onChange={(e) => handleChange(e, "registrarData", "gender")}
-          error={hasError("testimony.registrarData.gender")}
-          helperText={hasError("testimony.registrarData.gender") ? "Este campo es obligatorio" : ""}
-        />
+        >
+          <MenuItem value="M">Masculino</MenuItem>
+          <MenuItem value="F">Femenino</MenuItem>
+        </Select>
+        {hasError("testimony.registrarData.gender") && (
+          <p style={{ color: "red", fontSize: "0.8rem" }}>Este campo es obligatorio</p>
+        )}
+      </FormControl>
         <TextField
           label="Oficina de registro"
           fullWidth

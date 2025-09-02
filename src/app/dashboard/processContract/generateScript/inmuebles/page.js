@@ -85,9 +85,7 @@ function RenderPageScript() {
               if (!isMounted) return;
         
               if (obj && Array.isArray(obj.evidences)) {
-                try {
-                    console.log(obj.evidences);
-                    
+                try {            
                   const promiseImages = obj.evidences.map(async (image) => {
                     const responseImage = await fetchImageEvidence(image);
                     const blob = await responseImage.blob();
@@ -96,11 +94,8 @@ function RenderPageScript() {
 
                     return blob;
                   });
-                  console.log(imageUrls);
                   
-                  const images = await Promise.all(promiseImages);
-                  console.log(images);
-                  
+                  const images = await Promise.all(promiseImages);                  
                   setImagesMinuta(images);
                 } catch (error) {
                   console.error("Error cargando imágenes:", error);
@@ -259,7 +254,6 @@ function RenderPageScript() {
                 ...dataSendMinuta,
                 contractId : idContract
             };
-            console.log(imagesMinuta);
             
             if (imagesMinuta && imagesMinuta.length > 0) {                
                 if (Array.isArray(dataContract?.evidences) && dataContract?.evidences?.length > 0) {
@@ -296,7 +290,7 @@ function RenderPageScript() {
 
             const a = document.createElement('a');
             a.href = url;
-            a.download = "escritura-scrl.docx";
+            a.download = `escritura-${idContract}.docx`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

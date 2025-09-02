@@ -38,7 +38,6 @@ export default function FormFounders({
   };
 
   const [founders, setFounders] = React.useState(initialFounder ? initialFounder : [initialDataFounder]);
-  console.log(founders);
   
   const handleChangeFounder = (index, field, value) => {
     const list = [...founders];
