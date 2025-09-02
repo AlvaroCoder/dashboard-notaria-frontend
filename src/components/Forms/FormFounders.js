@@ -53,7 +53,7 @@ export default function FormFounders({
       } else {
         founder.maritalStatus.spouse = null;
         founder.maritalStatus.marriageType = {
-          type: 2,
+          type: 1,
           partidaRegistralNumber: "",
           province: ""
         };
@@ -71,7 +71,7 @@ export default function FormFounders({
     else if (field?.startsWith('marriageType-')) {
       const fieldForm = field.split("-")[1];
       if (!founder.maritalStatus.marriageType) {
-        founder.maritalStatus.marriageType = { type: founder.bienesMancomunados ? 2 : 1 };
+        founder.maritalStatus.marriageType = { type: founder.bienesMancomunados ? 2 : 1};
       }
       founder.maritalStatus.marriageType[fieldForm] = value;
     }
@@ -90,7 +90,7 @@ export default function FormFounders({
   
       if (isCasado) {
         founder.maritalStatus.marriageType = {
-          type: founder.bienesMancomunados ? 1 : 2
+          type: founder.bienesMancomunados ? 2 : 1
         };
   
         if (founder.bienesMancomunados) {
