@@ -38,7 +38,8 @@ export default function FormFounders({
   };
 
   const [founders, setFounders] = React.useState(initialFounder ? initialFounder : [initialDataFounder]);
-
+  console.log(founders);
+  
   const handleChangeFounder = (index, field, value) => {
     const list = [...founders];
   
@@ -54,6 +55,11 @@ export default function FormFounders({
       }
       list[index].maritalStatus.spouse[fieldForm] = value;
     }
+    else if (field?.startsWith('marriageType-')) {
+      const fieldForm = field.split("-")[1];
+      list[index].maritalStatus.marriageType[fieldForm] = value;
+      list[index].maritalStatus.spouse = null;
+    }
     else if (field === 'address') {
       list[index].address.name = value;
     }
@@ -65,9 +71,12 @@ export default function FormFounders({
       const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
       if (isCasado) {
         list[index].maritalStatus.marriageType = { type : list[index].bienesMancomunados ? 1 : 2};
-        list[index].maritalStatus.spouse = {
-          age : 19
-        };
+        if (list[index].bienesMancomunados) {
+          list[index].maritalStatus.spouse = {
+            age : 19
+          };
+        }
+        
       }
     }
     else {
@@ -189,8 +198,8 @@ export default function FormFounders({
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 mt-8">
-                        <TextField label="Nro Partida Registral" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-partidaRegistralNumber', e.target.value, person.bienesMancomunados)} />
-                        <TextField label="Oficina Registral (lugar)" placeholder="Provincia" onChange={(e) => handleChangeFounder(idx, 'spouse-province', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="Nro Partida Registral" type="number" onChange={(e) => handleChangeFounder(idx, 'marriageType-partidaRegistralNumber', e.target.value, person.bienesMancomunados)} />
+                        <TextField label="Oficina Registral (lugar)" placeholder="Provincia" onChange={(e) => handleChangeFounder(idx, 'marriageType-province', e.target.value, person.bienesMancomunados)} />
                         </div>
                     )}
                     </section>

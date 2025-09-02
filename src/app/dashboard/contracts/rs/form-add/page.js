@@ -320,7 +320,6 @@ function RenderApp({
         <section className='w-full flex justify-center items-center'>
           <div className='max-w-5xl w-full'>
           <FormFounders
-           initialFounder={dataSendMinuta?.founders?.people}
            handleClickBack={backActiveStep}
            handleSendFounder={handleSubmitFormStepperPerson}
           />
