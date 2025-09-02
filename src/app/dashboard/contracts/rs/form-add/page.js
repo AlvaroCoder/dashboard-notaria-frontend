@@ -11,7 +11,6 @@ import { headersTableroCliente } from '@/data/Headers';
 import { useFetch } from '@/hooks/useFetch';
 import { useSession } from '@/hooks/useSesion';
 import { asignJuniorToContracts, generateScriptContract, getDataContractByIdContract} from '@/lib/apiConnections';
-import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
 import { formatDateToYMD } from '@/lib/fechas';
 import { funUploadDataMinuta } from '@/lib/functionUpload';
 import { TextField } from '@mui/material';
@@ -320,6 +319,7 @@ function RenderApp({
         <section className='w-full flex justify-center items-center'>
           <div className='max-w-5xl w-full'>
           <FormFounders
+           initialFounder={dataSendMinuta?.founders?.people}
            handleClickBack={backActiveStep}
            handleSendFounder={handleSubmitFormStepperPerson}
           />

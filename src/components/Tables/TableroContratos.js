@@ -11,6 +11,7 @@ import CardContract from "../elements/CardContract";
 import { useRouter } from "next/navigation";
 import ButtonDownloadPdf from "../elements/ButtonDownloadPdf";
 import { estadosContrato } from "@/data/Features";
+import TableCellJunior from "./TableCells/TableCellJunior";
 
 
 export default function TableroContratos({
@@ -66,11 +67,8 @@ export default function TableroContratos({
               <TableRow>
                 <TableHead>Número</TableHead>
                 <TableHead>Tipo de Contrato</TableHead>
-                <TableHead>Tipo de Bien</TableHead>
-                <TableHead>Compradores</TableHead>
-                <TableHead>Vendedores</TableHead>
+                <TableHead>Junior Asignado</TableHead>
                 <TableHead>Minuta</TableHead>
-                <TableHead>Tipo de Pago</TableHead>
                 <TableHead>Estado</TableHead>
               </TableRow>
             </TableHeader>
@@ -83,21 +81,14 @@ export default function TableroContratos({
                     {contrato?.case || contrato?.contractType}
                     </Link>
                   </TableCell>
-                  <TableCell>{"Inmueble"}</TableCell>
-                  <TableCell>{
-                      contrato?.buyers?.people?.map((person, idx)=><p key={idx}>{person?.firstName} {person?.lastName}</p>)
-                    }</TableCell>
-                  <TableCell>{
-                    contrato?.sellers?.people?.map((person, idx)=><p key={idx}>{person?.firstName} {person?.lastName}</p>)
-                    }</TableCell>
+                  <TableCellJunior
+                    juniorId={contrato?.juniorId}
+                  />
                   <TableCell>
                     <ButtonDownloadPdf
                       minutaDirectory={contrato?.minutaDirectory}
                     />
                   </TableCell>
-                  <TableCell>
-                    <p className="text-sm break-words whitespace-normal w-20">
-                      {contrato.paymentMethod?.caption}</p></TableCell>
                   <TableCell>
                     {estadosContrato?.filter((_, idx)=>contrato.status === idx+1).map((item)=>(
                       <p key={idx} className={cn(item.bgColor, 'w-32 p-1 rounded-sm text-wrap text-center')}>{item?.title}</p>

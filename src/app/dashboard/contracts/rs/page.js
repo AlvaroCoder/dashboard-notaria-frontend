@@ -25,7 +25,7 @@ export default function Page() {
             <TableroContratos
                 titulo='Constitucion de SAC'
                 dataContracts={typeof(dataResponseRS)==='string' ? [] : dataResponseRS}
-                baseSlugIdContract='/dashboard/contracts/rs'
+                baseSlugIdContract='/dashboard/contracts/rs/'
                 slugCreateProcess='/dashboard/contracts/rs/form-add'
             />
         </div>
