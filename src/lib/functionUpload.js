@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { sendDataMinuta, sendMinutaWord, submitDataPreMinuta, submitDataPreMinuta2 } from "./apiConnections";
 import { formatDateToYMD } from "./fechas";
 
- export const funUploadDataMinuta=async(minutaWord, minutaPdf, clientId, contractType='sac')=>{
+ export const funUploadDataMinuta=async(minutaPdf, clientId, contractType='sac')=>{
     const newFormDataPdf = new FormData();
     newFormDataPdf.append('minutaFile', minutaPdf);
 
@@ -33,12 +33,7 @@ import { formatDateToYMD } from "./fechas";
     const responsePreMinutaJSON =  await responsePreMinuta.json();
     
     const idContract = responsePreMinutaJSON?.contractId;
-    
-    const newFormDataWord = new FormData();
-    newFormDataWord.append('minutaFile', minutaWord);
-
-    await sendMinutaWord(newFormDataWord, idContract);
-    
+        
     return {idContract}
   }
 

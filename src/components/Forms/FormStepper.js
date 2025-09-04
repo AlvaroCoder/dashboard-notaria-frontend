@@ -47,7 +47,6 @@ export default function FormStepper({
       setVendedores((prev) => (typeof updater === 'function' ? updater(prev) : updater));
     }
   }, []);
-  console.log(compradores);
   
   /**
    * Maneja TODOS los cambios de campos (normales y anidados)

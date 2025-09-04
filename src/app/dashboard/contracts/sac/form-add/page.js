@@ -186,7 +186,6 @@ function RenderApp({
       setLoading(true);
 
       const {idContract} = await funUploadDataMinuta(
-        dataMinuta?.minutaWord, 
         dataMinuta?.minutaPdf, 
         dataSelected?.client?.id);
         

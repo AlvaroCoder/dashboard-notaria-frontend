@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import Title1 from "../elements/Title1";
-import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { cn } from "@/lib/utils";
 
 const getMaritalOptions = (gender) => {
@@ -25,6 +25,7 @@ export default function FormFounders({
     age: '19',
     job: "",
     maritalStatus: {
+      moreInfo : false,
       civilStatus: "soltero",
       spouse: null
     },
@@ -43,6 +44,11 @@ export default function FormFounders({
     const list = [...founders];
     const founder = list[index];
   
+    if (field === 'moreInfo') {
+      founder.maritalStatus.moreInfo = Boolean(value);
+      founder.maritalStatus.spouse = null;
+    }
+
     if (field === 'bienesMancomunados') {
       founder.bienesMancomunados = value;
   
@@ -88,6 +94,7 @@ export default function FormFounders({
       const isCasado = value?.toLowerCase() === 'casado' || value?.toLowerCase() === 'casada';
   
       if (isCasado) {
+        founder.maritalStatus.moreInfo = true;
         founder.maritalStatus.marriageType = {
           type: founder.bienesMancomunados ? 2 : 1
         };
@@ -205,12 +212,23 @@ export default function FormFounders({
 
                     {person.bienesMancomunados ? (
                         <div className="grid grid-cols-2 gap-4 mt-8">
-                        <TextField label="Primer Nombre" onChange={(e) => handleChangeFounder(idx, 'spouse-firstName', e.target.value, person.bienesMancomunados)} />
-                        <TextField label="Apellido" onChange={(e) => handleChangeFounder(idx, 'spouse-lastName', e.target.value, person.bienesMancomunados)} />
-                        <TextField label="DNI" type="number" onChange={(e) => handleChangeFounder(idx, 'spouse-dni', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Primer Nombre" 
+                          onChange={(e) => handleChangeFounder(idx, 'spouse-firstName', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Apellido" 
+                          onChange={(e) => handleChangeFounder(idx, 'spouse-lastName', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="DNI" 
+                          type="number" 
+                          onChange={(e) => handleChangeFounder(idx, 'spouse-dni', e.target.value, person.bienesMancomunados)} />
                         <FormControl>
                             <InputLabel>Género</InputLabel>
                             <Select
+                            disabled={!person.maritalStatus.moreInfo}
                             value={person?.maritalStatus?.spouse?.gender || ''}
                             onChange={(e) => handleChangeFounder(idx, 'spouse-gender', e.target.value, person.bienesMancomunados)}
                             >
@@ -218,13 +236,47 @@ export default function FormFounders({
                             <MenuItem value="F">Femenino</MenuItem>
                             </Select>
                         </FormControl>
-                        <TextField label="Nacionalidad" onChange={(e) => handleChangeFounder(idx, 'spouse-nationality', e.target.value, person.bienesMancomunados)} />
-                        <TextField label="Trabajo" className="col-span-2" onChange={(e) => handleChangeFounder(idx, 'spouse-job', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Nacionalidad" 
+                          onChange={(e) => handleChangeFounder(idx, 'spouse-nationality', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Trabajo" 
+                          className="col-span-2" 
+                          onChange={(e) => handleChangeFounder(idx, 'spouse-job', e.target.value, person.bienesMancomunados)} />
+                        <div>
+                        <FormGroup>
+                              <FormControlLabel control={
+                                <Checkbox  
+                                  checked={person.maritalStatus.moreInfo}
+                                  onChange={(e)=>handleChangeFounder(idx,'moreInfo', e.target.checked)}
+                                />
+                              } label="Brindar informacion del conyugues" />
+                            </FormGroup>
+                        </div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 mt-8">
-                        <TextField label="Nro Partida Registral" type="number" onChange={(e) => handleChangeFounder(idx, 'marriageType-partidaRegistralNumber', e.target.value, person.bienesMancomunados)} />
-                        <TextField label="Oficina Registral (lugar)" placeholder="Provincia" onChange={(e) => handleChangeFounder(idx, 'marriageType-province', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Nro Partida Registral" 
+                          type="number" 
+                          onChange={(e) => handleChangeFounder(idx, 'marriageType-partidaRegistralNumber', e.target.value, person.bienesMancomunados)} />
+                        <TextField 
+                          disabled={!person.maritalStatus.moreInfo}
+                          label="Oficina Registral (lugar)" 
+                          placeholder="Provincia" onChange={(e) => handleChangeFounder(idx, 'marriageType-province', e.target.value, person.bienesMancomunados)} />
+                        <div>
+                        <FormGroup>
+                              <FormControlLabel control={
+                                <Checkbox  
+                                  checked={person.maritalStatus.moreInfo}
+                                  onChange={(e)=>handleChangeFounder(idx,'moreInfo', e.target.checked)}
+                                />
+                              } label="Brindar informacion del conyugues" />
+                            </FormGroup>
+                        </div>
                         </div>
                     )}
                     </section>
