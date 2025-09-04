@@ -18,6 +18,7 @@ const mkPerson = () => ({
   bienesMancomunados: true,
   address: { name: '', district: '', province: '', department: '' },
   maritalStatus: { 
+    moreInfo : false,
     civilStatus: 'soltero',
     spouse : null
   } // minúsculas para UI
@@ -36,6 +37,7 @@ export default function FormStepper({
   const [errores, setErrores] = useState([]);
 
   const [compradores, setCompradores] = useState([mkPerson()]);
+  
   const [vendedores, setVendedores] = useState([mkPerson()]);
 
   const setData = useCallback((personType, updater) => {
@@ -45,7 +47,8 @@ export default function FormStepper({
       setVendedores((prev) => (typeof updater === 'function' ? updater(prev) : updater));
     }
   }, []);
-
+  console.log(compradores);
+  
   /**
    * Maneja TODOS los cambios de campos (normales y anidados)
    * field puede ser:
@@ -56,6 +59,7 @@ export default function FormStepper({
    *  - 'spouse-*'  (firstName, dni, gender, nationality, age, job)
    *  - 'marriageType-*' (partidaRegistralNumber, province)
    */
+  
   const handleChange = useCallback((index, field, value, personType, bienesMancomunados = false) => {
     setData(personType, (prevData) => {
       const list = [...prevData];
@@ -65,6 +69,10 @@ export default function FormStepper({
       if (!person.address) person.address = {};
       if (!person.maritalStatus) person.maritalStatus = {};
 
+      if (field === 'moreInfo') {
+        person.maritalStatus.moreInfo = Boolean(value);
+        person.maritalStatus.spouse = null;
+      }
       // Cambiar tipo de bienes
       if (field === 'bienesMancomunados') {
         person.bienesMancomunados = Boolean(value);
@@ -75,7 +83,7 @@ export default function FormStepper({
             // Mancomunados => type 2 + spouse presente
             person.maritalStatus.marriageType = { type: 2 };
             if (!person.maritalStatus.spouse) {
-              person.maritalStatus.spouse = { age: 19 };
+              person.maritalStatus.spouse = {  };
             }
           } else {
             // Separados => type 1 + sin spouse
@@ -98,10 +106,11 @@ export default function FormStepper({
         const isCasado = civil === 'casado' || civil === 'casada';
 
         if (isCasado) {
+          person.maritalStatus.moreInfo = true;
           if (bienesMancomunados) {
             person.maritalStatus.marriageType = { type: 2 };
             if (!person.maritalStatus.spouse) {
-              person.maritalStatus.spouse = { age: 19 };
+              person.maritalStatus.spouse = {  };
             }
           } else {
             person.maritalStatus.marriageType = {
@@ -151,6 +160,8 @@ export default function FormStepper({
       return list;
     });
   }, [setData]);
+
+
 
   const addPerson = useCallback((personType) => {
     setData(personType, (prev) => [...prev, mkPerson()]);

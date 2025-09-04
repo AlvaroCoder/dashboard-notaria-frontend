@@ -443,7 +443,7 @@ function RenderCardsFormStepper({
                 />
               <section className='grid grid-cols-1 lg:grid-cols-2 gap-4 my-4'>
                 <TextField
-                  label="Nro de propiedad"
+                  label="Nro de partida registral"
                   type='number'
                   onChange={(e)=>setDataSendMinuta((prev)=>({...dataSendMinuta, vehicleData : {...prev.vehicleData, propertyRecord : {...prev.vehicleData.propertyRecord, number : e.target.value}}}))}
                   required

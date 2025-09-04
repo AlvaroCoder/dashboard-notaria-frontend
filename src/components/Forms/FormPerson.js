@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Trash2 } from 'lucide-react';
 import ErrorCard from '../elements/ErrorCard';
 import Title1 from '../elements/Title1';
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const getMaritalOptions = (gender) => {
   if (gender === 'F') return ['soltera', 'casada', 'viuda', 'divorciada'];
@@ -18,19 +18,54 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
   if (person?.bienesMancomunados) {
     return (
       <div className="grid grid-cols-2 gap-4 mt-8">
-        <TextField label="Primer Nombre" value={person?.maritalStatus?.spouse?.firstName || ''} onChange={(e) => onChange(idx, 'spouse-firstName', e.target.value, personType, person?.bienesMancomunados)} required />
-        <TextField label="Apellido" value={person?.maritalStatus?.spouse?.lastName || ''} onChange={(e) => onChange(idx, 'spouse-lastName', e.target.value, personType, person?.bienesMancomunados)} required />
-        <TextField label="DNI" type="number" value={person?.maritalStatus?.spouse?.dni || ''} onChange={(e) => onChange(idx, 'spouse-dni', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField 
+          disabled={!person.maritalStatus.moreInfo}
+          label="Primer Nombre" 
+          value={person?.maritalStatus?.spouse?.firstName || ''} 
+          onChange={(e) => onChange(idx, 'spouse-firstName', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField 
+          disabled={!person.maritalStatus.moreInfo}
+          label="Apellido" 
+          value={person?.maritalStatus?.spouse?.lastName || ''} 
+          onChange={(e) => onChange(idx, 'spouse-lastName', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField 
+          disabled={!person.maritalStatus.moreInfo}
+          label="DNI" 
+          type="number" 
+          value={person?.maritalStatus?.spouse?.dni || ''} 
+          onChange={(e) => onChange(idx, 'spouse-dni', e.target.value, personType, person?.bienesMancomunados)} required />
         <FormControl required>
           <InputLabel>Género</InputLabel>
-          <Select value={person?.maritalStatus?.spouse?.gender || ''} onChange={(e) => onChange(idx, 'spouse-gender', e.target.value, personType, person?.bienesMancomunados)} required>
+          <Select 
+            disabled={!person.maritalStatus.moreInfo}
+            value={person?.maritalStatus?.spouse?.gender || ''} 
+            onChange={(e) => onChange(idx, 'spouse-gender', e.target.value, personType, person?.bienesMancomunados)} required>
             <MenuItem value="M">Masculino</MenuItem>
             <MenuItem value="F">Femenino</MenuItem>
           </Select>
         
         </FormControl>
-        <TextField label="Nacionalidad" value={person?.maritalStatus?.spouse?.nationality || ''} onChange={(e) => onChange(idx, 'spouse-nationality', e.target.value, personType, person?.bienesMancomunados)} required />
-        <TextField label="Trabajo" className="col-span-2" value={person?.maritalStatus?.spouse?.job || ''} onChange={(e) => onChange(idx, 'spouse-job', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField 
+          disabled={!person.maritalStatus.moreInfo}
+          label="Nacionalidad" 
+          value={person?.maritalStatus?.spouse?.nationality || ''} 
+          onChange={(e) => onChange(idx, 'spouse-nationality', e.target.value, personType, person?.bienesMancomunados)} required />
+        <TextField 
+          disabled={!person.maritalStatus.moreInfo}
+          label="Trabajo" 
+          className="col-span-2" 
+          value={person?.maritalStatus?.spouse?.job || ''} 
+          onChange={(e) => onChange(idx, 'spouse-job', e.target.value, personType, person?.bienesMancomunados)} required />
+        <div>
+          <FormGroup>
+            <FormControlLabel control={
+              <Checkbox  
+                checked={person.maritalStatus.moreInfo}
+                onChange={(e)=>onChange(idx,'moreInfo', e.target.checked, personType, person?.bienesMancomunados)}
+              />
+            } label="Brindar informacion del conyugues" />
+          </FormGroup>
+        </div>
       </div>
     );
   }
@@ -38,16 +73,28 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
   return (
     <div className="grid grid-cols-1 gap-4 mt-8">
       <TextField
+        disabled={!person.maritalStatus.moreInfo}
         label="Nro Partida Registral"
         type="number"
         value={person?.maritalStatus?.marriageType?.partidaRegistralNumber || ''}
         onChange={(e) => onChange(idx, 'marriageType-partidaRegistralNumber', e.target.value, personType, person?.bienesMancomunados)}
       />
       <TextField
+        disabled={!person.maritalStatus.moreInfo}
         label="Provincia de la Boda"
         value={person?.maritalStatus?.marriageType?.province || ''}
         onChange={(e) => onChange(idx, 'marriageType-province', e.target.value, personType, person?.bienesMancomunados)}
       />
+      <div>
+      <FormGroup>
+            <FormControlLabel control={
+              <Checkbox  
+                checked={person.maritalStatus.moreInfo}
+                onChange={(e)=>onChange(idx,'moreInfo', e.target.checked, personType, person?.bienesMancomunados)}
+              />
+            } label="Brindar informacion del conyugues" />
+          </FormGroup>
+      </div>
     </div>
   );
 };
@@ -55,6 +102,7 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
 export default function FormPerson({
   data = [],
   handleChange = () => {},
+  handleGiveSpouseData = ()=>{},
   type = 'venta',
   handleDelete = () => {},
   errores = [],

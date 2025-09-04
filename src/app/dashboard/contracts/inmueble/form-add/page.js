@@ -245,6 +245,8 @@ function RenderCardsFormStepper({
                 newDataSendMinuta.paymentMethod = null;
             }
             
+            console.log(newDataSendMinuta);
+            
             if (dataSession?.payload?.role === 'junior') {
                 const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
                 if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
@@ -264,6 +266,8 @@ function RenderCardsFormStepper({
             const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta);
             
             if (!response.ok || response.status === 406) {
+                console.log(await response.json());
+                
                 toast("Sucedio un error",{
                     type :'error',
                     position : 'bottom-center'

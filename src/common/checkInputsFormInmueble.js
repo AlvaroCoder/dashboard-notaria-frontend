@@ -30,28 +30,31 @@ export function checkEmptyFieldsFormCompra(dataCompra) {
       const isCasado = civil === 'casado' || civil === 'casada';
   
       if (isCasado) {
-        if (person.bienesMancomunados) {
-          // Bienes mancomunados => validar spouse completo
-          const spouse = person.maritalStatus?.spouse;
-          if (
-            !spouse ||
-            !spouse.firstName || !spouse.lastName ||
-            !spouse.dni || !spouse.gender ||
-            !spouse.job || !spouse.nationality
-          ) {
-            hasError = true;
-          }
-        } else {
-          // Bienes separados => validar marriageType
-          const marriageType = person.maritalStatus?.marriageType;
-          if (
-            !marriageType ||
-            !marriageType.partidaRegistralNumber ||
-            !marriageType.province
-          ) {
-            hasError = true;
+        if (person.maritalStatus.moreInfo) {
+          if (person.bienesMancomunados) {
+            // Bienes mancomunados => validar spouse completo
+            const spouse = person.maritalStatus?.spouse;
+            if (
+              !spouse ||
+              !spouse.firstName || !spouse.lastName ||
+              !spouse.dni || !spouse.gender ||
+              !spouse.job || !spouse.nationality
+            ) {
+              hasError = true;
+            }
+          } else {
+            // Bienes separados => validar marriageType
+            const marriageType = person.maritalStatus?.marriageType;
+            if (
+              !marriageType ||
+              !marriageType.partidaRegistralNumber ||
+              !marriageType.province
+            ) {
+              hasError = true;
+            }
           }
         }
+
       }
   
       if (hasError) {
