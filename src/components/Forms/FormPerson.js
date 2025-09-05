@@ -63,7 +63,7 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
                 checked={person.maritalStatus.moreInfo}
                 onChange={(e)=>onChange(idx,'moreInfo', e.target.checked, personType, person?.bienesMancomunados)}
               />
-            } label="Brindar informacion del conyugues" />
+            } label="Brindar información marital" />
           </FormGroup>
         </div>
       </div>
@@ -92,7 +92,7 @@ const SpouseFields = ({ person, onChange, idx, personType }) => {
                 checked={person.maritalStatus.moreInfo}
                 onChange={(e)=>onChange(idx,'moreInfo', e.target.checked, personType, person?.bienesMancomunados)}
               />
-            } label="Brindar informacion del conyugues" />
+            } label="Brindar información marital" />
           </FormGroup>
       </div>
     </div>

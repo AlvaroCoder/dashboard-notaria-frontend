@@ -102,7 +102,7 @@ function RenderPageContracts() {
       const dataToday = formatDateToYMD(new Date());
       await submitFirmarDocumento(idContract, dataToday);
       
-      toast("Se firmo el documento",{
+      toast("Se selló el documento",{
         type:'success',
         position : 'bottom-right'
       });

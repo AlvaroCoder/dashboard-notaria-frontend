@@ -420,7 +420,7 @@ function RenderCardsFormStepper({
             return (
                 <section className='min-w-3xl h-fit p-4 mt-8 bg-white rounded-xl shadow-sm text-xl'>
                     <section className='my-2'>
-                        <Title1 className='text-center text-2xl'>Sube los comprobantes de pago</Title1>
+                        <Title1 className='text-center text-2xl'>Sube los comprobantes de pago del inmueble</Title1>
                         <p className='text-center text-gray-600 text-sm'>Sube los comprobantes de pago en formato JPG, JPEG y PNG (No obligatorio)</p>
                     </section>
                     <ButtonUploadImageMinuta

@@ -116,7 +116,7 @@ export default function View3ContractsConstitucionFirma({
                 onClick={handleClickSetFirma}
                 className={"w-full my-4"}
             >
-                {loadingDataClient ? <Loader2 className='animate-spin'/> : <p>Notario Firmo la Escritura</p>}
+                {loadingDataClient ? <Loader2 className='animate-spin'/> : <p>Notario selló la Escritura</p>}
             </Button>
         </section>
     </div>

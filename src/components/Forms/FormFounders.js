@@ -252,7 +252,7 @@ export default function FormFounders({
                                   checked={person.maritalStatus.moreInfo}
                                   onChange={(e)=>handleChangeFounder(idx,'moreInfo', e.target.checked)}
                                 />
-                              } label="Brindar informacion del conyugues" />
+                              } label="Brindar información marital" />
                             </FormGroup>
                         </div>
                         </div>
@@ -274,7 +274,7 @@ export default function FormFounders({
                                   checked={person.maritalStatus.moreInfo}
                                   onChange={(e)=>handleChangeFounder(idx,'moreInfo', e.target.checked)}
                                 />
-                              } label="Brindar informacion del conyugues" />
+                              } label="Brindar información marital" />
                             </FormGroup>
                         </div>
                         </div>
