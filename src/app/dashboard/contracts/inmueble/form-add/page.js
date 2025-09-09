@@ -12,7 +12,7 @@ import { cardDataInmuebles } from '@/data/CardData';
 import FormUploadMinuta2 from '@/components/Forms/FormUploadMinuta2';
 import { headersTableroCliente } from '@/data/Headers';
 import { useContracts } from '@/context/ContextContract';
-import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias } from '@/lib/apiConnections';
+import { asignJuniorToContracts, generateScriptCompraVenta, getDataContractByIdContract, subirEvidencias, subirEvidenciasSinDirectorio } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -89,10 +89,6 @@ function RenderCardsFormStepper({
         }
     });
 
-    const [dataMinuta, setDataMinuta] = useState({
-        minutaPdf : null,
-        minutaWord : null,
-    });
     const [notarioSelected, setNotarioSelected] = useState(null);
     const [imagesMinuta, setImagesMinuta] = useState([]);
     const [dataContract, setDataContract] = useState(null);
@@ -113,14 +109,10 @@ function RenderCardsFormStepper({
         pushActiveStep();
     }
 
-    const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
+    const handleUploadMinuta=async( detailsMinuta, lawyer)=>{
         try {
             setLoading(true);
-            
-            setDataMinuta({
-                minutaPdf : minutaPdf
-            });
-
+        
             setDataSendMinuta({
                 ...dataSendMinuta,
                 minuta : {
@@ -131,13 +123,14 @@ function RenderCardsFormStepper({
                     place : {
                         name : detailsMinuta?.namePlace,
                         district : detailsMinuta?.districtPlace
-                    }
+                    },
+                    lawyer
                 }
             });
 
             pushActiveStep();
 
-            toast("Se creo el proceso",{
+            toast("Se guardo la información",{
                 type : 'success',
                 position : 'bottom-right'
             });
@@ -221,32 +214,31 @@ function RenderCardsFormStepper({
         try {
             setLoading(true);
             
-            const {idContract, fileLocation} = await funUploadDataMinutaCompraVenta(
-                dataMinuta?.minutaWord,
-                dataMinuta?.minutaPdf,
+            const {idContract} = await funUploadDataMinutaCompraVenta(
                 dataSelected?.client?.id,
                 'propertyCompraVenta',
-                dataSendMinuta?.case
             );
             
             let newDataSendMinuta = {
+                contractId : idContract,
                 ...dataSendMinuta,
-                contractId : idContract
-            }
+            };
         
             if (imagesMinuta && imagesMinuta.length > 0) {
-                const responseEvidencias = await subirEvidencias(imagesMinuta, fileLocation?.directory);
+                const {fileLocation} = await subirEvidenciasSinDirectorio(imagesMinuta);
+                const directory = fileLocation?.directory
+                
                 newDataSendMinuta.paymentMethod = {
                     ...dataSendMinuta?.paymentMethod,
-                    evidences : responseEvidencias
+                    evidences : fileLocation?.fileNames || [],
                 };
+                newDataSendMinuta.directory = `DB_evidences/${directory}`;
 
             } else {
                 newDataSendMinuta.paymentMethod = null;
+                newDataSendMinuta.directory = null;
             }
-            
-            console.log(newDataSendMinuta);
-            
+                        
             if (dataSession?.payload?.role === 'junior') {
                 const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
                 if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
@@ -265,9 +257,7 @@ function RenderCardsFormStepper({
 
             const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta);
             
-            if (!response.ok || response.status === 406) {
-                console.log(await response.json());
-                
+            if (!response.ok || response.status === 406) {                
                 toast("Sucedio un error",{
                     type :'error',
                     position : 'bottom-center'
@@ -376,18 +366,12 @@ function RenderCardsFormStepper({
               <main className='grid grid-cols-1 lg:grid-cols-3 gap-2'>
                 <div className='col-span-2'>
                     <FormUploadMinuta2
-                        loading={loading}
                         handleUploadMinuta={handleUploadMinuta}
-                        dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+                        backActiveStep={backActiveStep}
                         numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
                         districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
                     />
-                    <Button 
-                        onClick={backActiveStep}
-                        className={'w-full mt-4'}
-                    >
-                        Regresar
-                    </Button>
+ 
                 </div>
                 <section className='hidden col-span-1 bg-white p-4 h-fit shadow rounded-sm lg:flex flex-col gap-4'>
                     <section>

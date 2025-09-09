@@ -106,13 +106,9 @@ function RenderApp({
 
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async(detailsMinuta, lawyer)=>{
     try {
       setLoading(true);
-
-      setDataMinuta({
-        minutaPdf,
-      });
 
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -124,7 +120,8 @@ function RenderApp({
           place : {
             name : detailsMinuta?.namePlace,
             district : detailsMinuta?.districtPlace
-          } 
+          } ,
+          lawyer
         },
       });
       toast("Se creo el proceso",{
@@ -188,7 +185,6 @@ function RenderApp({
       setLoading(true);      
 
       const {idContract} = await funUploadDataMinuta(
-        dataMinuta?.minutaPdf,
         dataSelected?.client?.id,
         'asociacion'
       );
@@ -305,10 +301,8 @@ function RenderApp({
       return (
         <section className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
           <FormUploadMinuta2
-            loading={loading}
+            backActiveStep={backActiveStep}
             handleUploadMinuta={handleUploadMinuta}
-            dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
-            dataPreviewWord={dataMinuta?.minutaWord}
             numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
             districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
           />

@@ -107,14 +107,10 @@ function RenderApp({
   };
 
 
-  const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async( detailsMinuta, lawyer)=>{
     try {
     
       setLoading(true);
-
-      setDataMinuta({
-        minutaPdf,
-      });
 
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -126,7 +122,8 @@ function RenderApp({
           place : {
             name : detailsMinuta?.namePlace,
             district : detailsMinuta?.districtPlace
-          }
+          },
+          lawyer
         }
       })
       pushActiveStep();
@@ -186,8 +183,8 @@ function RenderApp({
       setLoading(true);
 
       const {idContract} = await funUploadDataMinuta(
-        dataMinuta?.minutaPdf, 
-        dataSelected?.client?.id);
+        dataSelected?.client?.id
+      );
         
       const newDataSendMinuta = {
         ...dataSendMinuta,
@@ -201,7 +198,7 @@ function RenderApp({
               type : 'error',
               position : 'bottom-center'
               });
-              return
+              return;
           }
 
           toast("Se asigno el Junior correctamente",{
@@ -210,7 +207,7 @@ function RenderApp({
           });
       }
 
-      const response = await generateScriptContract('sac',newDataSendMinuta);
+      const response = await generateScriptContract('sac', newDataSendMinuta);
       
       if (!response.ok || response.status == 406) {
         toast("Sucedio un error",{
@@ -295,9 +292,8 @@ function RenderApp({
       return (
         <section className='px-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
           <FormUploadMinuta2
-            loading={loading}
             handleUploadMinuta={handleUploadMinuta}
-            dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+            backActiveStep={backActiveStep}
             numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
             districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
           />

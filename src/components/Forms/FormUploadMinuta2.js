@@ -4,23 +4,15 @@ import React, { useState } from 'react'
 import Title1 from '../elements/Title1';
 import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
-import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react';
-import CardAviso from '../Cards/CardAviso';
-import UploadMinuta from '../elements/ButtonUploadMinuta';
 import { formatDateToYMD } from '@/lib/fechas';
-import { hasEmptyFieldsUploadMinuta } from '@/lib/commonFunction';
-import { toast } from 'react-toastify';
-import FramePdf from '../elements/FramePdf';
+import { Button } from '../ui/button';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 export default function FormUploadMinuta2({
     handleUploadMinuta=()=>{},
-    handleContinue=()=>{},
-    loading=false,
-    dataPreviewPdf=null,
+    backActiveStep=()=>{},
     numberMinuta='',
     districtPlaceMinuta='',
-    minutaDir=''
 }) {
     const [detailsMinuta, setDetailsMinuta] = useState({
         number : numberMinuta,
@@ -28,8 +20,13 @@ export default function FormUploadMinuta2({
         districtPlace : districtPlaceMinuta,
         creationDay : formatDateToYMD(new Date())
     });
-    const [minutaPdf, setMinutaPdf] = useState(null);
     
+    const [dataLawyer, setDataLawyer] = useState({
+        firstName : "",
+        lastName : "",
+        registrationNumber : ""
+    });
+
     const handleChange=(e)=>{
         const target = e.target;
         setDetailsMinuta({
@@ -37,6 +34,15 @@ export default function FormUploadMinuta2({
             [target.name] : target.value
         });
     };
+
+    const handleChangeLawyer=(e)=>{
+        const target = e.target;
+        setDataLawyer({
+            ...dataLawyer,
+            [target.name] : target.value
+        });
+    }
+
   return (
     <div className='col-span-2'>
         <section className={cn('flex flex-col gap-4')}>
@@ -84,72 +90,56 @@ export default function FormUploadMinuta2({
                         required
                     />
             </section>
-            {
-                minutaDir!='' ?
-                <div className='bg-white p-8 shadow rounded-sm'>
-                    <Title1>Minuta del cliente</Title1>
-                    <p>Minuta subida por el cliente</p>
-                    <FramePdf
-                        directory={minutaDir}
-                    />
-                    <Button 
-                        onClick={()=>{
-                            const emptyFields = hasEmptyFieldsUploadMinuta(detailsMinuta);
-                
-                            if (emptyFields) {
-                                toast("Debe completar los campos",{
-                                    type : 'error',
-                                    position : 'bottom-center'
-                                });
-                                return;
-                            }
-                            handleContinue(detailsMinuta);
-                        }}
-                    className={"w-full my-4"}>
-                        Continuar
-                    </Button>
-                </div> :
-                <section className='bg-white p-8 shadow rounded-sm'>
-                    <Title1>Sube la Minuta en PDF</Title1>
-                        <p>Sube la minuta en formato .pdf</p>
-                        <div className='my-2 space-y-6'>
-                            <CardAviso
-                                advise='LA MINUTA ES DEL CLIENTE, SE GUARDARÁ TAL CUAL EN LA BASE DE DATOS'
-                            />
-                        </div>
-                    <UploadMinuta
-                        dataPreview={dataPreviewPdf}
-                        handleSetFile={(data)=>setMinutaPdf(data)}
-                    />
-                    <Button
-                        disabled={loading || !minutaPdf}
-                        className='mt-4 w-full'
-                        onClick={()=>{
-                            const emptyFields = hasEmptyFieldsUploadMinuta(detailsMinuta);
-            
-                            if (emptyFields) {
-                                toast("Debe completar los campos",{
-                                    type : 'error',
-                                    position : 'bottom-center'
-                                });
-                                return;
-                            }
-            
-                            if (!minutaPdf) {
-                                toast("Debe subir la minuta",{
-                                    type : 'error',
-                                    position : 'bottom-center'
-                                });
-                                return;
-                            }
-
-                            handleUploadMinuta(detailsMinuta, minutaPdf)
-                        }}
-                    >
-                        {loading ? <Loader2 className='animate-spin'/> : <p>Subir Minuta</p>}
-                    </Button>
-                </section>
-            }
+            <section className='w-full p-8 bg-white shadow rounded-sm flex flex-col gap-4'>
+                <div>
+                    <Title1 className='text-xl'>Subir información del abogado</Title1>
+                    <p>Información importante para guardar al abogado</p>
+                </div>
+                <TextField
+                    label="Nombre del abogado"
+                    value={dataLawyer.firstName}
+                    className='mt-6'
+                    name='firstName'
+                    onChange={handleChangeLawyer}
+                    fullWidth
+                    required
+                />
+                <TextField
+                    label="Apellido del abogado"
+                    value={dataLawyer.lastName}
+                    className='mt-6'
+                    name='lastName'
+                    onChange={handleChangeLawyer}
+                    fullWidth
+                    required
+                />
+                <TextField
+                    label="Número de colegiatura"
+                    value={dataLawyer.registrationNumber}
+                    className='mt-6'
+                    type='number'
+                    name='registrationNumber'
+                    onChange={handleChangeLawyer}
+                    fullWidth
+                    required
+                />
+            </section>
+            <div className='flex flex-row gap-4 mt-4'>
+                <Button 
+                    onClick={backActiveStep}
+                    variant={"outline"}
+                >
+                    Regresar
+                </Button>
+                <Button
+                    className={"flex-1 "}
+                    onClick={()=>{
+                        handleUploadMinuta(detailsMinuta, dataLawyer);
+                    }}
+                >
+                    Continuar <ArrowForwardIcon className='ml-2' />
+                </Button>
+            </div>
         </section>
     </div>
   )

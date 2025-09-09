@@ -110,13 +110,11 @@ function RenderApp({
   };
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async( detailsMinuta, minutaPdf)=>{
+  const handleUploadMinuta=async( detailsMinuta, lawyer)=>{
     try {
       setLoading(true);
 
-      setDataMinuta({
-        minutaPdf
-      });
+
     
       setDataSendMinuta({
         ...dataSendMinuta,
@@ -128,7 +126,8 @@ function RenderApp({
           place : {
             name : detailsMinuta?.namePlace,
             district : detailsMinuta?.districtPlace
-          } 
+          } ,
+          lawyer
         }
       });
       pushActiveStep();
@@ -191,7 +190,6 @@ function RenderApp({
     try {
       setLoading(true);
       const {idContract} = await funUploadDataMinuta(
-        dataMinuta?.minutaPdf,
         dataSelected?.client?.id,
         'scrl'
       );
@@ -295,9 +293,8 @@ function RenderApp({
       return (
         <section className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-2'>
           <FormUploadMinuta2
-            loading={loading}
             handleUploadMinuta={handleUploadMinuta}
-            dataPreviewPdf={dataMinuta?.minutaPdf && URL.createObjectURL(dataMinuta?.minutaPdf)}
+            backActiveStep={backActiveStep}
             numberMinuta={dataSendMinuta?.minuta?.minutaNumber}
             districtPlaceMinuta={dataSendMinuta?.minuta?.place?.district}
           />
