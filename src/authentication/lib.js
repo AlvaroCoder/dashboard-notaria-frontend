@@ -56,7 +56,6 @@ export async function login(dataUser) {
     let decodedToken;
     try {
       decodedToken = jwtDecode(access_token);
-      console.log("Token decodificado:", decodedToken);
     } catch (error) {
       console.error("Error decodificando el token:", error);
       return { error: true, message: "Token inválido" };
@@ -72,8 +71,6 @@ export async function login(dataUser) {
       payload: decodedToken, // ✅ Guardamos también los datos decodificados
     };
     const session = await encrypt({ user, expires });
-    console.log(user);
-    console.log(session);
     
     (await cookies()).set("dashboard-session", session, {
       expires,
