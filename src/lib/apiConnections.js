@@ -167,10 +167,17 @@ export async function processDataMinuta(dataMinuta) {
     });
 }
 
-export async function sendDataMinuta(dataMinuta) {
-    return fetch(URL_SEND_MINUTA,{
+export async function sendDataMinuta(dataMinuta, directory="") {
+    return fetch(URL_SEND_MINUTA+"?dir="+directory,{
         method : 'POST',
         body : dataMinuta,
+        redirect : 'follow'
+    });
+}
+
+export async function uploadDirMinuta(contractId, minutaDir, fileName) {
+    return fetch(`${process.env.NEXT_PUBLIC_URL_CONTRACTS}/createMinutaDir?contractId=${contractId}&minutaDir=${minutaDir}&fileName=${fileName}`,{
+        method : 'POST',
         redirect : 'follow'
     });
 }

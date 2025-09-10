@@ -12,6 +12,7 @@ import CardAviso from '../Cards/CardAviso';
 import { updateEscrituraWord } from '@/lib/apiConnections';
 import { toast } from 'react-toastify';
 import Separator2 from '../elements/Separator2';
+import ViewButtonUploadMinuta from './ViewButtonUploadMinuta';
 
 // ✅ Dynamic imports
 const FramePdf = dynamic(() => import('@/components/elements/FramePdf'), { ssr: false });
@@ -84,10 +85,21 @@ export default function View2ContractEscritura({
 		<Separator2/>
 		<div className='mt-4'>
 			<Title1>Minuta Subida</Title1>
-			<FramePdf
-				directory={dataContract?.minutaDirectory}
-				
-			/>
+			{
+				dataContract?.minutaDirectory ?
+				<FramePdf
+					directory={dataContract?.minutaDirectory}
+				/> :
+				<div className='w-full p-4 rounded-sm'>
+					<CardAviso
+						advise='Aun no se sube la minuta'
+					/>
+					<ViewButtonUploadMinuta
+						contractId={dataContract?.id}
+						directory={dataContract?.directory?.split('/')[1]}
+					/>
+				</div>
+			}
 		</div>
 	</section>
 	<section className='bg-white p-4 rounded-lg mt-4 shadow'>
