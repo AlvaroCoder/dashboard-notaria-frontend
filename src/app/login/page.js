@@ -50,6 +50,8 @@ export default function Page() {
       setLoading(true);
       const response = await login(dataSend);
       if (response.error) {
+        console.log(response.message);
+        
         setError({
           title : 'Error ',
           description : response.message
