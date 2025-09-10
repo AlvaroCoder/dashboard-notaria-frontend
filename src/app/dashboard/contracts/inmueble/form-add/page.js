@@ -213,32 +213,36 @@ function RenderCardsFormStepper({
     const handleSubmitData=async()=>{
         try {
             setLoading(true);
-            
-            const {idContract} = await funUploadDataMinutaCompraVenta(
-                dataSelected?.client?.id,
-                'propertyCompraVenta',
-            );
-            
             let newDataSendMinuta = {
-                contractId : idContract,
                 ...dataSendMinuta,
-            };
-        
+                clientId : dataSelected?.client?.id,
+            }
+
+            let idContract = null;
             if (imagesMinuta && imagesMinuta.length > 0) {
-                const {fileLocation} = await subirEvidenciasSinDirectorio(imagesMinuta);
-                const directory = fileLocation?.directory
+                const formDataImages = new FormData();
+                imagesMinuta.forEach((image) => {
+                  formDataImages.append("evidence", image[0]);
+                });
+
+                const responseEvidencias = await subirEvidenciasSinDirectorio(formDataImages);
+                const fileLocation =( await responseEvidencias.json())?.fileLocation;
+                const directory = fileLocation?.directory;
+
+                const fileNames = fileLocation?.fileNames.map((fileName)=>`DB_evidences/${directory}/${fileName}`);
                 
-                newDataSendMinuta.paymentMethod = {
-                    ...dataSendMinuta?.paymentMethod,
-                    evidences : fileLocation?.fileNames || [],
-                };
-                newDataSendMinuta.directory = `DB_evidences/${directory}`;
+                newDataSendMinuta.paymentMethod.evidences = fileNames;
+
+                const {idContract : idC} = await funUploadDataMinutaCompraVenta(dataSelected?.client?.id, 'propertyCompraVenta', fileLocation?.fileNames, directory);
+                idContract = idC;
 
             } else {
-                newDataSendMinuta.paymentMethod = null;
-                newDataSendMinuta.directory = null;
+                const {idContract : idC} = await funUploadDataMinutaCompraVenta(dataSelected?.client?.id, 'propertyCompraVenta', null, null);
+                idContract = idC;
             }
-                        
+
+            newDataSendMinuta.contractId = idContract;
+            
             if (dataSession?.payload?.role === 'junior') {
                 const responseJuniorAsigned = await asignJuniorToContracts(idContract, dataSession?.payload?.id);
                 if (!responseJuniorAsigned.ok || responseJuniorAsigned.status === 406) {
@@ -258,6 +262,8 @@ function RenderCardsFormStepper({
             const response = await generateScriptCompraVenta('inmueble', newDataSendMinuta);
             
             if (!response.ok || response.status === 406) {                
+                console.log(await response.json());
+                
                 toast("Sucedio un error",{
                     type :'error',
                     position : 'bottom-center'

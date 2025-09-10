@@ -4,7 +4,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { aceptarEscritura, submitEscrituraCliente, submitFirmarDocumento } from '@/lib/apiConnections';
 import { formatDateToYMD } from '@/lib/fechas';
 import dynamic from 'next/dynamic';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React, { Suspense, useState } from 'react'
 import { toast } from 'react-toastify';
 

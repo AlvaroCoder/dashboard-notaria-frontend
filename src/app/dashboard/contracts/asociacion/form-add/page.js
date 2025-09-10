@@ -65,10 +65,6 @@ function RenderApp({
   
   const [notarioSelected, setNotarioSelected] = useState(null);
   const [dataContract, setDataContract] = useState(null);
-  const [dataMinuta, setDataMinuta] = useState({
-    minutaPdf : null,
-    minutaWord : null,
-  });
 
   const {
     activeStep, 
@@ -106,41 +102,27 @@ function RenderApp({
 
 
   // Se encarga de mandar la minuta y luego procesarla
-  const handleUploadMinuta=async(detailsMinuta, lawyer)=>{
-    try {
-      setLoading(true);
-
-      setDataSendMinuta({
-        ...dataSendMinuta,
-        minuta : {
-          minutaNumber : detailsMinuta?.number,
-          creationDay : {
-            date : detailsMinuta?.creationDay
-          },
-          place : {
-            name : detailsMinuta?.namePlace,
-            district : detailsMinuta?.districtPlace
-          } ,
-          lawyer
+  const handleUploadMinuta=(detailsMinuta, lawyer)=>{
+    setDataSendMinuta({
+      ...dataSendMinuta,
+      minuta : {
+        minutaNumber : detailsMinuta?.number,
+        creationDay : {
+          date : detailsMinuta?.creationDay
         },
-      });
-      toast("Se creo el proceso",{
-        type : 'success',
-        position : 'bottom-right'
-      });
-      
-      pushActiveStep();
-
-    } catch (err) {
-      console.log(err);
-      toast("Error con la vista de minuta",{
-        type : 'error',
-        position : 'bottom-center'
-      });
-      
-    } finally{
-      setLoading(false);
-    }
+        place : {
+          name : detailsMinuta?.namePlace,
+          district : detailsMinuta?.districtPlace
+        } ,
+        lawyer
+      },
+    });
+    toast("Se creo el proceso",{
+      type : 'success',
+      position : 'bottom-right'
+    });
+    
+    pushActiveStep();
   }
 
   const handleSubmitFormStepperPerson=(dataFounder)=>{
@@ -213,6 +195,8 @@ function RenderApp({
       const response = await generateScriptContract('asociacion',newDataSendMinuta);
       
       if (!response.ok || response.status == 406) {
+        console.log(await response.json());
+        
         toast("Sucedio un error",{
           type : 'error',
           position : 'bottom-center'

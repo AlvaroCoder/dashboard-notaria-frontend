@@ -27,13 +27,16 @@ import { formatDateToYMD } from "./fechas";
     return {idContract}
   }
 
-  export const funUploadDataMinutaCompraVenta=async(clientId, contractType='sac')=>{
-    
+  export const funUploadDataMinutaCompraVenta=async(clientId, contractType='sac', evidences, directory)=>{
+    // si no hay evidences = null
+    // si no hay directory = null
     const JSONPreMinuta = {
       clientId,
       datesDocument : {
         processInitiate : formatDateToYMD(new Date())
       },
+      evidences : evidences ? evidences : null,
+      directory : directory ? `DB_evidences/${directory}` : null
     };
 
     const responsePreMinuta = await submitDataPreMinuta2(JSONPreMinuta, contractType);
