@@ -41,7 +41,7 @@ El desarrollo de este proyecto se centró en el **frontend del dashboard**, perm
 
 ---
 
-## Funcionamiento de la aplicacio2n.
+## Imagen de la aplicación
 
-![imagen_mockouo](https://raw.githubusercontent.com/AlvaroCoder/dashboard-notaria-frontend/refs/heads/main/Presentacio%CC%81n%20Proyecto%20Web%20Elegante%20Minimalista%20Beige.png?token=GHSAT0AAAAAAC7LTW6EWTPXBYRBQL7X5DUU2GRQMPA)
+![imagen_mockoup](https://raw.githubusercontent.com/AlvaroCoder/dashboard-notaria-frontend/refs/heads/main/Presentacio%CC%81n%20Proyecto%20Web%20Elegante%20Minimalista%20Beige.png?token=GHSAT0AAAAAAC7LTW6EWTPXBYRBQL7X5DUU2GRQMPA)
 
