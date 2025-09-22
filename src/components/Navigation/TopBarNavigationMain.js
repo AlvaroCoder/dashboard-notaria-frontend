@@ -2,14 +2,11 @@
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { Button } from '../ui/button';
 import { getSession } from '@/authentication/lib';
 import { UserIcon } from 'lucide-react';
 
 export default function TopBarNavigationMain() {
     const router = useRouter();
-    const [isFixed, setIsFixed] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
     const [username, setUsername] = useState(null);
     const existeRutaAdmin = pathname.split("/").includes("login") || pathname.split("/").includes("dashboard") ;
